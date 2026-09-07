@@ -148,6 +148,67 @@ verified against their product page.
 
 Report the count of items harvested and the count left `—`.
 
+## Minting Pins from a harvest
+
+A harvest **proposes**; a human **confirms**. Nothing is minted silently. This
+half runs after the order files are written, and it writes `PINS.md`.
+
+### 6. Walk the slugs, not the products
+
+Matching is **slug-driven**: read every distinct `ingredient:` key from
+`Recipes/`, and seek a product for each. Walking the products instead makes you
+filter out toilet roll; walking the slugs never considers it.
+
+Each slug ends in one of three states:
+
+- **Proposed** — a product matches. Carry it to step 7.
+- **Conflicted** — two or more products match. Carry every candidate.
+- **Absent** — nothing matches. Say so; do not stretch a near-match to fill it.
+
+Naive substring matching scores about 43 hits against 69 misses on this corpus,
+and roughly ten hits are wrong — `honey` matching *Hot Honey Gochujang*, `water`
+matching *Chickpeas in Water*. **The wrong ones score high**, so no confidence
+threshold separates them. Substring matching is a first pass that generates
+candidates for a human, never a filter that accepts them.
+
+### 7. Put every proposal to the user
+
+Show the slug, the product, its line number and pack size. Group the clean
+proposals so they can be confirmed as a block with exceptions named; put each
+conflict and each judgement call on its own, with a recommendation.
+
+Two rules settle most conflicts:
+
+- **Recency wins.** Orders are dated, so two products for one slug is usually a
+  switch you already made with your own money. The newest order is the decision;
+  the loser becomes an `alternate`.
+- **Explicit recipe text overrides recency.** A Recipe reading *"pre-cooked
+  green or Puy"* at 250g names Merchant Gourmet's exact product, and that beats a
+  more recent tin of something else.
+
+### 8. Write the confirmed Pins
+
+`confirmed: true` on anything a human agreed to; a hand-authored Pin is born
+confirmed, since there is no guess to check. **Propose changes to an existing
+Pin; never overwrite one.** A Pin already `confirmed: true` is a decision, and a
+fresh harvest is evidence, not authority.
+
+A Pin needs no product. The counter proteins have no line number and never will;
+a **Staple** may have none yet because you last bought it before the captured
+window. Both are still Pins, because "store-cupboard, do not shop for it" is a
+decision worth storing. **Unpinned** stays the absence of a row.
+
+### 9. Account for everything
+
+Record the **bought, matched nothing** list — harvested products binding to no
+slug. Evidence that the corpus is missing a Recipe, not candidates for a Pin.
+
+## Completion criterion for minting
+
+**Every distinct slug in `Recipes/` is either Pinned or listed as an absence
+with its reason.** Not most of them. Report the three counts: Pins written,
+absences recorded, products that matched nothing.
+
 ## What this cannot cover
 
 - **The proteins.** Chicken, eggs, steak and honey come from Soutars; fish from
@@ -164,7 +225,7 @@ Report the count of items harvested and the count left `—`.
 
 ## Known repo state
 
-`Orders/31-august.md` currently holds both the order-history index and the
-31 August detail, and no order file yet carries a Line column. First run should
-split that file into `Orders/history.md` plus a clean `Orders/31-august.md`,
-and backfill line numbers into the three August orders.
+`Orders/history.md` is the index; the three August orders carry Line columns.
+`PINS.md` holds 94 Pins, written 07 September 2026 — 62 with harvested line
+numbers, 7 counter proteins, 25 Staples awaiting a product. 18 ingredients are
+recorded there as absences, and the next harvest should close some of them.

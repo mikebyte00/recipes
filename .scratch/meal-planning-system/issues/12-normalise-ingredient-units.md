@@ -2,7 +2,7 @@
 
 Type: task
 Status: open
-Blocked by: 07, 13
+Blocked by: 07, 13 — both resolved; unblocked
 
 ## Question
 

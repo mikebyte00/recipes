@@ -121,15 +121,27 @@ default. `writing-for-agents` when authoring any of the four skills.
   widened past its 4-recipe sample. Corrected the Moroccan chicken from 75.5g to
   48g — a corpus error, not an extraction one. `CONTEXT.md` gains **Band**.
 
+- [Confirm And Write The Pins](issues/13-confirm-and-write-the-pins.md):
+  **`PINS.md` written — 94 Pins, 18 absences, all 112 slugs reached.** 62 carry
+  harvested line numbers, 7 are counter proteins, 25 are Staples with no product
+  yet: **a Pin does not need a product**, which is what stops `salt` appearing on
+  every shopping list as Unpinned. All six conflicts turned out to be switches
+  over three dated orders, so **recency wins and the loser becomes an
+  `alternate`** — except where explicit recipe text overrides it, as with the
+  Puy lentils. Near-duplicate slugs Pin to the same line number rather than being
+  collapsed. 38 Pins are Staples, `curry-powder` among them; `garlic`, `ginger`
+  and `black-olives` were deliberately left off and fall through to absences.
+  The minting procedure is now `Orders/HARVEST.md` steps 6-9.
+
 ## Not yet specified
 
 - **Authoring each of the four skills.** Their contracts depend on the file
   formats and folder layout, so the writing can't be specified until those
   land. Expect one ticket per skill, possibly more for the Waitrose one.
 - **How a shopping list is represented.** Its *location* is settled — a
-  regenerated section inside the Plan. The shape is not: it must split by
-  Store, quantify in Pin units, filter Staples, and flag Unpinned items, and
-  that depends on how ingredients get canonicalised.
+  regenerated section inside the Plan, splitting by Store, quantifying in Pin
+  units, filtering Staples and flagging Unpinned items. `PINS.md` now supplies
+  all four, so the remaining question is the shape on the page.
 - **The basket review step.** If Waitrose automation works, there has to be a
   moment where you see what it chose before anything is ordered. What that
   looks like depends on what the research finds.
