@@ -1,18 +1,39 @@
 ## Weekly Layout
 
-3x Sausage Breakfast
-4x Egg Breakfast
-3x Tofu Lunch
-2x Chicken Lunch
-2x White Fish Dinner (Bream, Bass)
-1x Oily Fish Dinner (Salmon/Chalk Stream Trout)
-1x Chicken Dinner
-1x Steak Dinner
-1x Fakeaway
+Seven days, four Slots each — **28 Slots, and a Menu fills every one of them**.
+Pudding is nightly: it carries 11–13.5g of protein for 120–170 kcal, the most
+protein-efficient Slot in the corpus, and without it no day in the corpus
+reaches the protein floor. If a real week has fewer meals in it, that comes out
+in the Plan, never in the Menu.
 
-Sunday & Monday should be White Fish Dinner (Bream, Bass)
-Wednesday should be Oily Fish Dinner (Salmon/Chalk Stream Trout)
+| Slot | Per week | Rule |
+| --- | --- | --- |
+| Breakfast | 7 | 3x sausage, 4x egg |
+| Lunch | 7 | tofu or chicken, **at least 2 of each** |
+| Dinner | 7 | six fixed below, Saturday free |
+| Pudding | 7 | no protein type; puddings sit outside the layout |
 
+**Dinners by day.** Six are fixed; the seventh is the Menu's own choice.
+
+| Day | Dinner |
+| --- | --- |
+| Sunday | White fish (bream, bass) |
+| Monday | White fish (bream, bass) |
+| Tuesday | Chicken |
+| Wednesday | Oily fish (salmon / chalk stream trout) |
+| Thursday | Steak |
+| Friday | **Fakeaway** — a tag, not a protein type. The dish still has one |
+| Saturday | **Free.** Whatever that Menu is thinnest on |
+
+**Fakeaway is not a protein type.** It is a Recipe tag, independent of
+`protein` — chicken in Menu 1, lemon sole in Menu 2 — so Friday's dinner is
+counted under its own protein type like any other. Listing it alongside the
+types double-counted a dinner.
+
+**Lunch is a floor, not a ratio.** An earlier 3-tofu / 2-chicken split was
+never once followed: Menu 1 runs 4 chicken / 3 tofu and Menu 2 runs 5 tofu /
+2 chicken. Two independently-written weeks ignoring a number means the number
+was wrong.
 
 ## Nutrient Goals
 

@@ -26,12 +26,12 @@ days:
     breakfast: zero-prep-sausage-chickpea-crisp-hash
     lunch: lemon-herb-lentil-tofu-pan
     dinner: the-combo-lemon-sole-plate-air-fryer-chips
-    pudding: null
+    pudding: the-real-salted-peanut-butter-mousse
   saturday:
     breakfast: high-protein-slide-toast-egg-scramble
-    lunch: null
-    dinner: null
-    pudding: null
+    lunch: creamy-pesto-chicken-cannellini-beans
+    dinner: korean-gochujang-glazed-chicken-with-sesame-sugar-snap-peas-pearl-barley
+    pudding: zesty-lemon-vanilla-bean-cheesecake
   sunday:
     breakfast: eggs-and-soldiers
     lunch: creamy-gochujang-sweetcorn-white-bean-skillet
@@ -41,14 +41,29 @@ days:
 
 Extracted from `Rotations/Week2.md`. Every value is a Recipe slug in `Recipes/`.
 
-**4 of 28 slots are unfilled** and carry `null`. `CONTEXT.md` says a Menu is
-complete — this one is not, and the gap is inherited from the corpus rather than
-introduced here. Both rotations drop the same four, which read as a deliberate
-weekly shape until Per-Slot Macro Bands established that dropping meals is a
-Plan-level act. Filling them needs the weekly protein-type layout, which
-`GOALS.md` under-specifies; that is Complete The Weekly Layout:
+**Complete: 28 of 28 slots filled.** The four inherited `null`s — Friday pudding
+and all three of Saturday's — were filled by
+[Complete The Weekly Layout](../.scratch/meal-planning-system/issues/14-complete-the-weekly-layout.md),
+07 September 2026, which also established that pudding is nightly and that
+dropping a meal is a Plan-level act. If you are out on Saturday, the Plan takes
+Saturday out; the Menu still offers it.
 
-- Friday pudding
-- Saturday lunch
-- Saturday dinner
-- Saturday pudding
+Every filled day clears the ~130g floor. Tuesday, Thursday and Sunday miss it;
+all three are inherited, not introduced, and re-pointing them is
+[Raise The Weak Days](../.scratch/meal-planning-system/issues/16-raise-the-weak-days.md).
+
+| Day | Protein | kcal |
+| --- | --- | --- |
+| Monday | ~133.5g | ~1610 |
+| Tuesday | ~129g | ~1760 |
+| Wednesday | ~135g | ~1670 |
+| Thursday | ~126g | ~1615 |
+| Friday | ~130.5g | ~1680 |
+| Saturday | ~131g | ~1705 |
+| Sunday | ~123g | ~1585 |
+
+Lunch runs 5 tofu / 2 chicken; dinner 3 white fish, 2 chicken, 1 oily fish
+and 1 steak. Six dinners are fixed by the weekly layout in
+[GOALS.md](../GOALS.md) — white fish Sunday and Monday, oily fish Wednesday,
+Fakeaway Friday, chicken Tuesday, steak Thursday — and **Saturday is the free
+dinner**, chosen per Menu.

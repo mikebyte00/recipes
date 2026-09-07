@@ -34,10 +34,11 @@ reusable, the Plan absorbs the mess of a real week.
 
 ## Fakeaway
 
-A [Recipe](#recipe) tag: a restaurant-style dish cooked at home, intended for
-weekend slots. The Fakeaway Peri-Peri Chicken Burger is the existing example —
-recorded as `'Nandos'` in the old spreadsheet, which was shorthand for the
-recipe, not a note about eating out.
+A [Recipe](#recipe) tag: a restaurant-style dish cooked at home. **Not a
+protein type** — a Fakeaway still has one, and is counted under it. Both
+existing Menus put theirs on Friday: a chicken burger in Menu 1, a lemon sole
+plate with chips in Menu 2. The burger was recorded as `'Nandos'` in the old
+spreadsheet, which was shorthand for the recipe, not a note about eating out.
 
 ## Macros
 

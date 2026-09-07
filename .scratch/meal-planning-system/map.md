@@ -148,6 +148,18 @@ default. `writing-for-agents` when authoring any of the four skills.
   home of `staple`** — 87 Pins, 17 absences, and the Absences list *is* the
   Unpinned flag.
 
+- [Complete The Weekly Layout](issues/14-complete-the-weekly-layout.md):
+  **a Menu is 28 Slots, pudding nightly, and both Menus are now complete.**
+  Measured, not preferred: strip the pudding and **0 of 10 corpus days reach the
+  ~130g floor** where 5 of 10 do with it — pudding is the most protein-efficient
+  Slot there is. **Fakeaway is a tag, not a protein type**, so `GOALS.md` was
+  double-counting Friday's dinner; the unassigned dinner was always **Saturday**,
+  and it stays **free**, chosen per Menu. Lunch becomes a floor — 7, tofu or
+  chicken, at least 2 of each — because the 3-tofu/2-chicken ratio was never once
+  followed and the two Menus lean opposite ways. Saturday is filled and the
+  **Plan** removes it when you are out. Surfaced two tickets rather than
+  absorbing them.
+
 ## Not yet specified
 
 - **Authoring each of the four skills.** Their contracts depend on the file
@@ -163,10 +175,6 @@ default. `writing-for-agents` when authoring any of the four skills.
 - **The basket review step.** If Waitrose automation works, there has to be a
   moment where you see what it chose before anything is ordered. What that
   looks like depends on what the research finds.
-- **What a no-pudding day targets.** Only live if [Complete The Weekly
-  Layout](issues/14-complete-the-weekly-layout.md) rules pudding is not nightly:
-  a 3-slot day sums to ~120g against a ~130g floor, so the other three Bands
-  would have to absorb it. Not sharp until that ticket lands.
 - **How a Plan records acting on `bulk-cook` and `eat-cold`.** The Recipe tags
   are capability only, settled in [The Tag Vocabulary](issues/03-the-tag-vocabulary.md).
   But a week that actually doubles a batch has to get doubled quantities onto
