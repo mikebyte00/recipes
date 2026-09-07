@@ -82,6 +82,13 @@ default. `writing-for-agents` when authoring any of the four skills.
   written; `PINS.md` declared. `Rotations/` deleted only once the extraction
   verifies.
 
+- [Extract The Corpus](issues/07-extract-the-corpus.md): **done** — 37 Recipes
+  and 2 Menus, every vocabulary value legal, every macro reproducing the
+  corpus, no orphans. Split first: unit normalisation needed a Pin catalogue
+  that did not exist. Five format holes recorded, chief among them that
+  puddings have no `protein` and that the mandated `~` cannot survive into
+  YAML.
+
 ## Not yet specified
 
 - **Authoring each of the four skills.** Their contracts depend on the file
