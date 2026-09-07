@@ -103,7 +103,8 @@ every macro reproducing the corpus, every Menu reference resolving, no orphans.
 - All 56 Menu slots resolve to real Recipe files. 37 of 37 Recipes are
   referenced; nothing is orphaned.
 
-`Rotations/` is **retained** pending sign-off. Deleting it is the final step.
+`Rotations/` is **deleted**, the final step, signed off 2026-09-07. It is
+recoverable at `git show 0beccfa:Rotations/Week1.md`.
 
 ## Format holes — the real output
 
@@ -116,8 +117,10 @@ for breakfast, lunch and dinner. All four puddings were written **without a
 `protein` key**.
 
 [The Tag Vocabulary](03-the-tag-vocabulary.md) did not say the field was
-optional. It now must be, or puddings need an enum value nothing counts.
-**Needs ratifying.**
+optional. **Ratified 2026-09-07: `protein` is omitted on a `pudding` and
+required on every other slot.** A `dairy` value was rejected — it would be a
+protein type nothing plans against, and a later session could read it as
+filling a slot. `VOCABULARY.md` carries the rule.
 
 ### 2. The `~` cannot survive into YAML
 
@@ -125,10 +128,11 @@ optional. It now must be, or puddings need an enum value nothing counts.
 estimates. **`protein_g: ~32` is not valid YAML** — `~` is null there.
 
 [What A Recipe File Looks Like](02-what-a-recipe-file-looks-like.md) already
-dropped it in its own example without remarking on it. So the tilde now lives in
-documentation and rendering, never in the data. That is a **direct conflict with
-a standing constraint** and should be settled explicitly rather than by
-accident.
+dropped it in its own example without remarking on it. **Ratified 2026-09-07:
+the `~` is a rendering rule, not a storage format.** Macros are stored as bare
+numbers so a Menu or Plan can sum them; every macro figure shown to the user
+carries the tilde. `CLAUDE.md` now says so, in place of "every figure carries
+`~`. Keep it".
 
 ### 3. `staple: true` sits on the ingredient, contradicting a resolved decision
 

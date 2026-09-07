@@ -18,7 +18,7 @@ existing corpus already clusters tightly by slot.
 
 A **complete** seven-day rotation: every day, every slot, filled with a
 [Recipe](#recipe). Never partial. Menus are reusable and go into rotation —
-`Rotations/Week1.md` and `Rotations/Week2.md` are the first two.
+`Menus/menu-1.md` and `Menus/menu-2.md` are the first two.
 
 A Menu is a template. It is not tied to any particular calendar week.
 

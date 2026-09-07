@@ -20,9 +20,9 @@ with its open questions as tickets in the adjacent `issues/` directory.
 
 **File formats and folder layout are not settled yet.** Read the map before
 inventing a shape for anything — the question is likely already an open ticket,
-and answering it in passing loses the decision. `Rotations/Week1.md` and
-`Rotations/Week2.md` are the original two-week corpus; they are the input to the
-extraction, not the target structure.
+and answering it in passing loses the decision. The original two-week corpus
+lived in `Rotations/`; it was the input to the extraction, and `git show
+0beccfa:Rotations/Week1.md` still reads it.
 
 ## The bar for a Recipe
 
@@ -44,7 +44,8 @@ raising rather than a spec to follow.
 
 - **Serves 2**, always, project-wide. Recipes carry no serving count.
 - **Protein and kcal only.** Carbohydrates and fat are deliberately untracked.
-- **Macros are approximations.** Every figure carries `~`. Keep it — the numbers
+- **Macros are approximations.** Store them as bare numbers, so a Menu or Plan
+  can sum them. Write `~` on every macro figure shown to the user — the numbers
   are estimates and the tilde is the honest signal.
 - **Targets live in [GOALS.md](GOALS.md)**: the weekly protein-type layout and
   the daily nutrient goals. Anything generating a Recipe or a Menu reads it.

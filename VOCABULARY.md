@@ -10,7 +10,7 @@ which holds the reasoning. This file is the operative list.
 | Field | Cardinality | Values |
 |---|---|---|
 | `slot` | one | `breakfast` `lunch` `dinner` `pudding` |
-| `protein` | one | `sausage` `egg` `tofu` `quorn` `chicken` `white-fish` `oily-fish` `beef` |
+| `protein` | one, or absent on a pudding | `sausage` `egg` `tofu` `quorn` `chicken` `white-fish` `oily-fish` `beef` |
 | `effort` | one | `low` `medium` `high` |
 | `appliances` | list | `skillet` `air-fryer` `ninja-sizzle` `rice-cooker` `pot` `toaster` `poacher` |
 | `tags` | list | `fakeaway` `bulk-cook` `eat-cold` |
@@ -34,6 +34,12 @@ which holds the reasoning. This file is the operative list.
 - **`eat-cold`** — fit to eat cold the next day, where no reheat is available.
 
 ## Notes on two fields
+
+**`protein` is omitted on a `pudding`** and required on every other slot.
+`GOALS.md` lays out the week in protein types across breakfast, lunch and
+dinner; puddings sit outside that layout, so a pudding has no protein type to
+carry. A `dairy` value would be a type nothing plans against, and a later
+session could read it as filling a slot.
 
 **`protein` is single-valued** because the fakeaway burger carries chicken *and*
 halloumi and the steak pilaf carries beef *and* parmesan, but `GOALS.md` counts

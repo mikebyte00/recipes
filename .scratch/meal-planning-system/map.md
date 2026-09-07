@@ -79,15 +79,15 @@ default. `writing-for-agents` when authoring any of the four skills.
   no prose; `Plans/YYYY-MM-DD.md` with no separate archive — a Plan is
   archived by existing, and stores its full resolved grid rather than a diff.
   Shopping output is a regenerated section of the Plan. `VOCABULARY.md`
-  written; `PINS.md` declared. `Rotations/` deleted only once the extraction
-  verifies.
+  written; `PINS.md` declared. `Rotations/` deleted once the extraction
+  verified — it has, and it is.
 
 - [Extract The Corpus](issues/07-extract-the-corpus.md): **done** — 37 Recipes
   and 2 Menus, every vocabulary value legal, every macro reproducing the
-  corpus, no orphans. Split first: unit normalisation needed a Pin catalogue
-  that did not exist. Five format holes recorded, chief among them that
-  puddings have no `protein` and that the mandated `~` cannot survive into
-  YAML.
+  corpus, no orphans. `Rotations/` deleted. Split first: unit normalisation
+  needed a Pin catalogue that did not exist. Five format holes recorded; the
+  two that needed a ruling got one — `protein` is omitted on a pudding, and
+  the mandated `~` is a rendering rule, not a storage format.
 
 ## Not yet specified
 
