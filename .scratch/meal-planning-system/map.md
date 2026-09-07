@@ -103,15 +103,6 @@ default. `writing-for-agents` when authoring any of the four skills.
   the shopping list, and a meal eaten cold on Tuesday was cooked on Monday.
   That representation is a Plan concern and isn't sharp enough to ticket yet.
 
-- **Minting the Pin catalogue itself.** The August harvest captured 86 distinct
-  products with verified line numbers, and the protein Pins must be authored by
-  hand, but no ticket owns turning either into the catalogue.
-  [Harvesting Past Orders](issues/09-harvesting-past-orders.md) owns the loop,
-  [How Ingredients Are Named](issues/04-how-ingredients-are-named.md) settled
-  what a Pin is, and this sits between them. Left as fog rather than ticketed
-  because it may turn out to be part of the canonical-ingredient matching
-  question rather than separate from it.
-
 ## Out of scope
 
 - Carbohydrate and fat tracking. Ruled out in charting: it means re-estimating
