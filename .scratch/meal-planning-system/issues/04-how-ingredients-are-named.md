@@ -86,6 +86,14 @@ bathroom tissue; `Fage Total 2` finds the product).
   unit that disagrees with its Pin is an **error surfaced at list time**, not a
   silent miscount. `each_g` bridges count and mass where a real recipe needs
   both.
+- **Amended by [Mint The Pin Catalogue](11-mint-the-pin-catalogue.md),
+  07 September 2026:** `unit` is **how the recipe measures it**, not how the
+  product is sold, and `pack` bridges to purchase. The `unit: can` on
+  cannellini below is superseded — the corpus writes 150g, 240g and 300g of it
+  in three meals, and rounding those to whole cans makes the recipes lie.
+  Aggregation still collapses to addition; the pack division happens once per
+  Pin at list time.
+
 - **Shopping lists quantify in Pin units** — `Cherry tomatoes, 300g`,
   `Cannellini beans, 4 cans` — exactly as the original CSV already did. `pack`
   identifies the product but never distorts the quantity, so a Pin missing

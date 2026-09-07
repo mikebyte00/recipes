@@ -99,6 +99,16 @@ default. `writing-for-agents` when authoring any of the four skills.
   overwrites; a losing conflict becomes an `alternate`. Pins hold decisions
   only, and line numbers revalidate lazily against the week's Plan.
 
+- [Mint The Pin Catalogue](issues/11-mint-the-pin-catalogue.md): **rules
+  settled, writing split out.** `unit` is how the recipe measures it and `pack`
+  is how it is sold — amending [How Ingredients Are
+  Named](issues/04-how-ingredients-are-named.md), because the corpus writes
+  150g, 240g and 300g of cannellini and whole cans would make those recipes
+  lie. Every slug gets a Pin except `water`; near-duplicate slugs are left to
+  Normalise Ingredient Units. `search_term` is the harvested product name
+  verbatim. Unpinned means no row. Only 13 of 112 slugs disagree on unit, so
+  the normalisation job is small.
+
 ## Not yet specified
 
 - **Authoring each of the four skills.** Their contracts depend on the file
