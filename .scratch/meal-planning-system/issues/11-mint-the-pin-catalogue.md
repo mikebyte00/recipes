@@ -2,7 +2,7 @@
 
 Type: grilling
 Status: open
-Blocked by: 09
+Blocked by: 09 (resolved — unblocked)
 
 ## Question
 
@@ -40,11 +40,28 @@ graduated from the map's fog.
   [Normalise Ingredient Units](12-normalise-ingredient-units.md).
 - **Staples.** Salt, pepper and all oils are confirmed staples. Which of the 86
   harvested products join them?
-- **Non-recipe products.** The harvest captured the household shop — toilet
-  roll, supplements, fruit no Recipe uses. Pinning those is wasted work, but
-  the filter is a judgement that should be visible rather than silent.
 
-Depends on the canonical-ingredient matching question in
-[Harvesting Past Orders](09-harvesting-past-orders.md): `Epicure Organic
-Cannellini Beans 400g` becoming `cannellini-beans` is the hard part, and
-getting it wrong writes a bad Pin that then looks settled.
+### Answered by Harvesting Past Orders — do not re-grill
+
+[Harvesting Past Orders](09-harvesting-past-orders.md) resolved two of the
+points that were listed here:
+
+- **Non-recipe products** need no filter. Matching is **slug-driven**: the 112
+  ingredient slugs are walked and a product sought for each, so toilet roll is
+  never considered. Products matching no slug are reported as a short "bought,
+  matched nothing" list — evidence, not candidates.
+- **Coverage is measured.** 112 distinct slugs against 86 distinct products.
+  Substring matching gives **43 candidates and 69 misses**, and ~10 of the 43
+  are wrong or ambiguous (`honey` → Hot Honey Gochujang; `water` → "in Water";
+  two each for cottage cheese, tartare sauce, white chocolate, lentils,
+  potatoes, avocado). Every match is human-confirmed; none is auto-accepted.
+
+It also fixed the record shape in part: a Pin carries **product, line number,
+pack size, declared unit, `store`, `staple`, `alternates`, `confirmed`** — and
+nothing countable, since purchase frequency and recency derive from `Orders/`.
+An unconfirmed Pin lives in `PINS.md` alongside the rest; consumers filter on
+`confirmed`.
+
+**So this ticket's live questions are the record's file shape** (one table or
+one record per ingredient) **and the declared unit**, where the corpus
+disagrees with the pack.

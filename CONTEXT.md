@@ -47,13 +47,18 @@ information. Targets are per-[Slot](#slot) bands plus a daily range.
 
 ## Pin
 
-A canonical ingredient bound to a specific purchasable product — the one you
-have bought before and vetted with your own money. A Pin is what turns
-"cannellini beans" into a thing that can be added to a basket without guessing.
+A canonical ingredient bound to a specific purchasable product — one you have
+vetted with your own money. A Pin is what turns "cannellini beans" into a thing
+that can be added to a basket without guessing.
+
+A past order is evidence for a Pin, not the only kind: the counter proteins and
+the store-cupboard staples are vetted the same way and written by hand.
 
 Pins are **stored in this repo**, not re-derived each week: a Pin is a decision,
 and decisions belong somewhere you can see and correct them. Past orders are how
-Pins get created, not where they live.
+Pins get created, not where they live. A Pin holds only what was decided;
+anything countable — how often something was bought, and when — stays countable
+from the orders themselves.
 
 A Pin also **declares the one unit its ingredient must be written in**, and
 Recipes comply. That turns shopping-list aggregation into plain addition, and

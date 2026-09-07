@@ -89,6 +89,16 @@ default. `writing-for-agents` when authoring any of the four skills.
   two that needed a ruling got one — `protein` is omitted on a pudding, and
   the mandated `~` is a rendering rule, not a storage format.
 
+- [Harvesting Past Orders](issues/09-harvesting-past-orders.md): **a harvest
+  proposes, a human confirms, nothing is minted silently.** Matching is
+  slug-driven, so the household shop never needs filtering; naive string
+  matching scores 43 hits against 69 misses with ~10 of the hits wrong, and the
+  wrong ones score *high*, which rules out any confidence threshold. Review
+  happens in `PINS.md` itself via `confirmed`, so there is one file. A harvest
+  runs inside weekly planning; it proposes changes to existing Pins and never
+  overwrites; a losing conflict becomes an `alternate`. Pins hold decisions
+  only, and line numbers revalidate lazily against the week's Plan.
+
 ## Not yet specified
 
 - **Authoring each of the four skills.** Their contracts depend on the file
@@ -101,9 +111,6 @@ default. `writing-for-agents` when authoring any of the four skills.
 - **The basket review step.** If Waitrose automation works, there has to be a
   moment where you see what it chose before anything is ordered. What that
   looks like depends on what the research finds.
-- **How often a harvest should run,** once Harvesting Past Orders settles the
-  mechanism. Likely a step inside weekly planning, but that depends on how
-  slow and how login-dependent a harvest turns out to be.
 - **How a Plan records acting on `bulk-cook` and `eat-cold`.** The Recipe tags
   are capability only, settled in [The Tag Vocabulary](issues/03-the-tag-vocabulary.md).
   But a week that actually doubles a batch has to get doubled quantities onto

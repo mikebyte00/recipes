@@ -1,7 +1,7 @@
 # Harvesting Past Orders
 
 Type: grilling
-Status: open
+Status: resolved
 Blocked by: 01, 04
 
 ## Question
@@ -206,3 +206,108 @@ harvest loop; [How Ingredients Are Named](04-how-ingredients-are-named.md)
 settled what a Pin *is*; [Extract The Corpus](07-extract-the-corpus.md) owns
 recipes. Turning 86 harvested products plus ~7 hand-authored protein Pins into
 the actual catalogue sits between them, unassigned.
+
+---
+
+## Answer
+
+**A harvest proposes; a human confirms; nothing is minted silently.** Resolved
+07 September 2026. The capture mechanism was already built and run — see the
+update above. This answer settles the half that was left: what happens to
+captured products once they exist.
+
+### The matching evidence
+
+Naive string matching was measured against the real corpus rather than assumed:
+**112 distinct ingredient slugs** across the 37 Recipes, **86 distinct
+products** across the three captured orders. Substring matching produces **43
+hits and 69 misses**, and **at least 10 of the 43 are wrong or ambiguous**:
+
+| Slug | What matching produced |
+|---|---|
+| `honey` | Cooks' Ingredients **Hot Honey Gochujang** — wrong |
+| `water` | "Chickpeas **in Water**", "**Water**cress" — wrong, and `water` should not be a Pin at all |
+| `butter` | **Butter** Beans, **Butter**nut Squash, Yeo Valley spread |
+| `garlic` | **Garlic** Granules, **Garlic** Mayonnaise — never fresh garlic |
+| `lemon` | Two lemon products **and** both lemon soles |
+| `cottage-cheese`, `tartare-sauce`, `white-chocolate`, `lentils`, `potatoes`, `avocado` | two plausible products each |
+
+The failures are not low-confidence. `honey` and `water` score high on any
+string metric, which is what rules out auto-accepting a confidence threshold.
+This corroborates [Can Claude Drive Waitrose](01-can-claude-drive-waitrose.md)
+from a third independent direction: **the wrong match is silent, and once
+written it looks settled.**
+
+The ticket recorded two conflicts. There are **at least six**.
+
+### Decisions
+
+1. **Matching is agent-proposes, human-confirms, in one batch.** The harvest
+   writes every candidate — slug, product, line number, pack size — and mints
+   nothing until it is reviewed. ~55 rows on the first pass, near-zero after.
+   Auto-accepting high-confidence matches was rejected on the evidence above.
+
+2. **A harvest proposes changes to existing Pins; it never overwrites.**
+   Fill-gaps-only lets the catalogue rot silently as buying drifts;
+   most-recent-wins silently undoes a deliberate choice. A divergence becomes a
+   review row, not an edit.
+
+3. **A harvest runs as a step inside weekly planning.** A no-op harvest is
+   nearly free — read the index, see nothing new, stop. Making it occasional
+   puts the loop on the user's memory, which is the chore the system exists to
+   remove.
+
+4. **A losing conflict product becomes an `alternates` entry**, not a discard
+   and not a rejection list. A product actually bought is a second valid
+   product, which is what `alternates` is for; and a harvest that finds a
+   product already listed as an alternate has nothing to report, so
+   re-proposal solves itself. A genuinely *wrong* match (`honey` → Hot Honey
+   Gochujang) never becomes a Pin field — it fails review and that is all.
+
+5. **The review artifact is `PINS.md` itself**, each Pin carrying
+   `confirmed: true|false`. One file, one source of truth — this project has
+   twice been bitten by a fact living in two places. An unconfirmed Pin is a
+   Pin with a question mark, not a different object, which makes "review before
+   trust" a checkable state rather than a habit. **Consumers of Pins must
+   filter on `confirmed`.**
+
+6. **Hand-authored Pins are Pins.** The ~7 counter proteins can never be
+   harvested and cover every dinner in the corpus; staples such as `salt` need
+   a Pin to *exist* in order for the `staple` flag to filter them off the
+   weekly list — leaving them Unpinned would flag salt for manual adding every
+   week, the exact inverse of the flag's purpose. `CONTEXT.md` was sharpened
+   accordingly: a Pin is **vetted**, and a Waitrose order is one kind of
+   evidence, not the only kind.
+
+7. **Matching runs slug-driven, not product-driven.** The 112 slugs are the
+   actual demand; a product no Recipe wants needs no Pin however food-like it
+   is. This also removes the household-shop filtering problem entirely —
+   toilet roll is never considered. **But the harvest ends with a short
+   "bought, matched nothing" list**, which is cheap and is evidence: Tenderstem
+   broccoli and Cooks' Ingredients Basil are both in the capture, match no
+   slug, and would otherwise vanish. The same self-improving loop, pointed the
+   other way — a product recurring there means a Recipe is missing an
+   ingredient or a slug is named wrong.
+
+8. **A Pin stores decisions; purchase evidence is derived from `Orders/`.**
+   The Pin holds product, line number, pack size, declared unit, store,
+   `staple`, `alternates`, `confirmed`. Counts and recency (cannellini ×5,
+   chickpeas ×3, Fage ×3 at 950g) stay countable from the orders rather than
+   being copied and going stale.
+
+9. **Line numbers revalidate lazily** — only the Pins a week's Plan actually
+   uses, as part of generating shopping output. A stale line number costs
+   nothing until the moment it is shopped with, and a Plan touches ~30 Pins,
+   not 86. Churn remains unmeasured; this is the cheapest way to measure it.
+
+### What this hands to the next ticket
+
+[Mint The Pin Catalogue](11-mint-the-pin-catalogue.md) is unblocked, and two of
+its grill points are answered here rather than left for it: **non-recipe
+products** are ruled out by slug-driven matching, and **coverage** is measured
+at 43 candidates against 69 misses. Its remaining work is the record shape and
+the declared-unit question.
+
+`Orders/HARVEST.md` documents capture only. The matching and review steps
+decided here are not written down anywhere yet; whoever builds the catalogue
+should extend it or point at a sibling.
