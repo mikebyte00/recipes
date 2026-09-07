@@ -155,8 +155,11 @@ default. `writing-for-agents` when authoring any of the four skills.
   land. Expect one ticket per skill, possibly more for the Waitrose one.
 - **How a shopping list is represented.** Its *location* is settled — a
   regenerated section inside the Plan, splitting by Store, quantifying in Pin
-  units, filtering Staples and flagging Unpinned items. `PINS.md` now supplies
-  all four, so the remaining question is the shape on the page.
+  units, filtering Staples and flagging Unpinned items. `PINS.md` supplies all
+  four, and [Normalise Ingredient Units](issues/12-normalise-ingredient-units.md)
+  made the arithmetic plain addition, so **only the shape on the page is left**.
+  Likely settled inside [What The Four Skills Are](issues/08-what-the-four-skills-are.md)
+  as that fourth skill's output rather than needing a ticket of its own.
 - **The basket review step.** If Waitrose automation works, there has to be a
   moment where you see what it chose before anything is ordered. What that
   looks like depends on what the research finds.
