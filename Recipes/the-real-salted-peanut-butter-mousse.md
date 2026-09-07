@@ -9,7 +9,7 @@ ingredients:
   - { ingredient: greek-yogurt, qty: 200, unit: g, note: Fage 2% }
   - { ingredient: peanut-butter, qty: 20, unit: g, note: 100% nut }
   - { ingredient: honey, qty: 10, unit: g }
-  - { ingredient: sea-salt-flakes, qty: 1, unit: pinch, staple: true }
+  - { ingredient: sea-salt-flakes, qty: 1, unit: pinch }
 ---
 
 1. In a small bowl, whisk the peanut butter and honey together until smooth. If it's too thick, add a teaspoon of warm water.

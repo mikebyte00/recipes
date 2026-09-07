@@ -12,9 +12,9 @@ ingredients:
   - { ingredient: sugar-snap-peas, qty: 150, unit: g }
   - { ingredient: gochujang, qty: 25, unit: g }
   - { ingredient: honey, qty: 15, unit: g }
-  - { ingredient: soy-sauce, qty: 15, unit: g, note: source reads "soy sauce or tamari" }
-  - { ingredient: sesame-oil, qty: 10, unit: g, staple: true }
-  - { ingredient: salt, qty: 1, unit: pinch, staple: true }
+  - { ingredient: soy-sauce, qty: 15, unit: g }
+  - { ingredient: sesame-oil, qty: 10, unit: g }
+  - { ingredient: salt, qty: 1, unit: pinch }
 ---
 
 1. Add the raw pearl barley, a pinch of salt, and water (1:2 ratio) into the rice cooker. Run on a standard grain or brown rice cycle until plump, chewy, and tender.

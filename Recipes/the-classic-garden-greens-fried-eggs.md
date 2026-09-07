@@ -12,7 +12,7 @@ ingredients:
   - { ingredient: sourdough, qty: 2, unit: slices, note: seeded }
   - { ingredient: spinach, qty: 120, unit: g }
   - { ingredient: spring-onions, qty: 30, unit: g, prep: sliced }
-  - { ingredient: olive-oil, staple: true }
+  - { ingredient: olive-oil }
 ---
 
 1. Toast the bread.

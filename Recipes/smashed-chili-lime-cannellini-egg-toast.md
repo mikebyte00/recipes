@@ -9,11 +9,11 @@ macros: { protein_g: 26, kcal: 395 }
 ingredients:
   - { ingredient: eggs, qty: 4, unit: each, prep: soft-boiled or poached }
   - { ingredient: cannellini-beans, qty: 240, unit: g, prep: drained }
-  - { ingredient: lime-juice, qty: 20, unit: g }
+  - { ingredient: lime, qty: 0.67, unit: each, prep: juiced }
   - { ingredient: sourdough, qty: 2, unit: slices, note: "seeded, approx. 90g" }
-  - { ingredient: chili-flakes, qty: 0.5, unit: tsp, staple: true }
-  - { ingredient: salt, qty: 1, unit: pinch, staple: true }
-  - { ingredient: black-pepper, qty: 1, unit: pinch, staple: true }
+  - { ingredient: chili-flakes, qty: 0.5, unit: tsp }
+  - { ingredient: salt, qty: 1, unit: pinch }
+  - { ingredient: black-pepper, qty: 1, unit: pinch }
 ---
 
 1. Poach the eggs.

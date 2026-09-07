@@ -13,12 +13,12 @@ ingredients:
   - { ingredient: light-cream-cheese, qty: 60, unit: g, note: e.g. Philadelphia Light }
   - { ingredient: vegetable-stock, qty: 100, unit: ml }
   - { ingredient: dijon-mustard, qty: 15, unit: g }
-  - { ingredient: olive-oil, qty: 10, unit: g, staple: true }
+  - { ingredient: olive-oil, qty: 10, unit: g }
   - { ingredient: tarragon, qty: 10, unit: g, prep: finely chopped }
   - { ingredient: garlic, qty: 1, unit: clove, prep: minced }
-  - { ingredient: salt, qty: 1, unit: pinch, staple: true }
-  - { ingredient: black-pepper, qty: 1, unit: pinch, staple: true }
-  - { ingredient: dried-parsley, qty: 1, unit: pinch, staple: true }
+  - { ingredient: salt, qty: 1, unit: pinch }
+  - { ingredient: black-pepper, qty: 1, unit: pinch }
+  - { ingredient: dried-parsley, qty: 1, unit: pinch }
 ---
 
 1. Toss the halved baby potatoes with 5g olive oil, sea salt, and dried parsley. Air-fry at 200°C for 18 minutes until golden and crispy-edged.

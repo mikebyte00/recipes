@@ -9,10 +9,10 @@ macros: { protein_g: 17.5, kcal: 295 }
 ingredients:
   - { ingredient: eggs, qty: 4, unit: each }
   - { ingredient: sourdough, qty: 3, unit: slices }
-  - { ingredient: oat-milk, note: quantity not recorded in the source }
-  - { ingredient: olive-oil, staple: true }
-  - { ingredient: salt, qty: 1, unit: pinch, staple: true }
-  - { ingredient: black-pepper, qty: 1, unit: pinch, staple: true }
+  - { ingredient: oat-milk, qty: 60, unit: g }
+  - { ingredient: olive-oil }
+  - { ingredient: salt, qty: 1, unit: pinch }
+  - { ingredient: black-pepper, qty: 1, unit: pinch }
 ---
 
 1. Whisk the eggs with the milk, salt and pepper.

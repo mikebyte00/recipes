@@ -11,10 +11,9 @@ ingredients:
   - { ingredient: brown-rice, qty: 150, unit: g, note: raw }
   - { ingredient: chestnut-mushrooms, qty: 200, unit: g, prep: sliced }
   - { ingredient: parmesan, qty: 50, unit: g, prep: grated }
-  - { ingredient: butter, qty: 30, unit: g, staple: true }
-  - { ingredient: truffle-oil, note: named in the title; added during extraction, staple: true }
-  - { ingredient: water, staple: true }
-  - { ingredient: salt, qty: 1, unit: pinch, staple: true }
+  - { ingredient: butter, qty: 30, unit: g }
+  - { ingredient: truffle-oil, note: named in the title; added during extraction }
+  - { ingredient: salt, qty: 1, unit: pinch }
 ---
 
 1. Pop the raw brown rice, the sliced raw mushrooms, a pinch of salt, and water straight into the rice cooker. The mushrooms will steam beautifully into the grains, releasing their rich juices. When done, stir through the grated parmesan, half the butter, and a drizzle of truffle oil.

@@ -8,12 +8,12 @@ appliances: [air-fryer, skillet]
 macros: { protein_g: 45, kcal: 395 }
 ingredients:
   - { ingredient: chicken-breast, qty: 2, unit: each, prep: cut into bite-sized pieces }
-  - { ingredient: butter-beans, qty: 1, unit: can }
+  - { ingredient: butter-beans, qty: 400, unit: g }
   - { ingredient: hot-sauce, qty: 30, unit: g, note: Frank's RedHot }
   - { ingredient: blue-cheese, qty: 40, unit: g, prep: crumbled, note: Saint Agur light }
   - { ingredient: greek-yogurt, qty: 80, unit: g }
   - { ingredient: celery, qty: 100, unit: g, prep: finely diced }
-  - { ingredient: oil-spray, staple: true }
+  - { ingredient: oil-spray }
 ---
 
 1. Toss the chicken directly in a bowl with the buffalo sauce and light oil spray.

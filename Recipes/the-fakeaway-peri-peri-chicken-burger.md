@@ -9,16 +9,16 @@ macros: { protein_g: 58, kcal: 800 }
 ingredients:
   - { ingredient: chicken-breast, qty: 2, unit: each, prep: pounded to an even thickness, note: "small, 150–170g each" }
   - { ingredient: peri-peri-sauce, qty: 2, unit: tbsp, note: plus extra for glazing }
-  - { ingredient: olive-oil, staple: true }
+  - { ingredient: olive-oil }
   - { ingredient: burger-buns, qty: 2, unit: each, note: brioche or wholemeal }
-  - { ingredient: lettuce, note: crisp }
-  - { ingredient: halloumi }
-  - { ingredient: pineapple }
+  - { ingredient: lettuce, qty: 40, unit: g, note: crisp }
+  - { ingredient: halloumi, qty: 100, unit: g }
+  - { ingredient: pineapple, qty: 60, unit: g, prep: sliced }
   - { ingredient: red-onion, qty: 0.25, unit: each, prep: thinly sliced }
   - { ingredient: garlic-mayonnaise }
   - { ingredient: peri-peri-mayonnaise }
-  - { ingredient: waffle-fries }
-  - { ingredient: smoked-paprika, staple: true }
+  - { ingredient: waffle-fries, qty: 300, unit: g }
+  - { ingredient: smoked-paprika }
 ---
 
 1. Marinate the chicken breasts in the Peri-Peri sauce and olive oil for at least 30 minutes.

@@ -9,7 +9,7 @@ macros: { protein_g: 17, kcal: 300 }
 ingredients:
   - { ingredient: eggs, qty: 4, unit: each }
   - { ingredient: sourdough, qty: 3, unit: slices }
-  - { ingredient: butter, staple: true }
+  - { ingredient: butter }
 ---
 
 1. Boil the water and cook the eggs for 6 minutes.

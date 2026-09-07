@@ -10,9 +10,9 @@ ingredients:
   - { ingredient: eggs, qty: 4, unit: each, prep: soft-poached }
   - { ingredient: avocado, qty: 1, unit: each }
   - { ingredient: sourdough, qty: 2, unit: slices, note: seeded }
-  - { ingredient: lemon-juice, qty: 20, unit: g }
-  - { ingredient: salt, qty: 1, unit: pinch, staple: true }
-  - { ingredient: black-pepper, qty: 1, unit: pinch, staple: true }
+  - { ingredient: lemon, qty: 0.5, unit: each, prep: juiced }
+  - { ingredient: salt, qty: 1, unit: pinch }
+  - { ingredient: black-pepper, qty: 1, unit: pinch }
 ---
 
 1. Toast your sourdough and layer it with the avocado, mashed with salt, pepper, and a squeeze of fresh lemon juice.

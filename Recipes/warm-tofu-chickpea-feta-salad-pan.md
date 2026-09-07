@@ -10,9 +10,9 @@ ingredients:
   - { ingredient: tofu, qty: 1, unit: pack }
   - { ingredient: chickpeas, qty: 1, unit: can, prep: drained }
   - { ingredient: cherry-tomatoes, qty: 150, unit: g, prep: halved }
-  - { ingredient: lemon-juice, qty: 20, unit: g }
+  - { ingredient: lemon, qty: 0.5, unit: each, prep: juiced }
   - { ingredient: feta, qty: 60, unit: g, note: lighter }
-  - { ingredient: olive-oil, staple: true }
+  - { ingredient: olive-oil }
 ---
 
 1. Cut the tofu into pieces.

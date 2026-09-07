@@ -10,9 +10,9 @@ ingredients:
   - { ingredient: feta, qty: 60, unit: g, prep: crumbled, note: lighter }
   - { ingredient: eggs, qty: 4, unit: each }
   - { ingredient: cherry-tomatoes, qty: 150, unit: g, prep: halved }
-  - { ingredient: baby-spinach, qty: 100, unit: g }
+  - { ingredient: spinach, qty: 100, unit: g }
   - { ingredient: sourdough, qty: 2, unit: slices, note: seeded }
-  - { ingredient: olive-oil, staple: true }
+  - { ingredient: olive-oil }
 ---
 
 1. Toast your sourdough.

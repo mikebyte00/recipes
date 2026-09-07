@@ -10,10 +10,10 @@ ingredients:
   - { ingredient: chicken-thighs, qty: 4, unit: each, note: "skin on, bone out" }
   - { ingredient: butternut-squash, qty: 450, unit: g, prep: diced }
   - { ingredient: courgette, qty: 150, unit: g, prep: sliced into half-moons }
-  - { ingredient: ras-el-hanout, qty: 15, unit: g, note: or Moroccan spice blend, staple: true }
+  - { ingredient: ras-el-hanout, qty: 15, unit: g }
   - { ingredient: flaked-almonds, qty: 15, unit: g }
-  - { ingredient: olive-oil, staple: true }
-  - { ingredient: salt, qty: 1, unit: pinch, staple: true }
+  - { ingredient: olive-oil }
+  - { ingredient: salt, qty: 1, unit: pinch }
 ---
 
 1. Toss the butternut squash cubes and sliced courgette in a bowl with olive oil, salt, and half the Moroccan spice blend.

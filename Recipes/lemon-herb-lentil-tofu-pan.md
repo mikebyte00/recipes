@@ -8,10 +8,9 @@ appliances: [skillet]
 macros: { protein_g: 43, kcal: 330 }
 ingredients:
   - { ingredient: tofu, qty: 1, unit: pack, prep: cut into pieces }
-  - { ingredient: lentils, qty: 250, unit: g, note: pre-cooked green or Puy }
-  - { ingredient: water, qty: 30, unit: g, staple: true }
-  - { ingredient: lemon-juice, qty: 20, unit: g }
-  - { ingredient: parsley, qty: 20, unit: g, prep: chopped, note: source reads "fresh parsley or 4g dried herbs" }
+  - { ingredient: lentils, qty: 250, unit: g, note: pre-cooked }
+  - { ingredient: lemon, qty: 0.5, unit: each, prep: juiced }
+  - { ingredient: parsley, qty: 20, unit: g, prep: chopped }
 ---
 
 1. Sear the tofu in a skillet until golden on both sides.

@@ -9,8 +9,8 @@ macros: { protein_g: 30, kcal: 380 }
 ingredients:
   - { ingredient: vegetarian-sausage, qty: 4, unit: each, prep: sliced into chunks }
   - { ingredient: cannellini-beans, qty: 300, unit: g, prep: "drained, patted dry" }
-  - { ingredient: oil-spray, qty: 4, unit: g, staple: true }
-  - { ingredient: dried-italian-herbs, qty: 3, unit: g, note: source reads "Italian herbs or garlic powder", staple: true }
+  - { ingredient: oil-spray, qty: 4, unit: g }
+  - { ingredient: dried-herbs, qty: 3, unit: g }
   - { ingredient: cottage-cheese, qty: 160, unit: g, note: to serve }
 ---
 

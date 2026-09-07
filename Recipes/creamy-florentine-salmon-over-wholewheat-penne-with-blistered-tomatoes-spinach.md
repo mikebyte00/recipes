@@ -7,18 +7,18 @@ tags: []
 appliances: [pot, ninja-sizzle, skillet]
 macros: { protein_g: 49, kcal: 710 }
 ingredients:
-  - { ingredient: salmon, qty: 300, unit: g, note: "skin-on, 2 x 150g" }
+  - { ingredient: salmon, qty: 2, unit: fillets, note: skin-on }
   - { ingredient: wholewheat-penne, qty: 130, unit: g, note: raw }
   - { ingredient: cherry-tomatoes, qty: 150, unit: g, prep: halved }
-  - { ingredient: baby-spinach, qty: 100, unit: g }
+  - { ingredient: spinach, qty: 100, unit: g }
   - { ingredient: passata, qty: 150, unit: g }
-  - { ingredient: light-cream-cheese, qty: 50, unit: g, note: or Quark }
+  - { ingredient: light-cream-cheese, qty: 50, unit: g }
   - { ingredient: parmesan, qty: 20, unit: g, prep: finely grated }
-  - { ingredient: olive-oil, qty: 10, unit: g, staple: true }
+  - { ingredient: olive-oil, qty: 10, unit: g }
   - { ingredient: garlic, qty: 1, unit: clove, prep: minced }
-  - { ingredient: salt, qty: 1, unit: pinch, staple: true }
-  - { ingredient: black-pepper, qty: 1, unit: pinch, staple: true }
-  - { ingredient: dried-oregano, qty: 1, unit: pinch, staple: true }
+  - { ingredient: salt, qty: 1, unit: pinch }
+  - { ingredient: black-pepper, qty: 1, unit: pinch }
+  - { ingredient: dried-oregano, qty: 0.5, unit: g }
 ---
 
 1. Boil the wholewheat penne in salted water until al dente, then drain (reserving 3 tbsp pasta water).

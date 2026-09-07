@@ -7,12 +7,12 @@ tags: []
 appliances: [skillet]
 macros: { protein_g: 48, kcal: 410 }
 ingredients:
-  - { ingredient: chicken-breast, qty: 300, unit: g, prep: diced }
-  - { ingredient: cannellini-beans, qty: 1, unit: can, prep: drained }
+  - { ingredient: chicken-breast, qty: 2, unit: each, prep: diced }
+  - { ingredient: cannellini-beans, qty: 400, unit: g, prep: drained }
   - { ingredient: cherry-tomatoes, qty: 150, unit: g, prep: halved }
   - { ingredient: green-pesto, qty: 30, unit: g }
   - { ingredient: cottage-cheese, qty: 120, unit: g }
-  - { ingredient: olive-oil, staple: true }
+  - { ingredient: olive-oil }
 ---
 
 1. Dice the chicken breast and fry in a hot skillet with olive oil for 5–6 minutes until golden and cooked through.

@@ -8,14 +8,14 @@ appliances: [ninja-sizzle, pot, skillet]
 macros: { protein_g: 48, kcal: 705 }
 ingredients:
   - { ingredient: white-fish, qty: 2, unit: fillets }
-  - { ingredient: wholewheat-linguine, qty: 130, unit: g, note: raw; source reads "linguine or spaghetti" }
+  - { ingredient: wholewheat-linguine, qty: 130, unit: g, note: raw; no Pin, so the spaghetti substitution stays here }
   - { ingredient: courgette, qty: 200, unit: g, prep: sliced into thin half-moons }
   - { ingredient: pine-nuts, qty: 15, unit: g }
-  - { ingredient: butter, qty: 20, unit: g, staple: true }
-  - { ingredient: olive-oil, qty: 10, unit: g, staple: true }
+  - { ingredient: butter, qty: 20, unit: g }
+  - { ingredient: olive-oil, qty: 10, unit: g }
   - { ingredient: lemon, qty: 1, unit: each, prep: juiced and zested }
-  - { ingredient: dried-oregano, qty: 4, unit: g, note: or Italian seasoning, staple: true }
-  - { ingredient: salt, qty: 1, unit: pinch, staple: true }
+  - { ingredient: dried-oregano, qty: 4, unit: g }
+  - { ingredient: salt, qty: 1, unit: pinch }
 ---
 
 1. Boil the wholewheat linguine in salted water until tender, then drain (reserve a splash of pasta water).

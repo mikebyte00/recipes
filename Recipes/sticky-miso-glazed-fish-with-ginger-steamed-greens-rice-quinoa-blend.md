@@ -8,14 +8,14 @@ appliances: [rice-cooker, air-fryer, ninja-sizzle]
 macros: { protein_g: 46, kcal: 705 }
 ingredients:
   - { ingredient: white-fish, qty: 2, unit: fillets }
-  - { ingredient: wholegrain-rice, qty: 130, unit: g }
+  - { ingredient: brown-rice, qty: 130, unit: g }
   - { ingredient: pak-choi, qty: 150, unit: g, prep: halved }
   - { ingredient: white-miso-paste, qty: 20, unit: g }
   - { ingredient: honey, qty: 15, unit: g }
   - { ingredient: soy-sauce, qty: 10, unit: g }
-  - { ingredient: sesame-oil, qty: 10, unit: g, staple: true }
+  - { ingredient: sesame-oil, qty: 10, unit: g }
   - { ingredient: ginger, qty: 5, unit: g, prep: freshly grated }
-  - { ingredient: salt, qty: 1, unit: pinch, staple: true }
+  - { ingredient: salt, qty: 1, unit: pinch }
 ---
 
 1. Add the wholegrain rice into the rice cooker with water (1:2 ratio), grated ginger, and a pinch of salt.

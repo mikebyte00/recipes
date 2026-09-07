@@ -10,9 +10,9 @@ ingredients:
   - { ingredient: vegetarian-sausage, qty: 4, unit: each, prep: sliced into chunks }
   - { ingredient: chickpeas, qty: 1, unit: can, prep: "drained, patted dry" }
   - { ingredient: cottage-cheese, qty: 160, unit: g, note: to serve }
-  - { ingredient: oil-spray, note: light spray, staple: true }
-  - { ingredient: salt, qty: 1, unit: pinch, staple: true }
-  - { ingredient: black-pepper, qty: 1, unit: pinch, staple: true }
+  - { ingredient: oil-spray, note: light spray }
+  - { ingredient: salt, qty: 1, unit: pinch }
+  - { ingredient: black-pepper, qty: 1, unit: pinch }
 ---
 
 1. Slice the sausages into chunks.

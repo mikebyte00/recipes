@@ -9,7 +9,10 @@ the shape in
 [How Ingredients Are Named](.scratch/meal-planning-system/issues/04-how-ingredients-are-named.md).
 Every row here was confirmed by hand in
 [Confirm And Write The Pins](.scratch/meal-planning-system/issues/13-confirm-and-write-the-pins.md),
-07 September 2026.
+07 September 2026, and reconciled against the Recipes in
+[Normalise Ingredient Units](.scratch/meal-planning-system/issues/12-normalise-ingredient-units.md)
+the same day — which merged seven near-duplicate slugs and took `staple` off the
+recipe ingredient, leaving the Pin as its only home.
 
 ## Reading a Pin
 
@@ -27,6 +30,20 @@ Every row here was confirmed by hand in
 | `staple` | store-cupboard. Recipes call for it, the shopping list leaves it out |
 | `confirmed` | a machine proposed it and a human agreed. Consumers filter on this |
 
+## What a Recipe may write
+
+Two rules, and a consumer can check both.
+
+1. **A quantified ingredient uses its Pin's `unit`, exactly.** Any other unit is
+   an error at list time, not a conversion to attempt.
+2. **A `staple` may omit `qty` and `unit` both** — `{ ingredient: olive-oil }`.
+   It never reaches a shopping list, so a number would be invented precision. A
+   **non-staple** with no `qty` is an error: a list cannot add a blank.
+
+So the check is: for every ingredient line, either `unit` equals the Pin's
+`unit`, or the line has no `qty` and its Pin says `staple: true`. Nothing else
+passes. 19 lines across 7 staple slugs currently take the second branch.
+
 **`line_number` is a string.** Leading zeros are significant: `088460` is not
 `88460`.
 
@@ -35,8 +52,8 @@ Every row here was confirmed by hand in
 hand, and adding it puts it in your order history where the next harvest turns
 it into a Pin.
 
-**94 Pins**: 62 with harvested line numbers, 7 counter proteins, 25
-store-cupboard staples not yet seen in an order. 18 of the corpus's 112
+**87 Pins**: 56 with harvested line numbers, 7 counter proteins, 24
+store-cupboard staples not yet seen in an order. 17 of the corpus's 104
 ingredients have no Pin.
 
 ## The catalogue
@@ -70,16 +87,6 @@ baby-potatoes:
   pack: { qty: 750, unit: g }
   search_term: Duchy Organic British Baby Potatoes
   line_number: "816562"
-  staple: false
-  confirmed: true
-
-baby-spinach:
-  display: Baby spinach
-  store: waitrose
-  unit: g
-  pack: { qty: 200, unit: g }
-  search_term: Duchy Organic Spinach
-  line_number: "022524"
   staple: false
   confirmed: true
 
@@ -157,6 +164,7 @@ cannellini-beans:
   pack: { qty: 400, unit: g }
   search_term: Epicure Organic Cannellini Beans
   line_number: "885637"
+  alternates: ["Haricot beans"]
   staple: false
   confirmed: true
 
@@ -268,13 +276,7 @@ dried-herbs:
   display: Dried herbs
   store: waitrose
   unit: g
-  staple: true
-  confirmed: true
-
-dried-italian-herbs:
-  display: Dried Italian herbs
-  store: waitrose
-  unit: g
+  alternates: ["Garlic powder"]
   staple: true
   confirmed: true
 
@@ -285,6 +287,7 @@ dried-oregano:
   pack: { qty: 12, unit: g }
   search_term: Cooks' Ingredients Oregano
   line_number: "432563"
+  alternates: ["Italian seasoning"]
   staple: true
   confirmed: true
 
@@ -373,6 +376,7 @@ honey:
   display: Honey
   store: soutars
   unit: g
+  alternates: ["Maple syrup"]
   staple: true
   confirmed: true
 
@@ -391,16 +395,6 @@ lemon:
   search_term: Duchy Organic Unwaxed Lemons
   line_number: "088911"
   alternates: ["Cooks' Ingredients Unwaxed Lemons (088460)"]
-  staple: false
-  confirmed: true
-
-lemon-juice:
-  display: Lemon juice
-  store: waitrose
-  unit: g
-  pack: { qty: 3, unit: each }
-  search_term: Duchy Organic Unwaxed Lemons
-  line_number: "088911"
   staple: false
   confirmed: true
 
@@ -442,6 +436,7 @@ light-cream-cheese:
   pack: { qty: 250, unit: g }
   search_term: Duchy Organic Soft Cheese Strength 1
   line_number: "563021"
+  alternates: ["Quark"]
   staple: false
   confirmed: true
 
@@ -452,36 +447,6 @@ lime:
   pack: { qty: 4, unit: each }
   search_term: Cooks' Ingredients Unwaxed Limes
   line_number: "011269"
-  staple: false
-  confirmed: true
-
-lime-juice:
-  display: Lime juice
-  store: waitrose
-  unit: g
-  pack: { qty: 4, unit: each }
-  search_term: Cooks' Ingredients Unwaxed Limes
-  line_number: "011269"
-  staple: false
-  confirmed: true
-
-mixed-salad-greens:
-  display: Mixed salad greens
-  store: waitrose
-  unit: bag
-  pack: { qty: 100, unit: g }
-  search_term: Duchy Organic Babyleaf & Rocket Salad
-  line_number: "483605"
-  staple: false
-  confirmed: true
-
-new-potatoes:
-  display: New potatoes
-  store: waitrose
-  unit: g
-  pack: { qty: 750, unit: g }
-  search_term: Duchy Organic British Baby Potatoes
-  line_number: "816562"
   staple: false
   confirmed: true
 
@@ -610,6 +575,7 @@ ras-el-hanout:
   pack: { qty: 50, unit: g }
   search_term: Cooks' Ingredients Ras el Hanout
   line_number: "682477"
+  alternates: ["Moroccan spice blend"]
   staple: true
   confirmed: true
 
@@ -634,7 +600,7 @@ red-pesto:
   confirmed: true
 
 rocket:
-  display: Rocket
+  display: Babyleaf & rocket salad
   store: waitrose
   unit: g
   pack: { qty: 100, unit: g }
@@ -687,6 +653,7 @@ sirloin-steak:
   display: Sirloin steak
   store: soutars
   unit: g
+  each_g: 150
   staple: false
   confirmed: true
 
@@ -713,6 +680,7 @@ soy-sauce:
   display: Soy sauce
   store: waitrose
   unit: g
+  alternates: ["Tamari"]
   staple: true
   confirmed: true
 
@@ -858,16 +826,6 @@ white-miso-paste:
   staple: true
   confirmed: true
 
-wholegrain-rice:
-  display: Wholegrain rice
-  store: waitrose
-  unit: g
-  pack: { qty: 1000, unit: g }
-  search_term: Duchy Organic Brown Basmati Rice
-  line_number: "086628"
-  staple: false
-  confirmed: true
-
 wholewheat-penne:
   display: Wholewheat penne
   store: waitrose
@@ -898,13 +856,10 @@ worcestershire-sauce:
 
 ## Absences
 
-The 18 ingredients with no Pin, and why. Recorded here so the catalogue's
-coverage is checkable rather than assumed.
-
-**Not a purchasable thing (1)**
-
-- `water` — `staple: true` in all five uses. A row would say only "do not buy
-  this".
+The 17 ingredients with no Pin, and why. Recorded here so the catalogue's
+coverage is checkable rather than assumed. **This list is the Unpinned flag**:
+an ingredient here is added to the order by hand, and buying it once puts it in
+the order history where the next harvest turns it into a Pin.
 
 **Never harvested (14)** — real shopping items absent from the three captured
 orders. Each will Pin itself on the next harvest after you buy it.

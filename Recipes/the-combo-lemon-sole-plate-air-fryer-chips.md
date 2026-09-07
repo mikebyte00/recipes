@@ -10,13 +10,13 @@ ingredients:
   - { ingredient: lemon-sole-fillets, qty: 270, unit: g, note: "1 pack, lightly dusted" }
   - { ingredient: lemon-sole-goujons, qty: 1, unit: box, note: frozen breaded }
   - { ingredient: potatoes, qty: 500, unit: g, prep: "cut into thick chips, skins on" }
-  - { ingredient: tartare-sauce }
-  - { ingredient: mixed-salad-greens, qty: 1, unit: bag, note: large; plus cucumber and radishes }
+  - { ingredient: tartare-sauce, qty: 40, unit: g }
+  - { ingredient: rocket, qty: 100, unit: g, note: plus cucumber and radishes }
   - { ingredient: lemon, qty: 1, unit: each, prep: cut into wedges }
-  - { ingredient: olive-oil, staple: true }
-  - { ingredient: salt, qty: 1, unit: pinch, staple: true }
-  - { ingredient: black-pepper, qty: 1, unit: pinch, staple: true }
-  - { ingredient: garlic-powder, qty: 1, unit: pinch, staple: true }
+  - { ingredient: olive-oil }
+  - { ingredient: salt, qty: 1, unit: pinch }
+  - { ingredient: black-pepper, qty: 1, unit: pinch }
+  - { ingredient: garlic-powder, qty: 1, unit: pinch }
 ---
 
 1. Cut the potatoes into thick chips. Soak them in cold water for 10 minutes to remove excess starch, then drain and dry them thoroughly with a clean tea towel.

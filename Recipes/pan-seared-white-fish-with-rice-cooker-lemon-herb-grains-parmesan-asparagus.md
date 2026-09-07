@@ -8,13 +8,13 @@ appliances: [rice-cooker, ninja-sizzle]
 macros: { protein_g: 48, kcal: 700 }
 ingredients:
   - { ingredient: white-fish, qty: 2, unit: fillets }
-  - { ingredient: wholegrain-rice, qty: 75, unit: g }
+  - { ingredient: brown-rice, qty: 75, unit: g }
   - { ingredient: quinoa, qty: 1, unit: pack, note: pre-cooked }
   - { ingredient: asparagus, qty: 250, unit: g }
   - { ingredient: parmesan, qty: 60, unit: g, prep: grated }
-  - { ingredient: lemon-juice, qty: 20, unit: g }
-  - { ingredient: dried-herbs, qty: 4, unit: g, staple: true }
-  - { ingredient: salt, qty: 1, unit: pinch, staple: true }
+  - { ingredient: lemon, qty: 0.5, unit: each, prep: juiced }
+  - { ingredient: dried-herbs, qty: 4, unit: g }
+  - { ingredient: salt, qty: 1, unit: pinch }
 ---
 
 1. Place the rice into the rice cooker with water (1:2), a squeeze of fresh lemon juice, and a pinch of dried herbs, and let it run.

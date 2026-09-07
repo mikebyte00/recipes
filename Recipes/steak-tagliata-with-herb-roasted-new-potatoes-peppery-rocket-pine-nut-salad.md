@@ -7,15 +7,15 @@ tags: []
 appliances: [air-fryer, ninja-sizzle]
 macros: { protein_g: 46, kcal: 720 }
 ingredients:
-  - { ingredient: sirloin-steak, qty: 2, unit: each }
-  - { ingredient: new-potatoes, qty: 400, unit: g, prep: halved, note: raw }
+  - { ingredient: sirloin-steak, qty: 300, unit: g }
+  - { ingredient: baby-potatoes, qty: 400, unit: g, prep: halved, note: raw }
   - { ingredient: rocket, qty: 60, unit: g }
   - { ingredient: pine-nuts, qty: 15, unit: g }
   - { ingredient: parmesan, qty: 20, unit: g, prep: flaked }
-  - { ingredient: olive-oil, qty: 15, unit: g, staple: true }
+  - { ingredient: olive-oil, qty: 15, unit: g }
   - { ingredient: balsamic-vinegar, qty: 10, unit: g }
-  - { ingredient: salt, qty: 1, unit: pinch, staple: true }
-  - { ingredient: rosemary, qty: 1, unit: pinch, staple: true }
+  - { ingredient: salt, qty: 1, unit: pinch }
+  - { ingredient: rosemary, qty: 1, unit: pinch }
 ---
 
 1. Toss the halved raw potatoes (skins on) with 10g of olive oil, sea salt, and a pinch of rosemary. Air-fry at 200°C for 18–20 minutes until ultra-crisp.

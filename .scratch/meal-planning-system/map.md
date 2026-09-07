@@ -133,6 +133,21 @@ default. `writing-for-agents` when authoring any of the four skills.
   and `black-olives` were deliberately left off and fall through to absences.
   The minting procedure is now `Orders/HARVEST.md` steps 6-9.
 
+- [Normalise Ingredient Units](issues/12-normalise-ingredient-units.md):
+  **one rule, checkable** — an ingredient line's `unit` equals its Pin's, or the
+  line has no `qty` and its Pin is a Staple. That second branch answers Extract
+  The Corpus's "no way to say quantity unknown" for the 19 staple lines; the six
+  non-staple blanks got estimates, because a list cannot add a blank. `water` is
+  **deleted from the Recipes** rather than Pinned or exempted — unbuyable and
+  unsummable, and every method already says "a splash". Five near-duplicate
+  slugs merged and two kept, with **juice folded into fruit** at 20g = half a
+  lemon, so a list can finally add lemons. Three Pin units looked wrong and were
+  left alone; the Recipes moved, because the Pins were confirmed by hand. The
+  ticket was scoped too small: it named 8 unit fixes as 13, one `or` as 13, and
+  inherited two more jobs from resolved tickets. **`PINS.md` is now the only
+  home of `staple`** — 87 Pins, 17 absences, and the Absences list *is* the
+  Unpinned flag.
+
 ## Not yet specified
 
 - **Authoring each of the four skills.** Their contracts depend on the file

@@ -13,8 +13,8 @@ ingredients:
   - { ingredient: black-olives, qty: 30, unit: g, prep: halved }
   - { ingredient: capers, qty: 15, unit: g, prep: drained }
   - { ingredient: cherry-tomatoes, qty: 150, unit: g, prep: halved }
-  - { ingredient: olive-oil, staple: true }
-  - { ingredient: salt, qty: 1, unit: pinch, staple: true }
+  - { ingredient: olive-oil }
+  - { ingredient: salt, qty: 1, unit: pinch }
 ---
 
 1. Boil your wholewheat spaghetti in salted water until tender, then drain.

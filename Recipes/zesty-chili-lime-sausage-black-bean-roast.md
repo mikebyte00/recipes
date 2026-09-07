@@ -12,7 +12,7 @@ ingredients:
   - { ingredient: chili-powder, qty: 1, unit: tsp }
   - { ingredient: cottage-cheese, qty: 160, unit: g }
   - { ingredient: lime, qty: 1, unit: each }
-  - { ingredient: oil-spray, note: light spray, staple: true }
+  - { ingredient: oil-spray, note: light spray }
 ---
 
 1. Mix the sausage chunks and black beans with oil spray and chili powder.

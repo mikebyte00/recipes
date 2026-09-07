@@ -10,9 +10,9 @@ ingredients:
   - { ingredient: tofu, qty: 1, unit: pack, prep: chopped into bite-sized pieces }
   - { ingredient: chickpeas, qty: 1, unit: can, prep: "drained, patted dry" }
   - { ingredient: harissa-paste, qty: 30, unit: g }
-  - { ingredient: lemon-juice, qty: 20, unit: g }
+  - { ingredient: lemon, qty: 0.5, unit: each, prep: juiced }
   - { ingredient: greek-yogurt, qty: 100, unit: g, note: to serve }
-  - { ingredient: oil-spray, staple: true }
+  - { ingredient: oil-spray }
 ---
 
 1. Chop the tofu into bite-sized pieces.
