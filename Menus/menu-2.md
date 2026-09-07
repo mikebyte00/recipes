@@ -43,7 +43,10 @@ Extracted from `Rotations/Week2.md`. Every value is a Recipe slug in `Recipes/`.
 
 **4 of 28 slots are unfilled** and carry `null`. `CONTEXT.md` says a Menu is
 complete — this one is not, and the gap is inherited from the corpus rather than
-introduced here. Recorded as evidence for Per-Slot Macro Bands:
+introduced here. Both rotations drop the same four, which read as a deliberate
+weekly shape until Per-Slot Macro Bands established that dropping meals is a
+Plan-level act. Filling them needs the weekly protein-type layout, which
+`GOALS.md` under-specifies; that is Complete The Weekly Layout:
 
 - Friday pudding
 - Saturday lunch

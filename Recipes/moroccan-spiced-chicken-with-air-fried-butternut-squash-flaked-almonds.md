@@ -5,7 +5,7 @@ protein: chicken
 effort: medium
 tags: []
 appliances: [air-fryer]
-macros: { protein_g: 75.5, kcal: 758 }
+macros: { protein_g: 48, kcal: 730 }
 ingredients:
   - { ingredient: chicken-thighs, qty: 4, unit: each, note: "skin on, bone out" }
   - { ingredient: butternut-squash, qty: 450, unit: g, prep: diced }

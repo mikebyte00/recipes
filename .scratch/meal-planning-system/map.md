@@ -109,6 +109,18 @@ default. `writing-for-agents` when authoring any of the four skills.
   verbatim. Unpinned means no row. Only 13 of 112 slugs disagree on unit, so
   the normalisation job is small.
 
+- [Per-Slot Macro Bands](issues/06-per-slot-macro-bands.md): **four Bands, one
+  per Slot, each a target plus a range — and they guide, they do not gate.** The
+  daily goals were mis-stated: protein is a **floor** and kcal a **ceiling**, not
+  a band and a target, which turns a corpus that failed its own goals 0/12 on
+  calories into 12/12 without touching a Recipe. The four targets sum to ~132g /
+  ~1685 kcal, because range-legal does not imply goal-compliant — a day can be
+  built band-legal at 113g or 1880 kcal, so the check lives on the day, not the
+  Recipe. Bands are per Slot only; breakfast's egg/sausage split (17–27 vs
+  29–32, no overlap) is a note, not two Bands. Pudding's range is deliberately
+  widened past its 4-recipe sample. Corrected the Moroccan chicken from 75.5g to
+  48g — a corpus error, not an extraction one. `CONTEXT.md` gains **Band**.
+
 ## Not yet specified
 
 - **Authoring each of the four skills.** Their contracts depend on the file
@@ -121,6 +133,10 @@ default. `writing-for-agents` when authoring any of the four skills.
 - **The basket review step.** If Waitrose automation works, there has to be a
   moment where you see what it chose before anything is ordered. What that
   looks like depends on what the research finds.
+- **What a no-pudding day targets.** Only live if [Complete The Weekly
+  Layout](issues/14-complete-the-weekly-layout.md) rules pudding is not nightly:
+  a 3-slot day sums to ~120g against a ~130g floor, so the other three Bands
+  would have to absorb it. Not sharp until that ticket lands.
 - **How a Plan records acting on `bulk-cook` and `eat-cold`.** The Recipe tags
   are capability only, settled in [The Tag Vocabulary](issues/03-the-tag-vocabulary.md).
   But a week that actually doubles a batch has to get doubled quantities onto

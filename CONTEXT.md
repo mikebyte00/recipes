@@ -43,7 +43,17 @@ recipe, not a note about eating out.
 
 Protein and kcal. Deliberately **not** carbohydrates or fat: the recipes are
 whole-food and low-sugar, so those two numbers are the ones that carry
-information. Targets are per-[Slot](#slot) bands plus a daily range.
+information. Targets are a per-[Slot](#slot) [Band](#band) plus daily goals.
+
+## Band
+
+The macro target for one [Slot](#slot): a protein and kcal figure to aim at,
+plus the range either side that is acceptable. Four Bands, one per Slot, and
+they live in [GOALS.md](GOALS.md) next to the daily goals.
+
+A Band **guides**, it does not gate. Nothing is rejected for falling outside
+one; the goals are checked by summing a day, not by policing a [Recipe](#recipe).
+The four targets are chosen to sum to a day that clears those goals.
 
 ## Pin
 
