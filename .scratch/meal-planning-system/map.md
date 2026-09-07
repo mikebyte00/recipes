@@ -112,9 +112,6 @@ default. `writing-for-agents` when authoring any of the four skills.
   because it may turn out to be part of the canonical-ingredient matching
   question rather than separate from it.
 
-- **Version control.** This directory is not a git repo. Worth initialising
-  before the extraction rewrites everything, but it's not on the critical path.
-
 ## Out of scope
 
 - Carbohydrate and fat tracking. Ruled out in charting: it means re-estimating
