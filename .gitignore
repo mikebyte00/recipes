@@ -1,0 +1,6 @@
+# .scratch/ is deliberately tracked: it holds the wayfinder map and the issue
+# tracker, which are this project's decision record. Do not ignore it.
+
+.DS_Store
+*.swp
+*~
