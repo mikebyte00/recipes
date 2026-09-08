@@ -6,28 +6,33 @@ Blocked by: 04
 
 ## Question
 
-How does a canonical ingredient name become a search term that actually finds
-the right product?
+Do the 44 stored `search_term`s actually resolve in Waitrose Multi-search, and
+what happens when one misses?
 
-[Can Claude Drive Waitrose](01-can-claude-drive-waitrose.md) found this is
-where all the remaining leverage sits. Waitrose search is bad in a *specific,
-learnable* way, and the project controls the input entirely:
+**This ticket was rewritten.** Its original question — how a canonical
+ingredient name becomes a search term, and whether that term is stored on the
+Pin or derived by rules — **is already answered.** `search_term` is a stored
+Pin field holding the harvested product name verbatim, decided in
+[Mint The Pin Catalogue](11-mint-the-pin-catalogue.md) and written in
+[Confirm And Write The Pins](13-confirm-and-write-the-pins.md). Coverage was
+measured at **44 of 44 shoppable Waitrose Pins, with a `line_number` on every
+one of them.** The ticket's second half — the output shape — was settled by
+[What The Four Skills Are](08-what-the-four-skills-are.md): a pasteable
+`search_term` block, with line numbers beside the table above it.
 
-| Naive term | Result | Better term | Result |
-| --- | --- | --- | --- |
-| `Fage 2%` | 1104, wrong | `Fage Total 2` | 9, right |
-| `pre cooked lentils` | 605, qualifier ignored | ? | ? |
-| `cottage cheese` | 65, cream cheese at 1 and 3 | ? | ? |
+What was never tested is the thing the whole design rests on.
 
-Prototype the transformation against all seven researched ingredients plus a
-sample from the real corpus, and find the rules: punctuation stripping, brand
-placement, dropping qualifiers search ignores, adding words that discriminate.
+- **Paste the block and see.** Take the 44 terms and run them through
+  Multi-search. How many resolve to the intended product, first hit?
+- **Characterise the misses.** [Can Claude Drive
+  Waitrose](01-can-claude-drive-waitrose.md) measured naive terms at 1 in 7 and
+  found that wrong matches surface silently — a harvested product name is a much
+  stronger input than a recipe word, but "stronger" is not "verified".
+- **Decide the fallback.** A term that misses has a `line_number` that resolves
+  directly at `/ecom/products/x/<n>`. Is the fix a per-Pin `search_term` edit, a
+  link for that one item, or something else? A bad match must stay a one-line
+  correction, not a rule change that perturbs the other 43.
 
-Settle whether the search term is **a field on the Pin** (learned once, stored,
-correctable by hand) or **derived** from the canonical name by rules. Storing it
-is likely right — it makes a bad match a one-line fix rather than a rule change
-that perturbs every other ingredient.
-
-Then decide the output shape: one multi-search deep link for the whole week, one
-link per ingredient, or a pasteable newline-separated block. Multi-search takes
-a pasted list, so the pasteable block may beat any URL scheme.
+Read the boundaries in `Orders/HARVEST.md` before driving a browser at Waitrose.
+Search paths are `Disallow`ed; Multi-search is a normal navigation the user
+clicks, which is why it is fine.

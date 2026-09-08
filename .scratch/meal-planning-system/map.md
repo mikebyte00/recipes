@@ -160,26 +160,37 @@ default. `writing-for-agents` when authoring any of the four skills.
   **Plan** removes it when you are out. Surfaced two tickets rather than
   absorbing them.
 
+- [What The Four Skills Are](issues/08-what-the-four-skills-are.md): **four
+  skills and one script**, seamed on re-runnability and on mechanical-versus-
+  judgement. `bin/shopping-list.py` is the repo's only code, authorised here and
+  nowhere else — the transform is plain addition plus a `ceil()`, measured at 39
+  shoppable lines from Menu 1, and an agent summing 180 ingredient uses in prose
+  will err silently. **Plan-the-week stays two skills** because the shopping
+  section is regenerated whenever the Plan changes. Skills live in
+  `.claude/skills/`; `Orders/HARVEST.md` does **not** move, because it is read
+  on demand rather than invoked. `new-recipe` is the only writer to the pool, so
+  `new-menu` **fails and names the gap** instead of minting. The harvest is step
+  1 of planning — last week's order should serve this week. Hard-fail on a
+  Recipe/Pin violation, fall back and flag on a missing `pack`. The script
+  checks the mechanical, the skill **reports** the day sums and never blocks.
+  Retired [The Query String Generator](issues/10-the-query-string-generator.md)'s
+  original question — `search_term` was already stored at 44/44 coverage — and
+  rewrote it as a verification.
+
 ## Not yet specified
 
-- **Authoring each of the four skills.** Their contracts depend on the file
-  formats and folder layout, so the writing can't be specified until those
-  land. Expect one ticket per skill, possibly more for the Waitrose one.
-- **How a shopping list is represented.** Its *location* is settled — a
-  regenerated section inside the Plan, splitting by Store, quantifying in Pin
-  units, filtering Staples and flagging Unpinned items. `PINS.md` supplies all
-  four, and [Normalise Ingredient Units](issues/12-normalise-ingredient-units.md)
-  made the arithmetic plain addition, so **only the shape on the page is left**.
-  Likely settled inside [What The Four Skills Are](issues/08-what-the-four-skills-are.md)
-  as that fourth skill's output rather than needing a ticket of its own.
-- **The basket review step.** If Waitrose automation works, there has to be a
-  moment where you see what it chose before anything is ordered. What that
-  looks like depends on what the research finds.
-- **How a Plan records acting on `bulk-cook` and `eat-cold`.** The Recipe tags
-  are capability only, settled in [The Tag Vocabulary](issues/03-the-tag-vocabulary.md).
-  But a week that actually doubles a batch has to get doubled quantities onto
-  the shopping list, and a meal eaten cold on Tuesday was cooked on Monday.
-  That representation is a Plan concern and isn't sharp enough to ticket yet.
+<!-- Emptied by [What The Four Skills Are](issues/08-what-the-four-skills-are.md),
+     07-08 September 2026. All four patches either graduated into tickets 17-22
+     or were answered outright. Refill as the frontier advances. -->
+
+- **Nothing currently in the fog.** The four patches that stood here are gone:
+  skill authoring graduated to tickets 18-21 and the script to 17; the shopping
+  list's shape was settled inside
+  [What The Four Skills Are](issues/08-what-the-four-skills-are.md); the basket
+  review step turned out to need no automation to exist — it *is* the shopping
+  section you read before pasting; and `bulk-cook`/`eat-cold` sharpened into
+  [How A Plan Records Bulk-Cook And Eat-Cold](issues/22-bulk-cook-and-eat-cold.md)
+  once the grid gained a consumer that parses it.
 
 ## Out of scope
 
