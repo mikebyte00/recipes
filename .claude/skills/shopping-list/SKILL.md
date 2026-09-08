@@ -49,7 +49,10 @@ the planning conversation — that is the whole reason this is not part of
    - The **Unpinned** list — the items they add by hand.
    - The line count and the store split, so they know the size of the shop.
 
-   Then hand them the **Multi-search block** to paste.
+   Then hand them the **Multi-search block** to paste, and the **counts block**
+   under it — Multi-search adds 1 of each and carries no quantity, so the counts
+   are a second pass they make by hand. Both come from the script; do not retype
+   either.
 
 **Done when** the Plan on disk ends with the script's current output, and the
 user has seen every ⚠ and every Unpinned item.

@@ -32,6 +32,13 @@ Skill](issues/21-author-shopping-list.md) shipped that defect until it was
 checked. Run every step of the skill too: that same ticket's splice command was
 wrong in a way no amount of reading it would have shown.
 
+**A diff is not a diagnosis.** When what you asked for and what came back
+differ, the cause may be the tool, the data, or the human in between — and
+reading the difference cannot tell you which. [The Query String
+Generator](issues/10-the-query-string-generator.md) invented a search failure
+mode out of two deviations that were both the user's own edits. Ask before
+naming a cause, especially when the pattern is your own.
+
 **Standing preferences for this effort**:
 
 - Serves 2, fixed, project-wide constant. Not a per-Recipe field.
@@ -276,6 +283,25 @@ wrong in a way no amount of reading it would have shown.
   table always said six and only its prose said five.
 
 
+- [The Query String Generator](issues/10-the-query-string-generator.md):
+  **the terms resolve — 34 of 34, first hit.** Pasted into Multi-search against
+  a real Plan, every harvested `search_term` returned its intended product,
+  against [Can Claude Drive Waitrose](issues/01-can-claude-drive-waitrose.md)'s
+  1-in-7 for naive recipe words. **The last untested assumption in the design
+  is now tested, and it held.** The real gap is **quantity**: Multi-search
+  carries no count syntax and adds 1 of everything, so 13 of 34 lines needed a
+  second pass by hand — a fact buried in a `Buy` column read while shopping
+  rather than while pasting. `bin/shopping-list.py` now renders a **counts
+  block** under the paste block; `divide()` already computed the number and
+  `build()` was throwing it away. The fallback for a missed term stays
+  **untested and unhurried**, since nothing missed and every row already carries
+  its `line_number`. **A correction is recorded in the ticket**: the first read
+  of this run reported two silent mismatches and generalised them into a
+  failure mode, and all of it was wrong — both deviations were the user's own
+  edits. A basket differs from a list for many reasons and search relevance is
+  only one; a diff cannot tell a bad match from a human edit, only asking can.
+
+
 ## Not yet specified
 
 <!-- Emptied by [What The Four Skills Are](issues/08-what-the-four-skills-are.md),
@@ -294,6 +320,11 @@ wrong in a way no amount of reading it would have shown.
      That ticket closed the two open choices it inherited (chain, and
      model-invoke) rather than opening any, and its one surprise -- the
      eaten-out false alarm -- was fixed in the skill on the spot.
+     Checked a fifth time on resolving [The Query String
+     Generator](issues/10-the-query-string-generator.md), 08 September 2026:
+     still empty. The one question it leaves open -- what to do about a
+     `search_term` that misses -- is deliberately parked in that ticket rather
+     than promoted here, because no miss has ever been observed to characterise.
      Refill as the frontier advances. -->
 
 - **Nothing currently in the fog.** The four patches that stood here are gone:

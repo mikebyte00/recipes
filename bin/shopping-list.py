@@ -222,7 +222,8 @@ def build(totals, quantified, pins):
             "search_term": pin.get("search_term"),
         }
         if store == "waitrose":
-            _, buy, flag = divide(total, pin)
+            count, buy, flag = divide(total, pin)
+            row["count"] = count
             row["buy"] = buy
             row["flag"] = flag
         shoppable[store].append(row)
@@ -271,6 +272,34 @@ def render(source, front, grid, shoppable, staples, unpinned):
             for r in rows:
                 out.append(r["search_term"] or r["display"])
             out.append("```")
+
+            # Multi-search adds one of everything and carries no quantity, so
+            # the counts are a second pass the user makes by hand.
+            counts = [r for r in rows if r["count"] > 1]
+            out.append("")
+            if counts:
+                out.append(
+                    f"**Multi-search adds 1 of each.** {len(rows) - len(counts)} "
+                    f"of {len(rows)} lines are right at 1; set these {len(counts)}:"
+                )
+                out.append("")
+                out.append("| Item | Count | Line |")
+                out.append("|---|---|---|")
+                for r in sorted(counts, key=lambda r: (-r["count"], r["display"].lower())):
+                    out.append(
+                        f"| {r['display']} | **{r['count']}** | {r['line_number'] or '—'} |"
+                    )
+                out.append("")
+            else:
+                out.append("**Multi-search adds 1 of each**, which is correct "
+                           "for every line this week.")
+                out.append("")
+            out.append(
+                "Then check the trolley holds "
+                f"{len(rows)} lines. A basket is assembled by hand, so it can "
+                "drift from this list -- the Line column is what settles any row "
+                "you are unsure of: `/ecom/products/x/<line>` resolves on its own."
+            )
         else:
             out.append("| Item | Need |")
             out.append("|---|---|")

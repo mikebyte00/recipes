@@ -1,7 +1,7 @@
 # The Query String Generator
 
 Type: prototype
-Status: open
+Status: resolved
 Blocked by: 04
 
 ## Question
@@ -36,3 +36,71 @@ What was never tested is the thing the whole design rests on.
 Read the boundaries in `Orders/HARVEST.md` before driving a browser at Waitrose.
 Search paths are `Disallow`ed; Multi-search is a normal navigation the user
 clicks, which is why it is fine.
+
+## Answer
+
+**The terms resolve. The gap is quantity, not relevance.** 34 harvested
+`search_term`s pasted into Multi-search against a real Plan — the week of
+2026-09-14, Menu 1 — and **every one returned its intended product**. The
+design assumption the whole project rests on holds.
+
+Set against [Can Claude Drive Waitrose](01-can-claude-drive-waitrose.md)'s 1
+in 7 for naive recipe words, that is the harvest earning its keep: a harvested
+product name is not merely a stronger input, it is a **sufficient** one.
+
+### Multi-search carries no quantity, and that is the real finding
+
+The paste adds **1 of everything**. There is no quantity syntax, so counts are
+a second pass the user makes by hand. On this Plan, 13 of 34 lines needed a
+count above 1 and 21 were already right.
+
+That was buried in the `Buy` column of a 34-row table — a column you read while
+shopping, not while pasting. `bin/shopping-list.py` now emits a **counts block**
+directly beneath the paste block: only the lines needing a change, largest
+first, with their line numbers, and a plain statement of how many are correct
+at 1. `divide()` already computed the count and `build()` was discarding it;
+the change threads it through and renders it.
+
+### The fallback was never needed, so it stays unchanged
+
+No term missed, so nothing had to be corrected. The per-Pin `search_term` edit
+versus per-item link question the ticket posed is therefore **still untested** —
+but it is also no longer urgent, and the machinery is in place either way: every
+row already carries its `line_number`, and `/ecom/products/x/<n>` resolves on
+its own. Leave the choice to the first real miss, which will name its own case
+better than speculation can.
+
+### A correction worth recording
+
+The first read of this test-run **reported two silent mismatches** — limes
+resolving to lemons, and the Greek yogurt resolving to a smaller tub — and
+generalised them into a pattern: *a longer product name losing to a shorter
+sibling.* Two data points, one confident mechanism, a named failure mode.
+
+**All of it was wrong.** The user had deliberately chosen a different yogurt,
+and the duplicate lemons were their own slip while assembling the basket.
+Neither was Multi-search. The pattern was invented to explain deviations that
+had no search-side cause at all, and it would have gone into the map as a
+finding had the user not said so.
+
+The lesson generalises past this ticket: **a basket differs from a list for
+many reasons, and search relevance is only one of them.** Reading a diff
+between what was asked for and what is present cannot distinguish a bad match
+from a human edit — only asking can. Ticket 23 got this right by measuring
+before accepting its own framing; this ticket got it wrong by accepting a
+framing it had authored itself, which is the harder case to catch.
+
+The one thing that survives is weaker and truer: a basket is assembled by hand,
+so it **can** drift from the list, and this run drifted twice. The script now
+closes with the trolley's expected line count and points at the Line column as
+the way to settle any row in doubt — a reconciliation aid, making no claim
+about why a row might differ.
+
+### Verified
+
+- 34 of 34 terms resolved to the intended product
+- counts block reproduces the 13 lines derived by hand, and the 21 at 1
+- Menu 1 still **39 lines**, Menu 2 still **42**, **0 flags**, **0 Recipe/Pin
+  rule violations** across 37 Recipes
+- the Plan regenerates idempotently and its week note survives above
+  `## Shopping`
