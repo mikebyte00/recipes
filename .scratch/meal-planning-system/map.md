@@ -177,11 +177,31 @@ default. `writing-for-agents` when authoring any of the four skills.
   original question — `search_term` was already stored at 44/44 coverage — and
   rewrote it as a verification.
 
+- [How A Plan Records Bulk-Cook And
+  Eat-Cold](issues/22-bulk-cook-and-eat-cold.md): **neither — no multiplier, no
+  back-reference, no note.** The premise was false: a Recipe serves 2, two Slots
+  need 4 portions, and buying twice gets 4 whether it is one pan or two — the
+  script sums before it rounds to packs, so even the `ceil()` is identical. A
+  Menu is 28 filled Slots, so **no portion exists that the grid is not already
+  paying for**, confirmed with the user. Doubling is spelled **the same Recipe
+  in both Slots**, which is the Recipe swap a Plan already has. Both Menus were
+  **already doing it** — an adjacent-day repeat, always a lunch, never a dinner,
+  three times over — and shopping correctly the whole time. **0 of 37 Recipes
+  carry either tag**; they are kept against rule 2, at the price of a standing
+  rule now in `VOCABULARY.md`: **`bulk-cook` and `eat-cold` have no consumer**,
+  so nothing generating, planning or shopping may branch on them. Unblocks
+  [The Shopping List Script](issues/17-the-shopping-list-script.md) and
+  [Author The Plan-The-Week Skill](issues/20-author-plan-the-week.md).
+
+
 ## Not yet specified
 
 <!-- Emptied by [What The Four Skills Are](issues/08-what-the-four-skills-are.md),
      07-08 September 2026. All four patches either graduated into tickets 17-22
-     or were answered outright. Refill as the frontier advances. -->
+     or were answered outright. Checked again on resolving [How A Plan Records
+     Bulk-Cook And Eat-Cold](issues/22-bulk-cook-and-eat-cold.md), 08 September
+     2026: still empty — that answer removed a representation rather than
+     opening one. Refill as the frontier advances. -->
 
 - **Nothing currently in the fog.** The four patches that stood here are gone:
   skill authoring graduated to tickets 18-21 and the script to 17; the shopping

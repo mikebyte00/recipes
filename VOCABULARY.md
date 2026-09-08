@@ -33,6 +33,14 @@ which holds the reasoning. This file is the operative list.
 - **`bulk-cook`** — can be cooked 4+ portions in one go.
 - **`eat-cold`** — fit to eat cold the next day, where no reheat is available.
 
+**`bulk-cook` and `eat-cold` have no consumer.** They are labels a human reads.
+Recipe generation, Menu building, weekly planning and the shopping list all
+ignore them. Acting on either is a Plan-time decision, and a Plan spells it by
+holding the **same Recipe in both Slots** — which sums to exactly one doubled
+batch, because the shopping list adds quantities before it rounds up to packs.
+See [How A Plan Records Bulk-Cook And
+Eat-Cold](.scratch/meal-planning-system/issues/22-bulk-cook-and-eat-cold.md).
+
 ## Notes on two fields
 
 **`protein` is omitted on a `pudding`** and required on every other slot.
