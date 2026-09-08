@@ -24,6 +24,15 @@ and answering it in passing loses the decision. The original two-week corpus
 lived in `Rotations/`; it was the input to the extraction, and `git show
 0beccfa:Rotations/Week1.md` still reads it.
 
+## There is exactly one piece of code
+
+`bin/shopping-list.py` aggregates a Plan into its shopping section, and it is
+the only code this project authorises. Adding a second `bin/` entry is a
+decision, not a convenience — raise it as a ticket. Everything else is prose,
+because everything else is judgement. Ruled in
+[.scratch/meal-planning-system/issues/08-what-the-four-skills-are.md](.scratch/meal-planning-system/issues/08-what-the-four-skills-are.md).
+
+
 ## The bar for a Recipe
 
 New Recipes match the existing 37. That bar is low on purpose, and it is the

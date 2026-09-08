@@ -194,6 +194,21 @@ default. `writing-for-agents` when authoring any of the four skills.
   [Author The Plan-The-Week Skill](issues/20-author-plan-the-week.md).
 
 
+- [The Shopping List Script](issues/17-the-shopping-list-script.md):
+  **`bin/shopping-list.py` is written and reproduces every regression number
+  exactly** — Menu 1 gives 180 ingredient uses → 63 quantified Pins → 24 Staples
+  dropped → **39 shoppable lines** (34 Waitrose, 3 Soutars, 2 Dorset Meats) →
+  14 Unpinned, and **0 Recipe/Pin rule violations across all 37 Recipes**. Menu 2
+  runs clean at 42 lines. Decided the one shape it needed: a Plan Slot that was
+  not cooked holds the reserved value **`eaten-out`**, now in `VOCABULARY.md`
+  under The Plan grid. Pack division splits on `unit in {g, ml}` — a countable
+  container means one unit is one pack, a measured amount against a different
+  measure is **flagged, never converted**. The script prints to stdout and the
+  skill writes it into the Plan. Surfaced [Fix The Flagged
+  Pins](issues/23-fix-the-flagged-pins.md). Unblocks [Author The Shopping-List
+  Skill](issues/21-author-shopping-list.md).
+
+
 ## Not yet specified
 
 <!-- Emptied by [What The Four Skills Are](issues/08-what-the-four-skills-are.md),
@@ -201,7 +216,9 @@ default. `writing-for-agents` when authoring any of the four skills.
      or were answered outright. Checked again on resolving [How A Plan Records
      Bulk-Cook And Eat-Cold](issues/22-bulk-cook-and-eat-cold.md), 08 September
      2026: still empty — that answer removed a representation rather than
-     opening one. Refill as the frontier advances. -->
+     opening one. [The Shopping List Script](issues/17-the-shopping-list-script.md)
+     added nothing here either; its one finding was sharp enough to ticket
+     directly. Refill as the frontier advances. -->
 
 - **Nothing currently in the fog.** The four patches that stood here are gone:
   skill authoring graduated to tickets 18-21 and the script to 17; the shopping

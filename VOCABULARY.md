@@ -1,7 +1,7 @@
 # Vocabulary
 
-The closed value lists a Recipe's fields draw from. **Closed means enforced: an
-unrecognised value is an error, not a new member.**
+The closed value lists a Recipe's fields and a Plan's grid draw from. **Closed
+means enforced: an unrecognised value is an error, not a new member.**
 
 Decided in
 [The Tag Vocabulary](.scratch/meal-planning-system/issues/03-the-tag-vocabulary.md),
@@ -40,6 +40,19 @@ holding the **same Recipe in both Slots** — which sums to exactly one doubled
 batch, because the shopping list adds quantities before it rounds up to packs.
 See [How A Plan Records Bulk-Cook And
 Eat-Cold](.scratch/meal-planning-system/issues/22-bulk-cook-and-eat-cold.md).
+
+## The Plan grid
+
+A Plan's grid holds the same 28 Slots as the Menu it came from. A Slot holds a
+Recipe slug, or the one reserved value:
+
+- **`eaten-out`** — the household did not cook this Slot. It buys nothing.
+
+Keeping the Slot present is what lets the 28-Slot completeness check stay
+meaningful: an empty value or a missing key reads as an incomplete grid, which
+`bin/shopping-list.py` treats as fatal. Decided in
+[The Shopping List Script](.scratch/meal-planning-system/issues/17-the-shopping-list-script.md).
+
 
 ## Notes on two fields
 
