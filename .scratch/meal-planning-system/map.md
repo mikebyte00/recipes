@@ -283,6 +283,31 @@ naming a cause, especially when the pattern is your own.
   table always said six and only its prose said five.
 
 
+- [Author The New-Recipe Skill](issues/18-author-new-recipe.md): **written,
+  and every step run before it was called done** —
+  `.claude/skills/new-recipe/SKILL.md`, five steps. **Model-invoked**, for the
+  reason tickets 20 and 21 both give: not firing means a Recipe freelanced into
+  the pool against a remembered bar. Model-invocation is **not** a licence to
+  chain — the skill states that writing to the pool is the **user's decision**,
+  keeping [What The Four Skills Are](issues/08-what-the-four-skills-are.md)'s
+  "`new-menu` names the gap and stops" rule where the caller cannot lose it.
+  The lever for holding the bar is **numbers, not adjectives**: step 2 makes the
+  agent read three neighbours in the same slot and protein and *state their
+  ingredient, appliance and step counts back*, and a measured per-slot table
+  gives a draft something to land inside. **Measuring found a false premise
+  again** — `CLAUDE.md`'s "three to six ingredients" holds for breakfast, lunch
+  and pudding but **not for dinner**, which runs 7–12 with a median of 9; 12 of
+  the 37 Recipes sit outside the stated bar. Two heredocs import
+  `bin/shopping-list.py` and reuse its loaders, **no second `bin/` entry**: a
+  Pin probe run *before* drafting, so units never pass through the agent, and a
+  step-5 check that **collects every failure** rather than raising on the first,
+  which is what `check_rule` alone does — it hid all vocabulary errors behind a
+  traceback until a deliberately bad file exposed it. Verified with a full
+  dry-run pudding, checked by the step-5 script **extracted from the SKILL.md**,
+  exercising all three ingredient shapes; the draft was **deleted, not added to
+  the pool**.
+
+
 - [The Query String Generator](issues/10-the-query-string-generator.md):
   **the terms resolve — 34 of 34, first hit.** Pasted into Multi-search against
   a real Plan, every harvested `search_term` returned its intended product,
@@ -325,6 +350,12 @@ naming a cause, especially when the pattern is your own.
      still empty. The one question it leaves open -- what to do about a
      `search_term` that misses -- is deliberately parked in that ticket rather
      than promoted here, because no miss has ever been observed to characterise.
+     Checked a sixth time on resolving [Author The New-Recipe
+     Skill](issues/18-author-new-recipe.md), 08 September 2026: still empty.
+     Measuring the corpus for its bar table surfaced one discrepancy -- that
+     `CLAUDE.md`'s "three to six ingredients" is false of dinners -- but that is
+     a correction to the user's own instruction file, raised with them rather
+     than promoted here. It opens no design question.
      Refill as the frontier advances. -->
 
 - **Nothing currently in the fog.** The four patches that stood here are gone:
