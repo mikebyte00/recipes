@@ -179,6 +179,7 @@ celery:
   display: Celery
   store: waitrose
   unit: g
+  pack: { qty: 400, unit: g }
   search_term: Duchy Organic Celery
   line_number: "085556"
   staple: false
@@ -318,7 +319,7 @@ feta:
 garlic-mayonnaise:
   display: Garlic mayonnaise
   store: waitrose
-  unit: g
+  unit: ml
   pack: { qty: 280, unit: ml }
   search_term: Waitrose Squeezy Garlic Mayonnaise
   line_number: "832208"
@@ -453,8 +454,8 @@ lime:
 oat-milk:
   display: Oat milk
   store: waitrose
-  unit: g
-  pack: { qty: 1, unit: litre }
+  unit: ml
+  pack: { qty: 1000, unit: ml }
   search_term: MOMA Organic Oat Barista
   line_number: "662470"
   staple: false
@@ -524,7 +525,7 @@ pearl-barley:
 peri-peri-mayonnaise:
   display: Peri peri mayonnaise
   store: waitrose
-  unit: g
+  unit: ml
   pack: { qty: 280, unit: ml }
   search_term: Waitrose Squeezy Piri Piri Mayonnaise
   line_number: "563763"
@@ -671,6 +672,7 @@ sourdough:
   display: Bread
   store: waitrose
   unit: slices
+  pack: { qty: 12, unit: slices }
   search_term: Light Rye Boule
   line_number: "841175"
   staple: false
@@ -698,6 +700,7 @@ spring-onions:
   display: Spring onions
   store: waitrose
   unit: g
+  pack: { qty: 100, unit: g }
   search_term: Duchy Organic Salad Onions Bunch
   line_number: "086479"
   staple: false

@@ -209,6 +209,21 @@ default. `writing-for-agents` when authoring any of the four skills.
   Skill](issues/21-author-shopping-list.md).
 
 
+- [Fix The Flagged Pins](issues/23-fix-the-flagged-pins.md): **all six fixed and
+  `litre` retired from the pack vocabulary** — `bin/shopping-list.py` now emits
+  **0 flags** on both Menus with every regression number from
+  [The Shopping List Script](issues/17-the-shopping-list-script.md) unchanged.
+  Measured first, and it changed the framing: all four flagged Pins are
+  single-sited and tiny (bread 9 slices, celery 100g, spring onions 30g, oat milk
+  60g), so **no value here is load-bearing at a rounding boundary** — which is
+  what made hand estimates acceptable at all. `oat-milk` moved to `ml` and the
+  Recipe with it, retiring a one-off unit rather than teaching the script a
+  conversion. `sourdough`'s `pack: 12 slices` is knowingly a **yield in a field
+  that means pack size**, taken because the honest alternative re-flags the row.
+  The two mayos were fixed rather than left: latent, and free to fix because no
+  `qty` exists to migrate.
+
+
 ## Not yet specified
 
 <!-- Emptied by [What The Four Skills Are](issues/08-what-the-four-skills-are.md),
@@ -218,7 +233,11 @@ default. `writing-for-agents` when authoring any of the four skills.
      2026: still empty — that answer removed a representation rather than
      opening one. [The Shopping List Script](issues/17-the-shopping-list-script.md)
      added nothing here either; its one finding was sharp enough to ticket
-     directly. Refill as the frontier advances. -->
+     directly. Checked a third time on resolving [Fix The Flagged
+     Pins](issues/23-fix-the-flagged-pins.md), 08 September 2026: still empty —
+     that ticket closed a defect class outright rather than opening a question,
+     and a whole-catalogue scan confirmed no successor defect is hiding.
+     Refill as the frontier advances. -->
 
 - **Nothing currently in the fog.** The four patches that stood here are gone:
   skill authoring graduated to tickets 18-21 and the script to 17; the shopping
