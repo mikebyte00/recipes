@@ -39,7 +39,9 @@ New Recipes match the existing 37. That bar is low on purpose, and it is the
 thing an agent is most likely to get wrong by trying to be impressive:
 
 - One to three appliances. Air fryer, skillet, rice cooker, Ninja Sizzle.
-- Few ingredients — often three to six.
+- Few ingredients — three to eight for breakfast, lunch and pudding; a dinner
+  plates a protein, a grain and a green and runs 7–12, median 9. Measured
+  against all 37 in [ticket 18](.scratch/meal-planning-system/issues/18-author-new-recipe.md).
 - Methods of three to six numbered steps.
 - Whole foods, low sugar, protein-forward.
 
