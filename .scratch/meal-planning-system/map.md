@@ -348,6 +348,19 @@ naming a cause, especially when the pattern is your own.
   edits. A basket differs from a list for many reasons and search relevance is
   only one; a diff cannot tell a bad match from a human edit, only asking can.
 
+- [Raise The Weak Days](issues/16-raise-the-weak-days.md): **the floor was
+  wrong, not the corpus — lowered ~130g → ~120g, no Recipe or Menu changed.**
+  Put to the user as three options (re-point the six short days at existing
+  denser Recipes, write new Recipes for the two structurally weak Slots, or
+  lower the floor); the user chose to lower it, to the top of a 110–120g range
+  offered back. At ~120g every day in both Menus clears it outright — the
+  lowest is ~122.5g — so nothing needed re-pointing. `GOALS.md`'s Nutrient
+  Goals is the only place the number lived. Real structure was found and kept
+  on record unused: **both Sundays run the two lowest-protein breakfasts in the
+  whole pool**, and **both Thursdays pair the steak dinner with the lightest
+  lunch tier** — either pattern would have closed most of the old gap by
+  re-pointing alone, worth knowing if the floor is ever raised again.
+
 
 ## Not yet specified
 

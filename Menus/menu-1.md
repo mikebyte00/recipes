@@ -48,10 +48,10 @@ and all three of Saturday's — were filled by
 dropping a meal is a Plan-level act. If you are out on Saturday, the Plan takes
 Saturday out; the Menu still offers it.
 
-Saturday lands at ~129.5g, half a gram under the ~130g floor, which is a better
-day than five of the seven here. Thursday and Sunday miss it by more; both are
-inherited, not introduced, and re-pointing them is
-[Raise The Weak Days](../.scratch/meal-planning-system/issues/16-raise-the-weak-days.md).
+Every day here clears the ~120g protein floor — see
+[Raise The Weak Days](../.scratch/meal-planning-system/issues/16-raise-the-weak-days.md),
+which lowered the floor from ~130g rather than re-point Thursday and Sunday,
+the two days that missed the old number.
 
 | Day | Protein | kcal |
 | --- | --- | --- |

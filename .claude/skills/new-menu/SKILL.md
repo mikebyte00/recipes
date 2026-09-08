@@ -45,7 +45,7 @@ grow the pool or fill the Slot some other way.
 3. **Fill the grid**, day by day, against the Layout. Six of the seven dinners
    are fixed by day; everything else is a floor or a count. Prefer the densest
    Recipe in each protein group first — the fills in `GOALS.md`'s worked
-   Menus were chosen that way, and it is what keeps a day clear of the ~130g
+   Menus were chosen that way, and it is what keeps a day clear of the ~120g
    floor. Repeats within a Menu are normal, not a defect: the pool is thinner
    than 28, puddings most of all.
 
@@ -99,7 +99,7 @@ grow the pool or fill the Slot some other way.
        day[d][0] += m['protein_g']; day[d][1] += m['kcal']
    for d in sl.DAYS:
        p, k = day[d]
-       note = ("  UNDER the ~130g floor" if p < 130 else "") + \
+       note = ("  UNDER the ~120g floor" if p < 120 else "") + \
               ("  OVER the ~1800 kcal ceiling" if k > 1800 else "")
        print(f"{d:<10} ~{p:g}g protein  ~{k:g} kcal{note}")
    PY

@@ -37,8 +37,12 @@ was wrong.
 
 ## Nutrient Goals
 
-- **Protein: ~130g/day, as a floor.** Overshooting costs nothing — carbohydrates
+- **Protein: ~120g/day, as a floor.** Overshooting costs nothing — carbohydrates
   and fat are untracked, so there is no budget for extra protein to blow.
+  Lowered from ~130g: measured against both Menus, 6 of 14 days missed ~130g by
+  0.5–7.5g while 8 cleared it, and [Raise The Weak Days](.scratch/meal-planning-system/issues/16-raise-the-weak-days.md)
+  found the corpus, not the number, was the better target — every day in both
+  Menus clears ~120g.
 - **Calories: ~1800/day, as a ceiling.** Being under is better than being over.
 
 Both are rough objectives. A day that misses one is not a failure to correct;

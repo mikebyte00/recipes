@@ -176,4 +176,4 @@ Estimate `protein_g` and `kcal` per person for a serving of 2, store them as
 bare numbers so a Menu and a Plan can sum them, and write `~` on every figure
 you show the user. The band is a target, not a gate — bands are checked at the
 **day**, in `plan-the-week`, and a Recipe at the edge of its range is fine when
-the day still clears ~130g protein under ~1800 kcal.
+the day still clears ~120g protein under ~1800 kcal.

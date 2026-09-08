@@ -1,7 +1,7 @@
 # Raise The Weak Days
 
 Type: grilling
-Status: open
+Status: resolved
 Blocked by: 14
 
 ## Question
@@ -54,3 +54,31 @@ values exactly and corrected the count.
 
 Re-pointing changes days that are otherwise fine. Every swap has to be re-summed
 against all four Bands, not just protein.
+
+## Answer
+
+**The floor was wrong, not the corpus. Lowered ~130g → ~120g, no Recipe or
+Menu changed.** Resolved 08 September 2026.
+
+Put to the user as three options: re-point the six short days at existing
+denser Recipes, write new Recipes for the two structurally weak Slots (Sunday
+breakfast, Thursday lunch), or lower the floor. **The user chose to lower it**,
+to ~120g — the top of a 110–120g range offered back, because it stays closest
+to the original number while still clearing every day.
+
+At ~120g, all 14 days in both Menus clear the floor outright — the lowest is
+Menu 1's Sunday at ~122.5g. Nothing needed re-pointing.
+
+`GOALS.md`'s Nutrient Goals section is the only place this lived — corrected
+there, with the reasoning kept in place rather than just the new number.
+`Menus/menu-1.md` and `Menus/menu-2.md` each carried a note naming the days
+that missed ~130g; both rewritten to point at this ticket instead of listing
+stale day names.
+
+Investigation before the ask found real structure worth keeping on record even
+though it went unused: **both Sundays run the two lowest-protein breakfasts in
+the whole pool** (`eggy-bread` 17.5g, `eggs-and-soldiers` 17g — everything else
+is 22–32g), and **both Thursdays pair a ~46g steak dinner with the lightest
+lunch tier** (43g). Either pattern would have closed most of the old gap by
+re-pointing alone, with kcal headroom to spare in every case except Menu 2's
+Tuesday. Worth knowing if the floor is ever raised again.

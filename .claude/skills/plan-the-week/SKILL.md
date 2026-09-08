@@ -72,7 +72,7 @@ Read `VOCABULARY.md` — *The Plan grid* — and `GOALS.md` before editing a gri
    for d in sl.DAYS:
        p, k, out = day[d]
        note = (f"  {out} Slot(s) eaten out -- not judged" if out else
-               ("  UNDER the ~130g floor" if p < 130 else "")
+               ("  UNDER the ~120g floor" if p < 120 else "")
                + ("  OVER the ~1800 kcal ceiling" if k > 1800 else ""))
        print(f"{d:<10} ~{p:g}g protein  ~{k:g} kcal{note}")
    PY
