@@ -308,6 +308,28 @@ naming a cause, especially when the pattern is your own.
   the pool**.
 
 
+- [Author The New-Menu Skill](issues/19-author-new-menu.md): **written, and
+  every step run before it was called done** — `.claude/skills/new-menu/SKILL.md`,
+  five steps. **Model-invoked**, same reasoning as the other three, but it is
+  the one skill of the four that **never chains anywhere**: a Menu is a
+  standing artifact `plan-the-week` reads on demand, not a pipeline stage.
+  **It never calls `new-recipe`** — a gap the pool cannot fill stops the skill
+  and names the exact Slot and constraint, handing the grow-the-pool decision
+  to the user rather than absorbing it. The seams collapse `GOALS.md`'s Weekly
+  Layout into one table: six of seven dinners fixed by day, breakfast a 3/4
+  split, lunch a **floor** of 2 tofu / 2 chicken (not a ratio), Saturday free.
+  A step-2 probe groups the pool by `(slot, protein)` with macros so a fill is
+  chosen from real numbers; a step-5 check reuses `load_grid`, `load_recipes`
+  and `check_rule` from `bin/shopping-list.py` **unmodified** — a Menu's
+  `days:` block is exactly the shape a Plan's grid is — **no second `bin/`
+  entry**. Verified with a full dry-run Menu 3 assembled from the real pool:
+  clean on completeness, resolution and the Recipe/Pin rule, correctly reported
+  three days under the ~130g floor without blocking, and a second run against a
+  deliberately bad slug confirmed the hard-fail path. The draft was **deleted,
+  not added to `Menus/`**. **This completes the four-skill set** first sketched
+  in [What The Four Skills Are](issues/08-what-the-four-skills-are.md).
+
+
 - [The Query String Generator](issues/10-the-query-string-generator.md):
   **the terms resolve — 34 of 34, first hit.** Pasted into Multi-search against
   a real Plan, every harvested `search_term` returned its intended product,
@@ -356,6 +378,9 @@ naming a cause, especially when the pattern is your own.
      `CLAUDE.md`'s "three to six ingredients" is false of dinners -- but that is
      a correction to the user's own instruction file, raised with them rather
      than promoted here. It opens no design question.
+     Checked a seventh time on resolving [Author The New-Menu
+     Skill](issues/19-author-new-menu.md), 08 September 2026: still empty. This
+     ticket closed the four-skill set outright rather than opening a question.
      Refill as the frontier advances. -->
 
 - **Nothing currently in the fog.** The four patches that stood here are gone:
