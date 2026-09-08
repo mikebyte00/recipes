@@ -25,6 +25,13 @@ handed off to a separate effort would be ceremony.
 default. `writing-for-agents` when authoring any of the four skills.
 `prototype` for file-shape questions. `research` for anything about Waitrose.
 
+**Authoring a skill ends by running it.** Parse its frontmatter as YAML before
+calling it done — an unquoted `: ` in a `description` makes a skill silently
+unloadable, and [Author The Shopping-List
+Skill](issues/21-author-shopping-list.md) shipped that defect until it was
+checked. Run every step of the skill too: that same ticket's splice command was
+wrong in a way no amount of reading it would have shown.
+
 **Standing preferences for this effort**:
 
 - Serves 2, fixed, project-wide constant. Not a per-Recipe field.
@@ -222,6 +229,24 @@ default. `writing-for-agents` when authoring any of the four skills.
   that means pack size**, taken because the honest alternative re-flags the row.
   The two mayos were fixed rather than left: latent, and free to fix because no
   `qty` exists to migrate.
+
+
+- [Author The Shopping-List Skill](issues/21-author-shopping-list.md):
+  **written, and every step run before it was called done** —
+  `.claude/skills/shopping-list/SKILL.md`, the repo's first skill.
+  **Model-invoked**, because it is the one you reach for mid-week in a session
+  about something else, which also leaves [Author
+  Plan-The-Week](issues/20-author-plan-the-week.md) free to chain or hand off.
+  Authoring forced three decisions: **`## Shopping` is a Plan's last section**
+  (now in `VOCABULARY.md`, so regeneration is one deterministic replace);
+  the section reaches the file **verbatim by construction**, because the splice
+  re-runs the script rather than transcribing it; and a flag **asks for the pack
+  size** rather than estimating it. Verified on a throwaway Plan: idempotent
+  across three runs from both starting states, a hard failure leaves the Plan
+  byte-identical, and **`eaten-out` works in a Plan** — never exercised outside a
+  Menu before — taking Menu 1 from 39 lines to 37. Running it caught two defects
+  invisible on the page, one of them a `description` that **failed to parse as
+  YAML**; the lesson is now a standing line in Notes.
 
 
 ## Not yet specified

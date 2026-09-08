@@ -53,6 +53,10 @@ meaningful: an empty value or a missing key reads as an incomplete grid, which
 `bin/shopping-list.py` treats as fatal. Decided in
 [The Shopping List Script](.scratch/meal-planning-system/issues/17-the-shopping-list-script.md).
 
+**A Plan's body ends with its `## Shopping` section.** Regenerating the list
+replaces everything from that heading to the end of the file, so anything
+written below it is lost on the next run. Notes about the week go above it.
+
 
 ## Notes on two fields
 
