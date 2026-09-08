@@ -249,6 +249,33 @@ wrong in a way no amount of reading it would have shown.
   YAML**; the lesson is now a standing line in Notes.
 
 
+- [Author The Plan-The-Week Skill](issues/20-author-plan-the-week.md):
+  **written, and every step run before it was called done** —
+  `.claude/skills/plan-the-week/SKILL.md`, six steps. **Model-invoked**, because
+  the cost of it not firing is not a retype but a Plan improvised by hand
+  against a grid the script treats as fatal when short. It **chains** into
+  `shopping-list`, the choice [Author The Shopping-List
+  Skill](issues/21-author-shopping-list.md) deliberately left open: the
+  re-runnability seam is an argument about the *second* run and says nothing
+  against the first, and a Plan with no shopping section is a half-done job.
+  The harvest stays step 1 but is **offered**, since a no-op harvest is free
+  only once the browser is open — skipping it merely routes this week's new
+  ingredients through **Unpinned**, which is the designed path anyway. The grid
+  is lifted by `awk`, **verbatim by construction**, as ticket 21 did for the
+  shopping section. **`menu:` is exercised for the first time** — mandated by
+  [Where Everything Lives](issues/05-where-everything-lives.md), read by the
+  script since it was written, and never carried by any file until now. Running
+  step 5 caught what reading it could not: a day with `eaten-out` Slots reported
+  UNDER the protein floor, a **false alarm** that would have trained the user to
+  ignore the report, so such a day is now reported and **not judged**. The day
+  sum is a heredoc importing `bin/shopping-list.py`, **not a second `bin/`
+  entry**. Verified end to end on a throwaway Plan: 28 Slots copied, 39 lines,
+  0 flags, idempotent, week notes surviving above `## Shopping`. Also corrected
+  a number the map itself was carrying — [Raise The Weak
+  Days](issues/16-raise-the-weak-days.md) is **six** short days, not five; its
+  table always said six and only its prose said five.
+
+
 ## Not yet specified
 
 <!-- Emptied by [What The Four Skills Are](issues/08-what-the-four-skills-are.md),
@@ -262,6 +289,11 @@ wrong in a way no amount of reading it would have shown.
      Pins](issues/23-fix-the-flagged-pins.md), 08 September 2026: still empty —
      that ticket closed a defect class outright rather than opening a question,
      and a whole-catalogue scan confirmed no successor defect is hiding.
+     Checked a fourth time on resolving [Author The Plan-The-Week
+     Skill](issues/20-author-plan-the-week.md), 08 September 2026: still empty.
+     That ticket closed the two open choices it inherited (chain, and
+     model-invoke) rather than opening any, and its one surprise -- the
+     eaten-out false alarm -- was fixed in the skill on the spot.
      Refill as the frontier advances. -->
 
 - **Nothing currently in the fog.** The four patches that stood here are gone:
