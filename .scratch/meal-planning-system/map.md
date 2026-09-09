@@ -362,6 +362,31 @@ naming a cause, especially when the pattern is your own.
   re-pointing alone, worth knowing if the floor is ever raised again.
 
 
+- [Browse The Pool](issues/24-browse-the-pool.md): **the one-code rule becomes
+  two named entries, and the repo gets an interface.** `bin/browse.py` generates
+  a self-contained `index.html` -- Recipes, Menus and Orders, all data inlined,
+  no server and no build step -- committed so GitHub Pages can serve it from the
+  branch root. The authorisation is not an exception to the rule but its goal:
+  the rule protected human readability, and a page that reads the markdown back
+  is that readability. **A third `bin/` entry is still a ticket.** Day totals and
+  protein-type composition are **computed from the Recipes, never read** from the
+  prose table in a Menu file, so drift is visible -- measured, and all 14 days
+  across both Menus agree exactly today. The page surfaces what nothing had said
+  aloud: **4 orphan Recipes** no Menu uses, and **4 items bought more than once
+  with no Pin**, which is the pinning worklist. Running it corrected the design
+  once: search had to cover `search_term`, not just `display`, because `display`
+  is the *Recipe's* word -- `parmigiano` returned nothing until the shelf's
+  vocabulary joined the haystack, which is the exact miss the requirement
+  existed to prevent. **`tests/` is the repo's first test directory**, 52 stdlib
+  tests, justified by one thing only: `Orders/*.md` hold real personal data, and
+  a redaction that silently stops redacting publishes it. Redaction is by
+  omission at parse time *and* a guard that refuses to write a page carrying a
+  redacted string, verified independently by grepping the output. **One risk is
+  left open and named**: the order files are tracked in git, so redacting the
+  page does nothing for the repository -- do not add a remote and enable Pages
+  until that is settled.
+
+
 ## Not yet specified
 
 <!-- Emptied by [What The Four Skills Are](issues/08-what-the-four-skills-are.md),
@@ -394,6 +419,12 @@ naming a cause, especially when the pattern is your own.
      Checked a seventh time on resolving [Author The New-Menu
      Skill](issues/19-author-new-menu.md), 08 September 2026: still empty. This
      ticket closed the four-skill set outright rather than opening a question.
+     Checked an eighth time on resolving [Browse The
+     Pool](issues/24-browse-the-pool.md), 09 September 2026: still empty as a
+     design question. That ticket opened one thing, and it is a **risk, not a
+     fog patch** -- `Orders/*.md` are tracked in git, so the repo cannot go
+     public as it stands. It is recorded in the ticket, where whoever adds a
+     remote will meet it.
      Refill as the frontier advances. -->
 
 - **Nothing currently in the fog.** The four patches that stood here are gone:

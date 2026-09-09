@@ -24,13 +24,27 @@ and answering it in passing loses the decision. The original two-week corpus
 lived in `Rotations/`; it was the input to the extraction, and `git show
 0beccfa:Rotations/Week1.md` still reads it.
 
-## There is exactly one piece of code
+## There are exactly two pieces of code
 
-`bin/shopping-list.py` aggregates a Plan into its shopping section, and it is
-the only code this project authorises. Adding a second `bin/` entry is a
-decision, not a convenience — raise it as a ticket. Everything else is prose,
-because everything else is judgement. Ruled in
-[.scratch/meal-planning-system/issues/08-what-the-four-skills-are.md](.scratch/meal-planning-system/issues/08-what-the-four-skills-are.md).
+Named, because the list is the rule:
+
+- **`bin/shopping-list.py`** aggregates a Plan into its shopping section. Ruled
+  in [What The Four Skills Are](.scratch/meal-planning-system/issues/08-what-the-four-skills-are.md).
+- **`bin/browse.py`** generates `index.html`, the browse interface over Recipes,
+  Menus and Orders. Ruled in
+  [Browse The Pool](.scratch/meal-planning-system/issues/24-browse-the-pool.md).
+
+A **third** `bin/` entry is a decision, not a convenience — raise it as a
+ticket. Everything else is prose, because everything else is judgement.
+
+`index.html` is generated and committed, and regenerating it is manual:
+re-run `bin/browse.py` whenever a Recipe, Menu, Pin or Order changes.
+`bin/browse.py --check` says whether the committed page has gone stale.
+
+**The page publishes a redacted view of `Orders/`**, which hold real personal
+data. Read [Browse The Pool](.scratch/meal-planning-system/issues/24-browse-the-pool.md)
+before touching that redaction, and run `python3 tests/test_browse.py`
+afterwards — those 52 tests exist to catch a redaction that stops redacting.
 
 
 ## The bar for a Recipe

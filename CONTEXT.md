@@ -62,12 +62,13 @@ A canonical ingredient bound to a specific purchasable product — one you have
 vetted with your own money. A Pin is what turns "cannellini beans" into a thing
 that can be added to a basket without guessing.
 
-A past order is evidence for a Pin, not the only kind: the counter proteins and
-the store-cupboard staples are vetted the same way and written by hand.
+An [Order](#order) is evidence for a Pin, not the only kind: the counter
+proteins and the store-cupboard staples are vetted the same way and written by
+hand.
 
 Pins are **stored in this repo**, not re-derived each week: a Pin is a decision,
-and decisions belong somewhere you can see and correct them. Past orders are how
-Pins get created, not where they live. A Pin holds only what was decided;
+and decisions belong somewhere you can see and correct them. [Orders](#order)
+are how Pins get created, not where they live. A Pin holds only what was decided;
 anything countable — how often something was bought, and when — stays countable
 from the orders themselves.
 
@@ -89,6 +90,27 @@ automation and listed for you to add by hand.
 
 Adding one by hand puts it in your order history, where the next harvest turns
 it into a Pin. The manual work feeds the system rather than repeating.
+
+## Order
+
+A completed Waitrose shop, captured from the household's own account and kept.
+An Order records what was actually bought: the products, their sizes and
+quantities, what they cost, and the six-digit line number that names each one on
+the shelf.
+
+An Order is **evidence, not a decision**. It says what happened once; a
+[Pin](#pin) says what to do next time. That is the whole of the relationship
+between them, and it is why an Order is never edited to reflect a change of mind
+— a Pin is.
+
+Orders are also the only place the **shop's own vocabulary** is written down. A
+[Recipe](#recipe) says parmesan and pine nuts; the Order says Parmigiano
+Reggiano and Pine Kernels. Those two vocabularies disagree, and an Order is the
+only record of how.
+
+An Order carries facts about the household as well as about its food — where and
+when the shop was collected, and whatever non-food went into the same basket.
+Those are not things this project plans against.
 
 ## Protein Type
 
