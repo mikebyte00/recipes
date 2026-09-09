@@ -156,23 +156,76 @@ they were invisible before this page existed.
 - **Regeneration is manual and therefore forgettable.** `--check` is the
   mitigation, not a fix. Automating it is a CI decision nobody has asked for.
 
-### Unresolved, and deliberately not fixed here
+### The repository risk, and how it was settled
 
-**`Orders/11-august.md`, `25-august.md` and `31-august.md` are tracked in git**,
-order numbers, postcode, collection windows and Toiletries included. Redacting
-`index.html` protects the *page*; it does nothing for the *repository*. If this
-repo is made public to serve Pages from the branch root, the raw order files are
-public with it — and they are in the history, so deleting them later does not
-retract them.
+**Settled 09 September 2026. The repo is public and Pages serves the page; the
+order files were taken out of the repo and out of its history first.**
 
-There is **no git remote configured**, so nothing has been exposed.
+The risk as originally written: `Orders/*.md` are tracked, order numbers, branch,
+postcode, collection windows and a personal-care category included. `browse.py`
+redacts the *page*; it does nothing for the *repository*. Serving Pages from the
+branch root publishes the repo alongside the page.
 
-Put to the user, who chose to **build the redaction and flag this rather than
-rewrite history or strip the source files**. The resolutions available, for
-whoever settles it:
+Three resolutions were offered — a private repo, strip and rewrite, or move
+`Orders/` out entirely. The user chose to **publish publicly, with the order
+files removed from the repo and purged from the history**, and judged the
+order numbers and the postcode to be the data that actually matters. The
+personal-care lines were scrubbed in the same pass regardless.
 
-- serve Pages from a **private** repo, which keeps the raw files unpublished;
-- strip the source files and rewrite the history before any remote is added;
-- move `Orders/*.md` out of the repo entirely.
+**The ticket's own statement of the risk was incomplete, and that is the lesson
+here.** It named three files. A scan of every tracked path found the postcode
+and real order numbers in **five**:
 
-**Do not add a remote and enable Pages until this is decided.**
+| Where | What |
+|---|---|
+| `Orders/{11,25,31}-august.md` | the captured orders themselves |
+| `Orders/HARVEST.md` | a worked example built from a real order |
+| `tests/test_browse.py` | a fixture using real values *on purpose*, to prove the guard catches them |
+| `issues/24-browse-the-pool.md` | this file, quoting the strings while documenting their redaction |
+| `issues/09-harvesting-past-orders.md` | an order number quoted as an example |
+
+Two of those exist *because* of the redaction work: a test proving PII is caught
+has to contain PII, and a decision record explaining what is hidden reaches for
+the thing it hides. Redaction machinery grows its own copies of the secret. A
+future audit should assume the same and grep, not read.
+
+### What was done
+
+1. `.gitignore` gains `Orders/*` with `HARVEST.md` and `history.md` allowlisted
+   — a new order file is ignored by default, so tracking one has to be a
+   deliberate act rather than a slip.
+2. `git filter-repo` purged the three order files from all 30 commits and
+   replaced the PII strings that remained in the history of the other four
+   files. **Two passes were needed**: the first replaced full product names,
+   and `PINS.md`'s prose used short forms. One pass looked clean by the tests
+   and was not.
+3. The order files stay on disk. **`bin/browse.py` is unchanged** — it reads the
+   filesystem, not git — so the same page is generated from the same sources.
+4. `tests/test_browse.py`'s fixture became synthetic. It caught an incomplete
+   edit doing so: the toiletries product was changed in the fixture but not in
+   the assertion handed to `assert_no_pii()`, and the suite went red. The 52
+   tests earned their existence a second time.
+
+Verified on the pushed branch, not just locally: `origin/main` carries no order
+number, no postcode, no branch name, and no string shaped like either beyond the
+synthetic replacements. The three order files appear in no commit.
+
+**Nothing was ever pushed before the rewrite** — the GitHub repo was empty, zero
+refs. This matters: GitHub keeps unreachable objects addressable by SHA after a
+force-push, so a rewrite done *after* a first push leaves the originals
+retrievable on their servers. Rewriting before the first push is the only
+version of this that fully works. Anyone repeating it elsewhere should check
+`git ls-remote` is empty before trusting it.
+
+### What this costs, from here
+
+- **A redaction failure is now an internet-facing failure.** It used to leak to
+  a local file. `python3 tests/test_browse.py` before any push that touches
+  `browse.py`, and treat a change near `assert_no_pii()` as load-bearing.
+- **Publishing is manual and two-step**: `python3 bin/browse.py`, then commit
+  and push. `--check` reports staleness, and a stale page is now a stale
+  *public* page.
+- **A fresh clone cannot regenerate the page.** The order files are not in it,
+  so `browse.py` has nothing to read for the Orders section. `index.html` is
+  committed, so the page survives; regenerating it needs the order files on
+  disk. Accepted rather than solved.

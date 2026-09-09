@@ -381,10 +381,26 @@ naming a cause, especially when the pattern is your own.
   tests, justified by one thing only: `Orders/*.md` hold real personal data, and
   a redaction that silently stops redacting publishes it. Redaction is by
   omission at parse time *and* a guard that refuses to write a page carrying a
-  redacted string, verified independently by grepping the output. **One risk is
-  left open and named**: the order files are tracked in git, so redacting the
-  page does nothing for the repository -- do not add a remote and enable Pages
-  until that is settled.
+  redacted string, verified independently by grepping the output. **One risk was
+  left open and named**: the order files were tracked in git, so redacting the
+  page did nothing for the repository.
+
+- [Browse The Pool](issues/24-browse-the-pool.md), settled 09 September 2026:
+  **the repo is public, and the harvested orders live outside it.** Chosen over
+  a private repo or leaving the risk standing. `Orders/*` is gitignored behind
+  an allowlist and the three order files were purged from all 30 commits before
+  the first push, so the page is served from the branch root at
+  `mikebyte00.github.io/recipes`. **`bin/browse.py` is unchanged** -- it reads
+  the filesystem, so the orders staying on disk cost no code. Three things worth
+  carrying: the ticket's own statement of the risk named **three files and the
+  real answer was five** -- a test proving PII is caught must contain PII, and a
+  decision record explaining a redaction reaches for the thing it hides, so
+  **redaction machinery grows its own copies of the secret**; the rewrite needed
+  **two passes**, because prose used short product names where the first pass
+  matched full ones, and one pass looked clean by the tests; and it only fully
+  works **before the first push**, since GitHub keeps unreachable objects
+  addressable by SHA afterwards. The cost accepted is that a redaction failure
+  is now internet-facing, and a fresh clone cannot regenerate the page.
 
 
 ## Not yet specified
@@ -421,10 +437,10 @@ naming a cause, especially when the pattern is your own.
      ticket closed the four-skill set outright rather than opening a question.
      Checked an eighth time on resolving [Browse The
      Pool](issues/24-browse-the-pool.md), 09 September 2026: still empty as a
-     design question. That ticket opened one thing, and it is a **risk, not a
-     fog patch** -- `Orders/*.md` are tracked in git, so the repo cannot go
-     public as it stands. It is recorded in the ticket, where whoever adds a
-     remote will meet it.
+     design question. That ticket opened one thing, and it was a **risk, not a
+     fog patch** -- `Orders/*.md` were tracked in git, so the repo could not go
+     public as it stood. **Settled the same day** by taking the order files out
+     of the repo and its history before the first push; see the ticket.
      Refill as the frontier advances. -->
 
 - **Nothing currently in the fog.** The four patches that stood here are gone:
