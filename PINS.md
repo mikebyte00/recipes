@@ -14,6 +14,11 @@ Every row here was confirmed by hand in
 the same day — which merged seven near-duplicate slugs and took `staple` off the
 recipe ingredient, leaving the Pin as its only home.
 
+The catalogue itself is unchanged since then. The coverage counts below — the
+87-Pin breakdown, [Absences](#absences), and [Bought, matched
+nothing](#bought-matched-nothing) — were recounted against the pool on
+09 September 2026, after four Recipes landed and took the corpus to 41.
+
 ## Reading a Pin
 
 | Field | Meaning |
@@ -53,7 +58,7 @@ hand, and adding it puts it in your order history where the next harvest turns
 it into a Pin.
 
 **87 Pins**: 56 with harvested line numbers, 7 counter proteins, 24
-store-cupboard staples not yet seen in an order. 17 of the corpus's 104
+store-cupboard staples not yet seen in an order. 28 of the corpus's 115
 ingredients have no Pin.
 
 ## The catalogue
@@ -859,18 +864,25 @@ worcestershire-sauce:
 
 ## Absences
 
-The 17 ingredients with no Pin, and why. Recorded here so the catalogue's
+The 28 ingredients with no Pin, and why. Recorded here so the catalogue's
 coverage is checkable rather than assumed. **This list is the Unpinned flag**:
 an ingredient here is added to the order by hand, and buying it once puts it in
 the order history where the next harvest turns it into a Pin.
 
-**Never harvested (14)** — real shopping items absent from the three captured
+**Never harvested (23)** — real shopping items absent from the three captured
 orders. Each will Pin itself on the next harvest after you buy it.
 
 - `blue-cheese` (Saint Agur light) · `burger-buns` · `chestnut-mushrooms` ·
   `flaked-almonds` · `green-beans` · `halloumi` · `lettuce` · `parsley` ·
   `pineapple` · `red-onion` · `strawberries` · `waffle-fries` ·
-  `wholewheat-linguine` · `milk-chocolate`
+  `wholewheat-linguine` · `milk-chocolate` · `chilli-oil` · `cinnamon` ·
+  `coconut-milk` · `jerk-seasoning` · `kidney-beans` · `marmalade` ·
+  `rice-vinegar` · `spring-onion` · `sweetheart-cabbage`
+
+Four of those nine additions — `chilli-oil`, `cinnamon`, `jerk-seasoning`,
+`rice-vinegar` — read like store cupboard, and would likely mint as staples.
+Likely is not confirmed, so they sit here until a harvest and a human say
+otherwise.
 
 `milk-chocolate` is the odd one: the only chocolates in the order history are
 dark (789167) and white. The Belgian Dark Chocolate may well be what the
@@ -882,18 +894,35 @@ one on a hunch is exactly what `confirmed` exists to prevent.
 - `garlic` · `ginger` · `black-olives` — cupboard-adjacent but genuinely
   perishable, so they belong on a shopping list. No product harvested yet.
 
+**Harvested, not yet minted (2)**
+
+- `banana` (Duchy Organic Fairtrade Bananas, 088937, in all three orders) ·
+  `blueberries` (Duchy Organic Blueberries, 088973, 31 August)
+
+These two are the ordinary case running backwards: the product was already in
+the order history, and the ingredient arrived afterwards with the yogurt pots.
+A harvest proposes; a human confirms. Until someone works
+[Orders/HARVEST.md](Orders/HARVEST.md) steps 6-9 over them they have no row,
+so they stay on the Unpinned flag and get added by hand.
+
 ## Bought, matched nothing
 
-24 of the 86 harvested products bind to no ingredient. Evidence, not candidates
-— matching is slug-driven, so these were never proposed.
+24 of the 86 harvested products bind to no Pin. Mostly evidence rather than
+candidates — matching is slug-driven, so these were never proposed.
 
-Household and personal (7): Andrex toilet tissue · Ecover washing liquid ×2 ·
+Household and personal (6): Andrex toilet tissue · Ecover washing liquid ×2 ·
 Ecover fabric softener · a personal-care refill · a supplement.
 
-Groceries outside the recipe corpus (17): bananas · blueberries · grapes ·
-kiwi · carrots · peppers · cucumber · radish · watercress · pumpkin seeds ·
-plum tomatoes · blackeye beans · beef bone broth · chimichurri marinade ·
-tomato salsa dip · Cooks' Ingredients Basil · **Tenderstem broccoli**.
+Groceries outside the recipe corpus (15): grapes · kiwi · carrots · peppers ·
+cucumber · radish · watercress · pumpkin seeds · plum tomatoes · blackeye
+beans · beef bone broth · chimichurri marinade · tomato salsa dip · Cooks'
+Ingredients Basil · **Tenderstem broccoli**.
+
+Chocolate (1): Cooks' Ingredients Belgian Dark Chocolate — see the
+`milk-chocolate` note in [Absences](#absences).
+
+Candidates, not evidence (2): bananas · blueberries. Both now answer a corpus
+ingredient and are listed under [Absences](#absences) awaiting a minted Pin.
 
 **Tenderstem broccoli** is worth a second look — 200g, bought twice, and no
 Recipe in the corpus uses it. That reads like a dinner side you cook regularly
