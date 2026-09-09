@@ -78,7 +78,7 @@ history. It is not enough for two things:
 
 ### Gap 1 — no product line numbers
 
-The files carry **order** numbers (e.g. 1000000003) but no **product** line
+The files carry **order** numbers but no **product** line
 numbers. [Can Claude Drive Waitrose](01-can-claude-drive-waitrose.md) found
 line numbers to be the stable, reliable identifier, and the eventual route by
 which the basket question could be revisited at all. Pins minted from this

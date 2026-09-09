@@ -6,3 +6,13 @@
 *~
 __pycache__/
 *.pyc
+
+# Harvested Waitrose orders hold real personal data — order numbers, the
+# collection branch and postcode, collection windows, and a personal-care
+# category. bin/browse.py reads them from disk and publishes a redacted view;
+# the repo is public, so the sources stay out of it. Keep them here locally.
+# Allowlist, not a pattern: a new order file is ignored by default, and adding
+# one to the repo has to be a deliberate act.
+Orders/*
+!Orders/HARVEST.md
+!Orders/history.md

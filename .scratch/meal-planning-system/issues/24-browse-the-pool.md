@@ -94,9 +94,11 @@ Two independent mechanisms, deliberately:
    anyone remembering to add it.
 
 Verified independently of both, by grepping the generated `index.html` for every
-PII string by hand: **0 hits** for all three order numbers, `Riverside`,
-`AB1 2CD`, all five collection windows, both toiletries products and both their
-line numbers. The two apparent hits are the page's own notice of *what it
+PII string by hand: **0 hits** for all three order numbers, the collection
+branch, the postcode, all five collection windows, both toiletries products and
+both their line numbers. The strings themselves are not quoted here; the repo is
+public, and naming them in the decision record would undo the redaction it
+documents. The two apparent hits are the page's own notice of *what it
 omits*, which is intended.
 
 The page says so on its face rather than silently dropping rows.

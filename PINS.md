@@ -17,7 +17,7 @@ recipe ingredient, leaving the Pin as its only home.
 The catalogue itself is unchanged since then. The coverage counts below — the
 87-Pin breakdown, [Absences](#absences), and [Bought, matched
 nothing](#bought-matched-nothing) — were recounted against the pool on
-09 September 2026, after four Recipes landed and took the corpus to 41.
+09 September 2026, after five Recipes landed and took the corpus to 42.
 
 ## Reading a Pin
 
@@ -58,7 +58,7 @@ hand, and adding it puts it in your order history where the next harvest turns
 it into a Pin.
 
 **87 Pins**: 56 with harvested line numbers, 7 counter proteins, 24
-store-cupboard staples not yet seen in an order. 28 of the corpus's 115
+store-cupboard staples not yet seen in an order. 30 of the corpus's 117
 ingredients have no Pin.
 
 ## The catalogue
@@ -864,12 +864,12 @@ worcestershire-sauce:
 
 ## Absences
 
-The 28 ingredients with no Pin, and why. Recorded here so the catalogue's
+The 30 ingredients with no Pin, and why. Recorded here so the catalogue's
 coverage is checkable rather than assumed. **This list is the Unpinned flag**:
 an ingredient here is added to the order by hand, and buying it once puts it in
 the order history where the next harvest turns it into a Pin.
 
-**Never harvested (23)** — real shopping items absent from the three captured
+**Never harvested (25)** — real shopping items absent from the three captured
 orders. Each will Pin itself on the next harvest after you buy it.
 
 - `blue-cheese` (Saint Agur light) · `burger-buns` · `chestnut-mushrooms` ·
@@ -877,9 +877,9 @@ orders. Each will Pin itself on the next harvest after you buy it.
   `pineapple` · `red-onion` · `strawberries` · `waffle-fries` ·
   `wholewheat-linguine` · `milk-chocolate` · `chilli-oil` · `cinnamon` ·
   `coconut-milk` · `jerk-seasoning` · `kidney-beans` · `marmalade` ·
-  `rice-vinegar` · `spring-onion` · `sweetheart-cabbage`
+  `rice-vinegar` · `spring-onion` · `sweetheart-cabbage` · `pancetta` · `peas`
 
-Four of those nine additions — `chilli-oil`, `cinnamon`, `jerk-seasoning`,
+Four of those eleven additions — `chilli-oil`, `cinnamon`, `jerk-seasoning`,
 `rice-vinegar` — read like store cupboard, and would likely mint as staples.
 Likely is not confirmed, so they sit here until a harvest and a human say
 otherwise.
@@ -910,8 +910,10 @@ so they stay on the Unpinned flag and get added by hand.
 24 of the 86 harvested products bind to no Pin. Mostly evidence rather than
 candidates — matching is slug-driven, so these were never proposed.
 
-Household and personal (6): Andrex toilet tissue · Ecover washing liquid ×2 ·
-Ecover fabric softener · a personal-care refill · a supplement.
+Household and personal (6): four cleaning and laundry lines, one personal-care
+refill, one supplement. Not named here — this file is public, and the page
+redacts the whole personal-care category, so listing the products in prose would
+undo that. The order files on disk have them.
 
 Groceries outside the recipe corpus (15): grapes · kiwi · carrots · peppers ·
 cucumber · radish · watercress · pumpkin seeds · plum tomatoes · blackeye
