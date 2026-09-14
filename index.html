@@ -482,8 +482,9 @@ function planExit(){
 
 function checkoutView(){
   return `<p class="lede">28 Slots, Monday first. A skipped Slot reads
-      <code>eaten-out</code>, which buys nothing. Paste this into
-      <code>plan-the-week</code> at step 3, in place of the copied Menu grid.</p>
+      <code>eaten-out</code> — the grid's one reserved value, and the only thing
+      besides a Recipe slug the shopping list accepts. It buys nothing. Paste this
+      into <code>plan-the-week</code> at step 3, in place of the copied Menu grid.</p>
     <div class="tools"><button id="edit">← Back to the week</button>
       <button id="startover">Start over</button></div>
     <textarea id="out" rows="32" readonly>${esc(planYaml())}</textarea>`;
@@ -500,7 +501,7 @@ function renderDrawer(){
   const here = at
     ? `Pick <b>${cap(at[0])} ${at[1]}</b>${
         plan[planKey(at)] ? ` <span class="note">— holds ${
-          plan[planKey(at)] === 'eaten-out' ? 'eaten out'
+          plan[planKey(at)] === 'eaten-out' ? 'skipped'
           : esc((byslug[plan[planKey(at)]] || {}).title || '')}</span>` : ''}`
     : `<b>All 28 Slots filled.</b>`;
 
