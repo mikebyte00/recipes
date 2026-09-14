@@ -48,9 +48,13 @@ Three hard guardrails, because the surrounding surfaces are live commerce:
 `robots.txt` disallows `/ecom/myaccount/my-orders` to crawlers. This procedure
 is a person reading their own account, at their own request, in their own
 browser — not a crawler indexing a site. **That reasoning covers this harvest
-and nothing else.** Driving the basket stays parked; see
+and the basket, and nothing else.**
+
+Driving the basket is **no longer parked**: the user extended that same
+reasoning to the trolley on 14 September 2026, and the procedure lives in
+[BASKET.md](BASKET.md). It writes; this file still only reads. Read
 `.scratch/meal-planning-system/issues/01-can-claude-drive-waitrose.md` before
-extending anything here.
+extending either beyond those two surfaces.
 
 ## Scope
 

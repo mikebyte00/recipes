@@ -376,7 +376,7 @@ def load_orders(root):
     parsed, raw = [], []
     for path in sorted(glob.glob(os.path.join(root, "Orders", "*.md"))):
         name = os.path.basename(path)
-        if name in ("HARVEST.md", "history.md"):
+        if name in ("HARVEST.md", "BASKET.md", "history.md"):
             continue
         text = read(path)
         raw.append(text)

@@ -30,7 +30,8 @@ list has to carry enough description for a human to resolve ambiguity.
 
 ## Answer
 
-**Verdict: semi-automation only. Do not build basket automation.**
+**Original verdict: semi-automation only. Do not build basket automation.**
+**Superseded in part, 14 September 2026 — see [Reassessment](#reassessment-14-september-2026).**
 
 Full report: [waitrose-feasibility.md](../research/waitrose-feasibility.md).
 Verified first-hand in a sandboxed browser, never signed in, no order touched.
@@ -82,3 +83,41 @@ no scraping, no basket driving.
 controls: the gap between `Fage 2%` (1104 results, wrong) and `Fage Total 2`
 (9 results, right) is a **string transformation**. That is the thing worth
 building.
+
+## Reassessment, 14 September 2026
+
+**Basket automation is built, by line number.** `Orders/BASKET.md` holds the
+procedure. The original verdict stands for everything it actually measured; it
+answered a different question from the one that got asked.
+
+**The blocker never applied to this design.** The verdict rested on search
+relevance — 1 ingredient in 7 resolving. Filling a basket from a Plan's Waitrose
+table **never searches**. Every row already carries a confirmed line number, and
+this ticket's own finding is that the 6-digit number resolves on its own. The
+matching problem the verdict was about had already been solved by `PINS.md`,
+which did not exist when the research ran.
+
+**"Add-to-trolley silently failed as a guest, cause undetermined" is resolved:
+the cause was being a guest.** Verified first-hand in the user's signed-in
+session — quantity 5 of line 097155 added on one click, reconciled exactly
+against the trolley total. The failure is specific to guest sessions, and it
+still presents as silence, which is why `BASKET.md` opens by checking sign-in.
+
+**Three findings that only appear when you write, not read:**
+
+- **Quantity is a typeable text box**, not a stepper. One type, one click, any
+  quantity. This is what makes the whole thing cheap.
+- **Setting that box programmatically silently does nothing** — the page's own
+  state stays at 1 and the click adds nothing, with no error. Real events only.
+- **The header trolley total is stale after an add** and shows neither the old
+  nor the new value. Verification reads the trolley page.
+
+**The robots.txt line was crossed deliberately.** `/ecom/shop/trolley` is
+`Disallow`ed. The user overruled it on the reasoning already used for the
+harvest — their own session, their own basket, at their own request, not a
+crawler — and asked for the decision to be recorded rather than re-litigated.
+It extends to the trolley and product pages and **nothing further**; placing an
+order stays the user's, and credentials are never entered.
+
+**Unchanged:** Multi-search remains the surface for Unpinned items, which have
+no line number by definition. This automates the pinned lines, not the list.

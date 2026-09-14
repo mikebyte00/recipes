@@ -15,4 +15,5 @@ __pycache__/
 # one to the repo has to be a deliberate act.
 Orders/*
 !Orders/HARVEST.md
+!Orders/BASKET.md
 !Orders/history.md

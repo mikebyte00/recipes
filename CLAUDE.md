@@ -96,13 +96,23 @@ raising rather than a spec to follow.
 
 ## Waitrose
 
-The project **generates search terms for the user to paste**; it does not drive
-the basket and does not place orders. That is a deliberate decision backed by
-research, not a gap waiting to be filled — see
+The project **generates search terms for the user to paste**, and — since
+14 September 2026 — can also **fill the trolley directly by line number**,
+following [Orders/BASKET.md](Orders/BASKET.md). It still **does not place
+orders**: checkout, payment and slot booking are the user's, always, and
+credentials are never entered.
+
+Basket-filling works only because every pinned row already carries a line
+number; it never searches. Unpinned items have no line number and stay with
+Multi-search. Read
 [.scratch/meal-planning-system/issues/01-can-claude-drive-waitrose.md](.scratch/meal-planning-system/issues/01-can-claude-drive-waitrose.md)
-before proposing automation here. `robots.txt` disallows the trolley, search,
-order-history and lists paths; Multi-search deep links are a normal navigation
-the user clicks, which is why they are fine.
+before proposing automation beyond that. `robots.txt` disallows the trolley,
+search, order-history and lists paths. The user overruled it for the trolley,
+product and order-history pages — their own session, their own basket, at their
+own request — and that overrule covers **those surfaces and nothing else**.
+Search stays off the table on relevance grounds regardless: it resolved
+1 ingredient in 7. Multi-search deep links are a normal navigation the user
+clicks, which is why they are fine.
 
 **Harvesting orders is the one exception**, and it is read-only: capturing a
 completed order's items and line numbers from the user's own signed-in session
