@@ -12,6 +12,7 @@ which holds the reasoning. This file is the operative list.
 | `slot` | one | `breakfast` `lunch` `dinner` `pudding` |
 | `protein` | one, or absent on a pudding | `sausage` `egg` `tofu` `quorn` `chicken` `white-fish` `oily-fish` `beef` |
 | `effort` | one | `low` `medium` `high` |
+| `rating` | one, or absent | `1` `2` `3` `4` `5` |
 | `appliances` | list | `skillet` `air-fryer` `ninja-sizzle` `rice-cooker` `pot` `toaster` `poacher` |
 | `tags` | list | `fakeaway` `bulk-cook` `eat-cold` |
 
@@ -58,7 +59,7 @@ replaces everything from that heading to the end of the file, so anything
 written below it is lost on the next run. Notes about the week go above it.
 
 
-## Notes on two fields
+## Notes on three fields
 
 **`protein` is omitted on a `pudding`** and required on every other slot.
 `GOALS.md` lays out the week in protein types across breakfast, lunch and
@@ -85,3 +86,15 @@ across three appliances.
 - `low` — ~4 or fewer ingredients, 0–1 appliances.
 - `medium` — 5–7 ingredients, 1–2 appliances.
 - `high` — 8+ ingredients, or 3 appliances.
+
+**`rating` is written by a human, never by an agent.** It records how good the
+household found a Recipe once they had eaten it, which is not knowable at the
+time it is authored. Unlike `effort` — Claude-generated and then stored — a
+rating has no rule an agent could apply, so **a Recipe an agent writes omits
+the field entirely** and the household adds a number later. Most of the pool is
+unrated and will stay that way for a while.
+
+Absent is not zero. `bin/browse.py` sorts unrated Recipes last under every sort
+order, because a blank must not read as a bad score. Nothing else consumes the
+field: Menu building, weekly planning and the shopping list all ignore it, and
+it is the browse page's sort control alone that gives it a consumer.

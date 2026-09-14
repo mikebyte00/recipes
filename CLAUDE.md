@@ -41,10 +41,27 @@ ticket. Everything else is prose, because everything else is judgement.
 re-run `bin/browse.py` whenever a Recipe, Menu, Pin or Order changes.
 `bin/browse.py --check` says whether the committed page has gone stale.
 
+**Parity between the Recipes, `index.html` and GitHub Pages is vital.** The
+page is served from the branch root at `mikebyte00.github.io/recipes`, so the
+committed `index.html` *is* what the household reads on a phone in the kitchen.
+A markdown change that stops there is invisible. Every edit to a Recipe, Menu,
+Pin or Order therefore finishes the same way, and the change is not done until
+it has:
+
+1. `python3 bin/browse.py` — regenerate the page.
+2. `python3 tests/test_browse.py` — 54 tests, including the redaction ones.
+3. `git commit` the source change **and** `index.html` in the same commit.
+4. `git push` — Pages serves the pushed commit, so an unpushed commit is a
+   stale page.
+
+Committing a Recipe without its regenerated page is the failure mode this
+guards against: `--check` then reports stale on someone else's unrelated run,
+and the live page quietly disagrees with the repo.
+
 **The page publishes a redacted view of `Orders/`**, which hold real personal
 data. Read [Browse The Pool](.scratch/meal-planning-system/issues/24-browse-the-pool.md)
 before touching that redaction, and run `python3 tests/test_browse.py`
-afterwards — those 52 tests exist to catch a redaction that stops redacting.
+afterwards — those tests exist to catch a redaction that stops redacting.
 
 
 ## The bar for a Recipe

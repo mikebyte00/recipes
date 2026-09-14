@@ -344,6 +344,21 @@ class AgainstTheRealRepo(unittest.TestCase):
                        if f.endswith(".md")])
         self.assertEqual(len(self.data["recipes"]), on_disk)
 
+    def test_a_rated_recipe_carries_its_rating_into_the_payload(self):
+        rows = browse.build_payload(self.data)["recipes"]
+        rated = {r["slug"]: r["rating"] for r in rows if r["rating"] is not None}
+        self.assertTrue(rated, "no Recipe in the pool carries a rating")
+        for slug, rating in rated.items():
+            self.assertIn(rating, range(1, 6), slug)
+
+    def test_an_unrated_recipe_carries_none_rather_than_a_number(self):
+        rows = browse.build_payload(self.data)["recipes"]
+        on_disk = browse.load_recipes(ROOT)
+        unrated = [r for r in rows if "rating" not in on_disk[r["slug"]]]
+        self.assertTrue(unrated, "every Recipe is rated; nothing left to check")
+        for row in unrated:
+            self.assertIsNone(row["rating"], row["slug"])
+
     def test_reads_both_menus_as_twenty_eight_filled_slots(self):
         self.assertEqual(len(self.data["menus"]), 2)
         for menu in self.data["menus"]:

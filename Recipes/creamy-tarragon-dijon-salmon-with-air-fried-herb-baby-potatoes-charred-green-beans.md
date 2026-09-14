@@ -3,6 +3,7 @@ title: Creamy Tarragon & Dijon Salmon with Air-Fried Herb Baby Potatoes & Charre
 slot: dinner
 protein: oily-fish
 effort: high
+rating: 5
 tags: []
 appliances: [air-fryer, ninja-sizzle, skillet]
 macros: { protein_g: 47, kcal: 710 }

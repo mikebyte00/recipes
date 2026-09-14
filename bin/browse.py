@@ -471,6 +471,9 @@ def build_payload(data):
             "slot": slot,
             "protein": recipe.get("protein"),
             "effort": recipe.get("effort"),
+            # Human-only, and absent on most Recipes. VOCABULARY.md: nothing
+            # infers a rating, so an unrated Recipe carries None and sorts last.
+            "rating": recipe.get("rating"),
             "appliances": recipe.get("appliances") or [],
             "tags": recipe.get("tags") or [],
             "protein_g": macros.get("protein_g"),
@@ -592,9 +595,10 @@ main{padding:1.1rem 0 4rem}
 input[type=search]{flex:1;min-width:0;font:inherit;font-size:.95rem;color:inherit;
   background:var(--card);border:1px solid var(--rule);border-radius:2px;padding:.5rem .65rem}
 input[type=search]:focus{outline:none;border-color:var(--accent)}
-button{font:inherit;font-size:.9rem;color:inherit;background:var(--card);
+button,select{font:inherit;font-size:.9rem;color:inherit;background:var(--card);
   border:1px solid var(--rule);border-radius:2px;padding:.5rem .8rem;cursor:pointer}
-button:hover{border-color:var(--accent)}
+button:hover,select:hover{border-color:var(--accent)}
+select:focus{outline:none;border-color:var(--accent)}
 .badge{display:inline-block;min-width:1.15rem;margin-left:.35rem;padding:0 .3rem;
   background:var(--accent);color:#fff;border-radius:999px;font-size:.72rem;text-align:center}
 
@@ -696,6 +700,27 @@ ol.method li{margin-bottom:.6rem}
 const D = JSON.parse(document.getElementById('data').textContent);
 const byslug = Object.fromEntries(D.recipes.map(r => [r.slug, r]));
 const FACETS = ['slot','protein','effort','appliances','tags'];
+/* Sort is per-group, not global: the Slot headings stay and the order inside
+   each changes. An absent value sorts last in every mode -- unrated is
+   unknown, not zero, and a blank rating must not read as a bad one. */
+const SORTS = {
+  title:   {label:'Title',   key: r => r.title.toLowerCase()},
+  rating:  {label:'Rating',  key: r => r.rating,    desc:true},
+  protein: {label:'Protein', key: r => r.protein_g, desc:true},
+};
+
+/* Absent last, then by key, then title as the tie-break so the order is
+   total -- two 5s or two 47g Recipes must not shuffle between renders. */
+function sorted(rs){
+  const {key, desc} = SORTS[route.sort] || SORTS.title;
+  return rs.slice().sort((x,y) => {
+    const a = key(x), b = key(y);
+    if (a == null || b == null) return a == null ? (b == null ? 0 : 1) : -1;
+    if (a !== b) return (a < b ? -1 : 1) * (desc ? -1 : 1);
+    return x.title.toLowerCase() < y.title.toLowerCase() ? -1 : 1;
+  });
+}
+const star = n => n == null ? '' : '\u2605' + n;
 const cap = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
 const nice = s => s ? s.replace(/-/g,' ') : '';
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c =>
@@ -705,18 +730,19 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c =>
 const g = n => n == null ? '—' : '~' + (+n) + 'g';
 const kc = n => n == null ? '—' : '~' + Math.round(n);
 
-let route = {view:'recipes', slug:null, sub:null, f:{}, q:'', min:0};
+let route = {view:'recipes', slug:null, sub:null, f:{}, q:'', min:0, sort:'title'};
 
 function readHash(){
   const raw = location.hash.replace(/^#/,'');
   const [path, query] = raw.split('?');
   const parts = (path || 'recipes').split('/');
   const r = {view: parts[0] || 'recipes', slug: parts[1] || null, sub: null,
-             f:{}, q:'', min:0};
+             f:{}, q:'', min:0, sort:'title'};
   if (r.view === 'orders') { r.sub = parts[1] || 'orders'; r.slug = null; }
   const p = new URLSearchParams(query || '');
   r.q = p.get('q') || '';
   r.min = +(p.get('min') || 0);
+  if (SORTS[p.get('sort')]) r.sort = p.get('sort');
   FACETS.forEach(k => { const v = p.get(k); if (v) r.f[k] = v.split(','); });
   return r;
 }
@@ -725,6 +751,7 @@ function writeHash(r, replace){
   const p = new URLSearchParams();
   if (r.q) p.set('q', r.q);
   if (r.min) p.set('min', r.min);
+  if (r.sort !== 'title') p.set('sort', r.sort);
   FACETS.forEach(k => { if ((r.f[k]||[]).length) p.set(k, r.f[k].join(',')); });
   let path = r.view;
   if (r.view === 'recipe' || r.view === 'menu') path += '/' + r.slug;
@@ -741,6 +768,7 @@ function qs(){
   const p = new URLSearchParams();
   if (route.q) p.set('q', route.q);
   if (route.min) p.set('min', route.min);
+  if (route.sort !== 'title') p.set('sort', route.sort);
   FACETS.forEach(k => { if ((route.f[k]||[]).length) p.set(k, route.f[k].join(',')); });
   const s = p.toString();
   return s ? '?' + s : '';
@@ -798,14 +826,14 @@ function facetPanel(){
 
 function recipeList(){
   const hits = D.recipes.filter(matches);
-  const groups = D.slots.map(slot => [slot, hits.filter(r => r.slot === slot)])
+  const groups = D.slots.map(slot => [slot, sorted(hits.filter(r => r.slot === slot))])
                         .filter(([,rs]) => rs.length);
   const body = groups.length ? groups.map(([slot, rs]) => `
     <div class="group"><h2>${slot}</h2><em>${rs.length}</em></div>
     <ul class="list">${rs.map(r => `<li><a href="#recipe/${r.slug}${qs()}">
       <div class="row"><span class="t">${esc(r.title)}</span>
         <span class="macro">${scoreDot('protein',r)}${g(r.protein_g)} · ${kc(r.kcal)} kcal</span></div>
-      <div class="meta">${[nice(r.protein), r.effort ? r.effort+' effort' : '',
+      <div class="meta">${[star(r.rating), nice(r.protein), r.effort ? r.effort+' effort' : '',
         (r.appliances||[]).map(nice).join(', ') || 'no appliance',
         (r.tags||[]).map(nice).join(', ')].filter(Boolean).join(' · ')}</div>
     </a></li>`).join('')}</ul>`).join('')
@@ -818,6 +846,10 @@ function recipeList(){
     <div class="tools">
       <input type="search" id="q" placeholder="Search titles, ingredients, products, method"
              value="${esc(route.q)}">
+      <select id="sort" aria-label="Sort within each Slot">${
+        Object.entries(SORTS).map(([k,v]) =>
+          `<option value="${k}"${k === route.sort ? ' selected' : ''}>${v.label}</option>`
+        ).join('')}</select>
       <button id="filterbtn">Filters${n ? `<span class="badge">${n}</span>` : ''}</button>
     </div>
     <div class="layout">${facetPanel()}<div>${body}</div></div>`;
@@ -852,7 +884,7 @@ function recipeDetail(slug){
   return `<a class="back" href="${listHash()}">← Recipes</a>
   <article>
     <h2>${esc(r.title)}</h2>
-    <p class="tagline">${[cap(r.slot), nice(r.protein), r.effort ? r.effort+' effort':'' ,
+    <p class="tagline">${[star(r.rating), cap(r.slot), nice(r.protein), r.effort ? r.effort+' effort':'' ,
         (r.appliances||[]).map(nice).join(' · ')].filter(Boolean).join(' · ')}
       ${(r.tags||[]).map(t=>`<span class="pill">${nice(t)}</span>`).join('')}</p>
 
@@ -1032,6 +1064,9 @@ function wireFilters(){
     const at = q.selectionStart; render();
     const nq = document.getElementById('q'); nq.focus(); nq.setSelectionRange(at, at);
   }, 180); };
+
+  const sort = document.getElementById('sort');
+  sort.onchange = () => { route.sort = sort.value; writeHash(route, true); render(); };
 
   sheet.querySelectorAll('.chip').forEach(chip => chip.onclick = () => {
     const {facet, value} = chip.dataset;
