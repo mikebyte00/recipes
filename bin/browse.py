@@ -584,10 +584,17 @@ header{border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:20;
 .brand{display:flex;align-items:baseline;gap:.6rem;padding:.9rem 0 .5rem}
 .brand h1{font-size:1.15rem}
 .brand span{font-size:.75rem;color:var(--soft);letter-spacing:.06em;text-transform:uppercase}
-nav{display:flex;gap:1.25rem;padding-bottom:.1rem}
+nav{display:flex;align-items:center;gap:1.25rem;padding-bottom:.1rem}
 nav a{padding:.35rem 0 .55rem;font-size:.95rem;color:var(--soft);
   border-bottom:2px solid transparent}
 nav a.on{color:var(--ink);border-bottom-color:var(--accent)}
+/* Plan is a toggle, not a section -- a pill on the right, so it does not read
+   as a fourth heading in a row of three. */
+nav a#plantoggle{margin-left:auto;padding:.3rem .85rem;border:1px solid var(--rule);
+  border-radius:999px;background:var(--card);font-size:.85rem;
+  margin-bottom:.2rem;cursor:pointer}
+nav a#plantoggle:hover{border-color:var(--accent);color:var(--accent)}
+nav a#plantoggle.on{background:var(--accent);border-color:var(--accent);color:#fff}
 
 main{padding:1.1rem 0 4rem}
 .lede{color:var(--soft);font-size:.87rem;margin:.1rem 0 1rem}
@@ -818,13 +825,14 @@ function scoreDot(kind, r){
 }
 
 function renderNav(){
-  const tabs = [['recipes','Recipes'],['menus','Menus'],['plan','Plan'],
-                ['orders','Past orders']];
+  const tabs = [['recipes','Recipes'],['menus','Menus'],['orders','Past orders'],
+                ['plan','Plan']];
   const here = route.view === 'recipe' ? 'recipes'
              : route.view === 'menu' ? 'menus' : route.view;
   document.getElementById('nav').innerHTML = tabs.map(([v,label]) =>
     v === 'plan'
-      ? `<a class="${planOn?'on':''}" href="#recipes" id="plantoggle">${label}</a>`
+      ? `<a class="${planOn?'on':''}" href="#recipes" id="plantoggle"
+           aria-pressed="${planOn}">${planOn ? 'Planning…' : label}</a>`
       : `<a class="${v===here?'on':''}" href="#${v}">${label}</a>`).join('');
   /* Plan is a toggle, not a destination: it turns the pool into a picker and
      leaves you wherever the hash already was. */
