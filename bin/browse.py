@@ -669,7 +669,19 @@ ol.method li{margin-bottom:.6rem}
 .day dl{margin:0;display:grid;grid-template-columns:5.2rem 1fr;gap:.2rem .6rem}
 .day dt{font-size:.75rem;color:var(--soft);text-transform:capitalize}
 .day dd{margin:0;font-size:.92rem}
-.day dd select{width:100%}
+/* Plan mode. The drawer is its own thing, not a reused .sheet -- .sheet turns
+   into a sticky sidebar on wide screens and this must stay at the bottom. */
+.drawer{position:fixed;inset:auto 0 0 0;z-index:40;background:var(--card);
+  border-top:1px solid var(--rule);box-shadow:0 -2px 14px rgba(50,40,28,.12);
+  padding:.7rem 0}
+.drawer .wrap{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.drawer .where{font-size:.95rem}
+.drawer .where b{text-transform:capitalize}
+.drawer .rest{margin-left:auto;display:flex;gap:.5rem}
+body.plan-on{padding-bottom:6rem}
+body.plan-on .list a{cursor:pointer}
+body.plan-on .list a:hover{background:var(--accent-soft)}
+body.plan-on .list a:hover .t{color:var(--accent)}
 button[disabled]{opacity:.45;cursor:not-allowed}
 button[disabled]:hover{border-color:var(--rule)}
 textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -700,6 +712,7 @@ textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,m
 </div></header>
 <main class="wrap"><div id="app"></div></main>
 <div class="scrim" id="scrim" hidden></div>
+<div class="drawer" id="drawer" hidden></div>
 
 <script id="data" type="application/json">__PAYLOAD__</script>
 <script>
@@ -810,7 +823,17 @@ function renderNav(){
   const here = route.view === 'recipe' ? 'recipes'
              : route.view === 'menu' ? 'menus' : route.view;
   document.getElementById('nav').innerHTML = tabs.map(([v,label]) =>
-    `<a class="${v===here?'on':''}" href="#${v}">${label}</a>`).join('');
+    v === 'plan'
+      ? `<a class="${planOn?'on':''}" href="#recipes" id="plantoggle">${label}</a>`
+      : `<a class="${v===here?'on':''}" href="#${v}">${label}</a>`).join('');
+  /* Plan is a toggle, not a destination: it turns the pool into a picker and
+     leaves you wherever the hash already was. */
+  document.getElementById('plantoggle').onclick = event => {
+    event.preventDefault();
+    if (planOn) return planExit();
+    planOn = true;
+    if (route.view === 'recipes') render(); else location.hash = '#recipes';
+  };
 }
 
 function facetPanel(){
@@ -832,7 +855,10 @@ function facetPanel(){
 }
 
 function recipeList(){
-  const hits = D.recipes.filter(matches);
+  /* While a Slot is being picked the pool narrows to Recipes of that Slot --
+     the facets and the search box still apply on top. */
+  const only = planOn && !checkedOut ? planSlot() : null;
+  const hits = D.recipes.filter(r => (!only || r.slot === only) && matches(r));
   const groups = D.slots.map(slot => [slot, sorted(hits.filter(r => r.slot === slot))])
                         .filter(([,rs]) => rs.length);
   const body = groups.length ? groups.map(([slot, rs]) => `
@@ -980,78 +1006,99 @@ function menuDetail(slug){
   </article>`;
 }
 
-/* Plan mode: the 28 Slots of a week as dropdowns, Monday first, and the YAML
-   block that pastes into the plan-the-week skill. Selections live in this
-   object for the session only -- the page is generated, not an app, and a
-   refresh starting clean is the honest state rather than a stale one. */
-const PLAN_DAYS = D.days.slice(1).concat(D.days.slice(0, 1));
-const PLAN_TOTAL = PLAN_DAYS.length * D.slots.length;
+/* Plan mode. The pool stays on screen and the wizard walks: the drawer names
+   one Slot, a click on a Recipe fills it and advances. Selections live here for
+   the session only -- the page is generated, not an app, and a refresh starting
+   clean is honest where a stale grid would not be. */
+const PLAN_SEQ = D.days.slice(1).concat(D.days.slice(0, 1))
+  .flatMap(day => D.slots.map(slot => [day, slot]));
 let plan = {};
+let planOn = false;
+let cursor = 0;
 let checkedOut = false;
 
-const planKey = (day, slot) => day + '.' + slot;
-const planCount = () =>
-  PLAN_DAYS.reduce((n, d) => n + D.slots.filter(s => plan[planKey(d, s)]).length, 0);
+const planKey = ([day, slot]) => day + '.' + slot;
+const planSlot = () => (PLAN_SEQ[cursor] || [])[1];
+const planDone = () => PLAN_SEQ.filter(pair => plan[planKey(pair)]).length;
 
 /* The Plan grid's own frontmatter shape -- two-space YAML, every Slot valued,
    a skipped Slot spelled `eaten-out`. VOCABULARY.md, The Plan grid. */
 function planYaml(){
-  return 'days:\n' + PLAN_DAYS.map(day => '  ' + day + ':\n' +
-    D.slots.map(s => '    ' + s + ': ' + plan[planKey(day, s)]).join('\n')
+  const days = [...new Set(PLAN_SEQ.map(([day]) => day))];
+  return 'days:\n' + days.map(day => '  ' + day + ':\n' +
+    D.slots.map(s => '    ' + s + ': ' + plan[day + '.' + s]).join('\n')
   ).join('\n') + '\n';
 }
 
-function planView(){
-  if (checkedOut) return `<p class="lede">28 Slots, Monday first. A skipped Slot reads
-      <code>eaten-out</code>, which buys nothing. Paste this into
-      <code>plan-the-week</code> at step 3, in place of the copied Menu grid.</p>
-    <div class="tools"><button id="edit">← Back to the grid</button></div>
-    <textarea id="out" rows="32" readonly>${esc(planYaml())}</textarea>`;
-
-  const days = PLAN_DAYS.map(day => {
-    const cells = D.slots.map(s => {
-      const chosen = plan[planKey(day, s)] || '';
-      const opts = sorted(D.recipes.filter(r => r.slot === s)).map(r =>
-        `<option value="${esc(r.slug)}"${r.slug === chosen ? ' selected' : ''}
-          >${esc(r.title)} — ${g(r.protein_g)}</option>`).join('');
-      return `<dt>${s}</dt><dd><select data-day="${day}" data-slot="${s}"
-          aria-label="${cap(day)} ${s}">
-        <option value="">choose…</option>
-        <option value="eaten-out"${chosen === 'eaten-out' ? ' selected' : ''}
-          >— skip (eaten out) —</option>
-        ${opts}</select></dd>`;
-    }).join('');
-    return `<div class="day"><h4><span>${cap(day)}</span></h4><dl>${cells}</dl></div>`;
-  }).join('');
-
-  return `<p class="lede">A Recipe for every Slot, or skip it — skipping counts.
-      <strong id="count">${planCount()} / ${PLAN_TOTAL}</strong> chosen.</p>
-    <div class="tools">
-      <button id="checkout"${planCount() < PLAN_TOTAL ? ' disabled' : ''}>Checkout</button>
-      <button id="reset">Clear</button>
-    </div>${days}`;
+function planSet(value){
+  if (cursor >= PLAN_SEQ.length) return;
+  plan[planKey(PLAN_SEQ[cursor])] = value;
+  cursor++;
+  render();
 }
 
-/* Changing one Slot updates the counter in place rather than re-rendering, so
-   the keyboard stays where it was in a 28-dropdown grid. */
-function wirePlan(){
-  const out = document.getElementById('out');
-  if (out){
-    document.getElementById('edit').onclick = () => { checkedOut = false; render(); };
-    out.focus(); out.select();
-    return;
-  }
-  const tick = () => {
-    document.getElementById('count').textContent = planCount() + ' / ' + PLAN_TOTAL;
-    document.getElementById('checkout').disabled = planCount() < PLAN_TOTAL;
+function planExit(){
+  planOn = false; checkedOut = false; render();
+}
+
+function checkoutView(){
+  return `<p class="lede">28 Slots, Monday first. A skipped Slot reads
+      <code>eaten-out</code>, which buys nothing. Paste this into
+      <code>plan-the-week</code> at step 3, in place of the copied Menu grid.</p>
+    <div class="tools"><button id="edit">← Back to the week</button>
+      <button id="startover">Start over</button></div>
+    <textarea id="out" rows="32" readonly>${esc(planYaml())}</textarea>`;
+}
+
+function renderDrawer(){
+  const drawer = document.getElementById('drawer');
+  document.body.classList.toggle('plan-on', planOn && !checkedOut);
+  drawer.hidden = !planOn || checkedOut;
+  if (drawer.hidden) return;
+
+  const done = planDone();
+  const at = PLAN_SEQ[cursor];
+  const here = at
+    ? `Pick <b>${cap(at[0])} ${at[1]}</b>${
+        plan[planKey(at)] ? ` <span class="note">— holds ${
+          plan[planKey(at)] === 'eaten-out' ? 'eaten out'
+          : esc((byslug[plan[planKey(at)]] || {}).title || '')}</span>` : ''}`
+    : `<b>All 28 Slots filled.</b>`;
+
+  drawer.innerHTML = `<div class="wrap">
+    <span class="where">${here}</span>
+    <span class="macro">${done} / ${PLAN_SEQ.length}</span>
+    <span class="rest">
+      <button id="planback"${cursor ? '' : ' disabled'}>← Back</button>
+      ${at ? `<button id="planskip">Skip</button>` : ''}
+      <button id="planout"${done < PLAN_SEQ.length ? ' disabled' : ''}>Checkout</button>
+      <button id="planexit">Exit</button>
+    </span></div>`;
+
+  document.getElementById('planback').onclick = () => { cursor--; render(); };
+  if (at) document.getElementById('planskip').onclick = () => planSet('eaten-out');
+  document.getElementById('planout').onclick = () => { checkedOut = true; render(); };
+  document.getElementById('planexit').onclick = planExit;
+}
+
+/* In plan mode a click on a Recipe fills the current Slot instead of opening
+   the Recipe. Delegated, so it survives every re-render of the list. */
+function wirePlanClicks(){
+  document.getElementById('app').onclick = event => {
+    if (!planOn || checkedOut) return;
+    const link = event.target.closest('a[href^="#recipe/"]');
+    if (!link) return;
+    event.preventDefault();
+    planSet(decodeURIComponent(link.getAttribute('href').split('?')[0].slice(8)));
   };
-  document.querySelectorAll('#app select[data-day]').forEach(sel => sel.onchange = () => {
-    const key = planKey(sel.dataset.day, sel.dataset.slot);
-    if (sel.value) plan[key] = sel.value; else delete plan[key];
-    tick();
-  });
-  document.getElementById('checkout').onclick = () => { checkedOut = true; render(); };
-  document.getElementById('reset').onclick = () => { plan = {}; render(); };
+}
+
+function wireCheckout(){
+  const out = document.getElementById('out');
+  out.focus(); out.select();
+  document.getElementById('edit').onclick = () => { checkedOut = false; render(); };
+  document.getElementById('startover').onclick = () => {
+    plan = {}; cursor = 0; checkedOut = false; render(); };
 }
 
 function ordersView(){
@@ -1119,14 +1166,15 @@ function render(){
   const app = document.getElementById('app');
   const v = route.view;
   app.innerHTML =
-      v === 'recipe' ? recipeDetail(route.slug)
+      checkedOut    ? checkoutView()
+    : v === 'recipe' ? recipeDetail(route.slug)
     : v === 'menus'  ? menuList()
     : v === 'menu'   ? menuDetail(route.slug)
-    : v === 'plan'   ? planView()
     : v === 'orders' ? ordersView()
     : recipeList();
-  if (v === 'plan') wirePlan();
-  if (v === 'recipes' || v === undefined) wireFilters();
+  renderDrawer();
+  if (checkedOut) wireCheckout();
+  else if (v === 'recipes' || v === undefined) { wireFilters(); wirePlanClicks(); }
   window.scrollTo(0, 0);
 }
 
