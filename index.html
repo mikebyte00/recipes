@@ -271,7 +271,7 @@ function renderNav(){
   document.getElementById('nav').innerHTML = tabs.map(([v,label]) =>
     v === 'plan'
       ? `<a class="${planOn?'on':''}" href="#recipes" id="plantoggle"
-           aria-pressed="${planOn}">${planOn ? 'Planning…' : label}</a>`
+           aria-pressed="${planOn}">${planOn ? 'Planning' : label}</a>`
       : `<a class="${v===here?'on':''}" href="#${v}">${label}</a>`).join('');
   /* Plan is a toggle, not a destination: it turns the pool into a picker and
      leaves you wherever the hash already was. */
