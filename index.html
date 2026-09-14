@@ -108,6 +108,12 @@ ol.method li{margin-bottom:.6rem}
 .day dl{margin:0;display:grid;grid-template-columns:5.2rem 1fr;gap:.2rem .6rem}
 .day dt{font-size:.75rem;color:var(--soft);text-transform:capitalize}
 .day dd{margin:0;font-size:.92rem}
+.day dd select{width:100%}
+button[disabled]{opacity:.45;cursor:not-allowed}
+button[disabled]:hover{border-color:var(--rule)}
+textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:.82rem;line-height:1.5;color:inherit;background:var(--card);
+  border:1px solid var(--rule);border-radius:2px;padding:.7rem}
 .subnav{display:flex;gap:1rem;margin-bottom:1rem;font-size:.85rem}
 .subnav a{color:var(--soft);border-bottom:1px solid transparent;padding-bottom:.15rem}
 .subnav a.on{color:var(--accent);border-bottom-color:var(--accent)}
@@ -238,7 +244,8 @@ function scoreDot(kind, r){
 }
 
 function renderNav(){
-  const tabs = [['recipes','Recipes'],['menus','Menus'],['orders','Past orders']];
+  const tabs = [['recipes','Recipes'],['menus','Menus'],['plan','Plan'],
+                ['orders','Past orders']];
   const here = route.view === 'recipe' ? 'recipes'
              : route.view === 'menu' ? 'menus' : route.view;
   document.getElementById('nav').innerHTML = tabs.map(([v,label]) =>
@@ -412,6 +419,80 @@ function menuDetail(slug){
   </article>`;
 }
 
+/* Plan mode: the 28 Slots of a week as dropdowns, Monday first, and the YAML
+   block that pastes into the plan-the-week skill. Selections live in this
+   object for the session only -- the page is generated, not an app, and a
+   refresh starting clean is the honest state rather than a stale one. */
+const PLAN_DAYS = D.days.slice(1).concat(D.days.slice(0, 1));
+const PLAN_TOTAL = PLAN_DAYS.length * D.slots.length;
+let plan = {};
+let checkedOut = false;
+
+const planKey = (day, slot) => day + '.' + slot;
+const planCount = () =>
+  PLAN_DAYS.reduce((n, d) => n + D.slots.filter(s => plan[planKey(d, s)]).length, 0);
+
+/* The Plan grid's own frontmatter shape -- two-space YAML, every Slot valued,
+   a skipped Slot spelled `eaten-out`. VOCABULARY.md, The Plan grid. */
+function planYaml(){
+  return 'days:\n' + PLAN_DAYS.map(day => '  ' + day + ':\n' +
+    D.slots.map(s => '    ' + s + ': ' + plan[planKey(day, s)]).join('\n')
+  ).join('\n') + '\n';
+}
+
+function planView(){
+  if (checkedOut) return `<p class="lede">28 Slots, Monday first. A skipped Slot reads
+      <code>eaten-out</code>, which buys nothing. Paste this into
+      <code>plan-the-week</code> at step 3, in place of the copied Menu grid.</p>
+    <div class="tools"><button id="edit">← Back to the grid</button></div>
+    <textarea id="out" rows="32" readonly>${esc(planYaml())}</textarea>`;
+
+  const days = PLAN_DAYS.map(day => {
+    const cells = D.slots.map(s => {
+      const chosen = plan[planKey(day, s)] || '';
+      const opts = sorted(D.recipes.filter(r => r.slot === s)).map(r =>
+        `<option value="${esc(r.slug)}"${r.slug === chosen ? ' selected' : ''}
+          >${esc(r.title)} — ${g(r.protein_g)}</option>`).join('');
+      return `<dt>${s}</dt><dd><select data-day="${day}" data-slot="${s}"
+          aria-label="${cap(day)} ${s}">
+        <option value="">choose…</option>
+        <option value="eaten-out"${chosen === 'eaten-out' ? ' selected' : ''}
+          >— skip (eaten out) —</option>
+        ${opts}</select></dd>`;
+    }).join('');
+    return `<div class="day"><h4><span>${cap(day)}</span></h4><dl>${cells}</dl></div>`;
+  }).join('');
+
+  return `<p class="lede">A Recipe for every Slot, or skip it — skipping counts.
+      <strong id="count">${planCount()} / ${PLAN_TOTAL}</strong> chosen.</p>
+    <div class="tools">
+      <button id="checkout"${planCount() < PLAN_TOTAL ? ' disabled' : ''}>Checkout</button>
+      <button id="reset">Clear</button>
+    </div>${days}`;
+}
+
+/* Changing one Slot updates the counter in place rather than re-rendering, so
+   the keyboard stays where it was in a 28-dropdown grid. */
+function wirePlan(){
+  const out = document.getElementById('out');
+  if (out){
+    document.getElementById('edit').onclick = () => { checkedOut = false; render(); };
+    out.focus(); out.select();
+    return;
+  }
+  const tick = () => {
+    document.getElementById('count').textContent = planCount() + ' / ' + PLAN_TOTAL;
+    document.getElementById('checkout').disabled = planCount() < PLAN_TOTAL;
+  };
+  document.querySelectorAll('#app select[data-day]').forEach(sel => sel.onchange = () => {
+    const key = planKey(sel.dataset.day, sel.dataset.slot);
+    if (sel.value) plan[key] = sel.value; else delete plan[key];
+    tick();
+  });
+  document.getElementById('checkout').onclick = () => { checkedOut = true; render(); };
+  document.getElementById('reset').onclick = () => { plan = {}; render(); };
+}
+
 function ordersView(){
   const sub = route.sub || 'orders';
   const tabs = [['orders','By order'],['items','Every item'],['pins','Pins']];
@@ -480,8 +561,10 @@ function render(){
       v === 'recipe' ? recipeDetail(route.slug)
     : v === 'menus'  ? menuList()
     : v === 'menu'   ? menuDetail(route.slug)
+    : v === 'plan'   ? planView()
     : v === 'orders' ? ordersView()
     : recipeList();
+  if (v === 'plan') wirePlan();
   if (v === 'recipes' || v === undefined) wireFilters();
   window.scrollTo(0, 0);
 }
