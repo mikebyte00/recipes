@@ -1,6 +1,6 @@
 ---
 name: plan-the-week
-description: "Plan a real week's food. Harvests last week's Waitrose order, copies a Menu's grid into Plans/YYYY-MM-DD.md, edits it for the week actually happening — days away, Recipes swapped, Slots eaten out — then generates the shopping list. Use when planning or re-planning a week, or when asked what the household is eating and buying."
+description: "Plan a real week's food. Harvests last week's Waitrose order, copies a Menu's grid into Plans/YYYY-MM-DD.md, edits it for the week actually happening — days away, Recipes swapped, Slots eaten out — generates the shopping list, then offers to fill the Waitrose trolley. Use when planning or re-planning a week, or when asked what the household is eating and buying."
 ---
 
 # Plan the week
@@ -91,8 +91,22 @@ Read `VOCABULARY.md` — *The Plan grid* — and `GOALS.md` before editing a gri
    Multi-search block — this is the same skill the user re-runs on Wednesday
    when a Recipe changes.
 
+7. **Offer to fill the trolley.** The Waitrose table is now final, and every row
+   in it carries a line number — so the basket can be built directly, following
+   `Orders/BASKET.md`. Like the harvest, it is a browser session in the user's
+   own signed-in account: **ask before opening one**, and never place the order.
+
+   Say what it covers before they answer: the pinned Waitrose lines only. The
+   **Unpinned** items have no line number by definition and stay with the
+   Multi-search block from step 6, as do Soutars and Dorset Meats, which are
+   counter lists.
+
+   Declining is a normal week. The Multi-search block is a complete way to shop
+   on its own, and step 6 already handed it over.
+
 **Done when** `Plans/<Monday>.md` holds 28 Slots, the user has seen every day
-that misses a goal, and the file ends with a `## Shopping` section.
+that misses a goal, and the file ends with a `## Shopping` section. Filling the
+trolley is offered, never required — a week that declines it is finished.
 
 ## The grid stays whole
 
