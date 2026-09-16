@@ -14,10 +14,11 @@ Every row here was confirmed by hand in
 the same day — which merged seven near-duplicate slugs and took `staple` off the
 recipe ingredient, leaving the Pin as its only home.
 
-The catalogue itself is unchanged since then. The coverage counts below — the
-87-Pin breakdown, [Absences](#absences), and [Bought, matched
-nothing](#bought-matched-nothing) — were recounted against the pool on
-09 September 2026, after five Recipes landed and took the corpus to 42.
+The coverage counts below — the 87-Pin breakdown, [Absences](#absences), and
+[Bought, matched nothing](#bought-matched-nothing) — were recounted against the
+pool on 09 September 2026, after five Recipes landed and took the corpus to 42.
+`pancetta` was pinned directly on 16 September 2026 (see [Absences](#absences)),
+taking the catalogue to 88.
 
 ## Reading a Pin
 
@@ -490,6 +491,13 @@ pak-choi:
   staple: false
   confirmed: true
 
+pancetta:
+  display: Pancetta
+  store: soutars
+  unit: g
+  staple: false
+  confirmed: true
+
 parmesan:
   display: Parmesan
   store: waitrose
@@ -864,12 +872,17 @@ worcestershire-sauce:
 
 ## Absences
 
-The 30 ingredients with no Pin, and why. Recorded here so the catalogue's
+The 29 ingredients with no Pin, and why. Recorded here so the catalogue's
 coverage is checkable rather than assumed. **This list is the Unpinned flag**:
 an ingredient here is added to the order by hand, and buying it once puts it in
 the order history where the next harvest turns it into a Pin.
 
-**Never harvested (25)** — real shopping items absent from the three captured
+`pancetta` was pinned directly on 16 September 2026 — Soutars, not Waitrose, so
+it would never have surfaced through a harvest. Recorded here rather than in
+the counts below, since it broke the assumption the rest of this section rests
+on.
+
+**Never harvested (24)** — real shopping items absent from the three captured
 orders. Each will Pin itself on the next harvest after you buy it.
 
 - `blue-cheese` (Saint Agur light) · `burger-buns` · `chestnut-mushrooms` ·
@@ -877,7 +890,7 @@ orders. Each will Pin itself on the next harvest after you buy it.
   `pineapple` · `red-onion` · `strawberries` · `waffle-fries` ·
   `wholewheat-linguine` · `milk-chocolate` · `chilli-oil` · `cinnamon` ·
   `coconut-milk` · `jerk-seasoning` · `kidney-beans` · `marmalade` ·
-  `rice-vinegar` · `spring-onion` · `sweetheart-cabbage` · `pancetta` · `peas`
+  `rice-vinegar` · `spring-onion` · `sweetheart-cabbage` · `peas`
 
 Four of those eleven additions — `chilli-oil`, `cinnamon`, `jerk-seasoning`,
 `rice-vinegar` — read like store cupboard, and would likely mint as staples.
