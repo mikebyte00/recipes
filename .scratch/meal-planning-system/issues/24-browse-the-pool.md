@@ -73,6 +73,31 @@ says so is unchanged.
   in the nav. A Recipe's **Used by** still links to them, which is what the
   orphan count depends on.
 
+- The landing view was originally the **Recipe list**, and the nav read
+  `Recipes · Plans · Past orders`. **Amended on 16 September 2026**: giving
+  `Plans/` a section answered *what am I cooking tonight* in principle and left
+  it three taps away in practice — open the page, tap Plans, tap the week,
+  scroll to today. The nav is now `Today · Recipes · Plans · Orders` and the
+  default route is `#today`.
+
+  **`#today` holds no new data.** It resolves the week from `new Date()` in the
+  reader's browser and looks up the Plan whose slug is that week's Monday, so
+  the same committed `index.html` is correct on Thursday as on Monday. Baking
+  the date in at generation time would make the page wrong by Tuesday, which is
+  the same staleness trap `--check` exists for, with no `--check` to catch it.
+
+  Today's day renders as the Plan's own day block, marked `.now`; the remaining
+  six follow. When no Plan covers the current week the page says so and falls
+  back to the latest Plan's full week **without** marking a day as today —
+  labelling last week's Wednesday *Today* in a kitchen is worse than one more
+  scroll. With no Plans at all, `#today` renders the Recipe list, so a fresh
+  repo still has a front door.
+
+  The rule from the `Plans/` amendment is unchanged and now matters more: a
+  Plan is still never checked against the Weekly Layout, and `#today` reports a
+  day with nothing cooked at home as *nothing cooked at home*, not as a
+  nutritional failure.
+
 ### `tests/` — the repo's first tests, and why
 
 `tests/test_browse.py`, **52 tests**, stdlib `unittest`, no new dependency and

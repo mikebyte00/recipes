@@ -631,9 +631,13 @@ header{border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:20;
 .brand{display:flex;align-items:baseline;gap:.6rem;padding:.9rem 0 .5rem}
 .brand h1{font-size:1.15rem}
 .brand span{font-size:.75rem;color:var(--soft);letter-spacing:.06em;text-transform:uppercase}
-nav{display:flex;align-items:center;gap:1.25rem;padding-bottom:.1rem}
+/* Four tabs plus the pill overflow 360px. Scroll rather than wrap -- a wrapped
+   nav pushes the list down the fold on the smallest phone. */
+nav{display:flex;align-items:center;gap:1.25rem;padding-bottom:.1rem;
+  overflow-x:auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
 nav a{padding:.35rem 0 .55rem;font-size:.95rem;color:var(--soft);
-  border-bottom:2px solid transparent}
+  white-space:nowrap;border-bottom:2px solid transparent}
 nav a.on{color:var(--ink);border-bottom-color:var(--accent)}
 /* Plan is a toggle, not a section -- a pill on the right, so it does not read
    as a fourth heading in a row of three. */
@@ -680,10 +684,16 @@ select:focus{outline:none;border-color:var(--accent)}
 .group em{font-style:normal;font-size:.78rem;color:var(--soft)}
 ul.list{list-style:none;margin:0;padding:0}
 ul.list li{border-bottom:1px solid var(--rule)}
-ul.list a{display:block;padding:.7rem .2rem}
+/* A list row is title / macro / meta. On a phone the title takes the whole
+   width and the macro drops onto the meta line -- squeezing it into a right
+   column wrapped nearly every title onto two lines. Wide enough, and the macro
+   returns to its right-aligned column where a sorted list can be scanned. */
+ul.list a{display:flex;flex-wrap:wrap;align-items:baseline;gap:.15rem .5rem;
+  padding:.55rem .2rem}
 ul.list a:hover{background:var(--card)}
-.row{display:flex;gap:.75rem;align-items:baseline;justify-content:space-between}
-.row .t{font-size:1rem}
+ul.list a .t{flex:1 0 100%;font-size:1rem}
+ul.list a .macro{order:2}
+ul.list a .meta{order:3;flex:1;margin-top:0}
 .macro{white-space:nowrap;font-size:.85rem;color:var(--soft);font-variant-numeric:tabular-nums}
 .meta{font-size:.78rem;color:var(--soft);margin-top:.15rem}
 .dot{display:inline-block;width:.42rem;height:.42rem;border-radius:50%;
@@ -719,10 +729,22 @@ ol.method li{margin-bottom:.6rem}
 .pill.un{border-color:var(--accent);color:var(--accent)}
 .day{border-bottom:1px solid var(--rule);padding:.8rem 0}
 .day h4{margin:0 0 .35rem;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--soft);display:flex;justify-content:space-between;align-items:baseline}
+  color:var(--soft);display:flex;flex-wrap:wrap;gap:0 .7rem;
+  justify-content:space-between;align-items:baseline}
+/* The day's totals are a macro, not a heading: they keep their own case, and
+   they wrap onto their own line rather than running off a 360px screen when a
+   goal flag joins them. */
+.day h4 .macro{text-transform:none;letter-spacing:0;white-space:normal}
 .day dl{margin:0;display:grid;grid-template-columns:5.2rem 1fr;gap:.2rem .6rem}
 .day dt{font-size:.75rem;color:var(--soft);text-transform:capitalize}
 .day dd{margin:0;font-size:.92rem}
+/* Today's card is the page's answer to "what am I cooking tonight". Same .day
+   block, lifted off the list and sized to read at arm's length on a worktop. */
+.day.now{border:1px solid var(--rule);border-left:3px solid var(--accent);
+  background:var(--card);border-radius:2px;padding:.9rem 1rem;margin-bottom:1.5rem}
+.day.now h4{font-size:.9rem;color:var(--accent)}
+.day.now dl{gap:.45rem .6rem}
+.day.now dd{font-size:1.05rem}
 /* A meal in the day grid is the way into its Recipe, so it has to read as a
    link -- the global bare `a` would leave it looking like plain text. */
 .day dd a,.tagline a{color:var(--accent)}
@@ -759,6 +781,9 @@ textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,m
   .sheet-foot .close{display:none}
   #filterbtn{display:none}
   .day dl{grid-template-columns:6rem 1fr}
+  ul.list a .t{flex:1 1 auto}
+  ul.list a .macro{margin-left:auto}
+  ul.list a .meta{flex:1 0 100%}
 }
 </style>
 
@@ -811,13 +836,13 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c =>
 const g = n => n == null ? '—' : '~' + (+n) + 'g';
 const kc = n => n == null ? '—' : '~' + Math.round(n);
 
-let route = {view:'recipes', slug:null, sub:null, f:{}, q:'', min:0, sort:'title'};
+let route = {view:'today', slug:null, sub:null, f:{}, q:'', min:0, sort:'title'};
 
 function readHash(){
   const raw = location.hash.replace(/^#/,'');
   const [path, query] = raw.split('?');
-  const parts = (path || 'recipes').split('/');
-  const r = {view: parts[0] || 'recipes', slug: parts[1] || null, sub: null,
+  const parts = (path || 'today').split('/');
+  const r = {view: parts[0] || 'today', slug: parts[1] || null, sub: null,
              f:{}, q:'', min:0, sort:'title'};
   if (r.view === 'orders') { r.sub = parts[1] || 'orders'; r.slug = null; }
   const p = new URLSearchParams(query || '');
@@ -881,8 +906,8 @@ function scoreDot(kind, r){
 
 function renderNav(){
   /* `planmode` is the wizard toggle, not a view -- `plan` is a Plan's own page. */
-  const tabs = [['recipes','Recipes'],['plans','Plans'],['orders','Past orders'],
-                ['planmode','Plan']];
+  const tabs = [['today','Today'],['recipes','Recipes'],['plans','Plans'],
+                ['orders','Orders'],['planmode','Plan']];
   const here = route.view === 'recipe' ? 'recipes'
              : route.view === 'menu' ? 'menus'
              : route.view === 'plan' ? 'plans' : route.view;
@@ -929,11 +954,11 @@ function recipeList(){
   const body = groups.length ? groups.map(([slot, rs]) => `
     <div class="group"><h2>${slot}</h2><em>${rs.length}</em></div>
     <ul class="list">${rs.map(r => `<li><a href="#recipe/${r.slug}${qs()}">
-      <div class="row"><span class="t">${esc(r.title)}</span>
-        <span class="macro">${scoreDot('protein',r)}${g(r.protein_g)} · ${kc(r.kcal)} kcal</span></div>
-      <div class="meta">${[star(r.rating), nice(r.protein), r.effort ? r.effort+' effort' : '',
+      <span class="t">${esc(r.title)}</span>
+      <span class="macro">${scoreDot('protein',r)}${g(r.protein_g)} · ${kc(r.kcal)} kcal</span>
+      <span class="meta">${[star(r.rating), nice(r.protein), r.effort ? r.effort+' effort' : '',
         (r.appliances||[]).map(nice).join(', ') || 'no appliance',
-        (r.tags||[]).map(nice).join(', ')].filter(Boolean).join(' · ')}</div>
+        (r.tags||[]).map(nice).join(', ')].filter(Boolean).join(' · ')}</span>
     </a></li>`).join('')}</ul>`).join('')
     : `<p class="empty">No Recipe matches those filters.</p>`;
 
@@ -942,7 +967,8 @@ function recipeList(){
       D.orphans.length ? ` · ${D.orphans.length} used by no Menu` : ''}.
       Showing ${hits.length}.</p>
     <div class="tools">
-      <input type="search" id="q" placeholder="Search titles, ingredients, products, method"
+      <input type="search" id="q" placeholder="Search recipes"
+             title="Searches titles, ingredients, Pinned products and method"
              value="${esc(route.q)}">
       <select id="sort" aria-label="Sort within each Slot">${
         Object.entries(SORTS).map(([k,v]) =>
@@ -1007,8 +1033,8 @@ function recipeDetail(slug){
 
     <section><h3>Used by</h3>
       ${r.used_by.length ? `<ul class="list">${r.used_by.map(u=>`<li><a href="#menu/${u.menu}">
-        <div class="row"><span class="t">${esc(u.title)}</span>
-        <span class="macro">${cap(u.day)} ${u.slot}</span></div></a></li>`).join('')}</ul>`
+        <span class="t">${esc(u.title)}</span>
+        <span class="macro">${cap(u.day)} ${u.slot}</span></a></li>`).join('')}</ul>`
       : `<div class="warn">No Menu uses this Recipe. It is in the pool and in no
           rotation — an orphan.</div>`}</section>
   </article>`;
@@ -1018,12 +1044,12 @@ function menuList(){
   return `<p class="lede">${D.menus.length} Menus. Every one is 28 Slots — a Menu is
     never partial; a real week's deviation belongs to a Plan.</p>
     <ul class="list">${D.menus.map(m=>`<li><a href="#menu/${m.slug}">
-      <div class="row"><span class="t">${esc(m.title)}</span>
-      <span class="macro">${g((m.week.protein_g/7).toFixed(1))} · ${kc(m.week.kcal/7)} kcal / day</span></div>
-      <div class="meta">${m.violations.length
+      <span class="t">${esc(m.title)}</span>
+      <span class="macro">${g((m.week.protein_g/7).toFixed(1))} · ${kc(m.week.kcal/7)} kcal / day</span>
+      <span class="meta">${m.violations.length
         ? `<span class="flag">${m.violations.length} layout violation${m.violations.length>1?'s':''}</span>`
         : 'clears the Weekly Layout'} · ${
-        Object.values(m.totals).filter(t=>t.flags.length).length} day(s) missing a goal</div>
+        Object.values(m.totals).filter(t=>t.flags.length).length} day(s) missing a goal</span>
     </a></li>`).join('')}</ul>`;
 }
 
@@ -1077,35 +1103,70 @@ function planList(){
     latest first. A Plan is one real week — Recipes swapped, days away, Slots
     eaten out.</p>
     <ul class="list">${D.plans.map(p=>`<li><a href="#plan/${p.slug}">
-      <div class="row"><span class="t">${esc(p.title)}</span>
-      <span class="macro">${p.cooked} / ${SLOT_COUNT} cooked</span></div>
-      <div class="meta">${[p.menu_title ? 'from ' + esc(p.menu_title) : '',
+      <span class="t">${esc(p.title)}</span>
+      <span class="macro">${p.cooked} / ${SLOT_COUNT} cooked</span>
+      <span class="meta">${[p.menu_title ? 'from ' + esc(p.menu_title) : '',
         SLOT_COUNT - p.cooked ? (SLOT_COUNT - p.cooked) + ' Slot(s) eaten out'
                               : 'every Slot cooked at home'
-        ].filter(Boolean).join(' · ')}</div>
+        ].filter(Boolean).join(' · ')}</span>
     </a></li>`).join('')}</ul>`;
+}
+
+/* One day of a Plan. Today is the same block lifted out and marked `.now`,
+   which is why this is a function and not two copies of the markup. */
+function dayBlock(p, day, cls, label){
+  const t = p.totals[day];
+  const cells = D.slots.map(s => {
+    const value = p.days[day][s];
+    const r = byslug[value];
+    return `<dt>${s}</dt><dd>${r
+      ? `<a href="#recipe/${r.slug}">${esc(r.title)}</a>
+         <span class="note">${g(r.protein_g)}</span>`
+      : `<span class="note">${value === 'eaten-out' ? 'eaten out' : '—'}</span>`}</dd>`;
+  }).join('');
+  return `<div class="day${cls ? ' ' + cls : ''}"><h4><span>${esc(label || cap(day))}</span>
+    <span class="macro">${t.cooked
+      ? `${g(t.protein_g)} · ${kc(t.kcal)} kcal ${
+          t.flags.length ? `<span class="flag">↓${t.flags.join(' ')}</span>` : ''}`
+      : 'nothing cooked at home'}</span></h4>
+    <dl>${cells}</dl></div>`;
+}
+
+/* The Monday of the week containing `d`, as YYYY-MM-DD in local time -- a Plan
+   is named for its Monday, and toISOString would shift the date across
+   midnight for anyone west of Greenwich. */
+function mondayISO(d){
+  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate() - ((d.getDay() + 6) % 7));
+  const pad = n => String(n).padStart(2,'0');
+  return x.getFullYear() + '-' + pad(x.getMonth()+1) + '-' + pad(x.getDate());
+}
+
+/* What am I cooking tonight, and where is that Recipe. The page's most-asked
+   question, so it is the page's front door. The week is resolved from the
+   clock in the reader's hand, never baked in at generation time -- the page is
+   committed and would otherwise be wrong by Tuesday. */
+function todayView(){
+  const now = new Date();
+  const week = mondayISO(now);
+  const p = D.plans.find(x => x.slug === week) || D.plans[0];
+  const stale = p.slug !== week;
+  const day = D.days[now.getDay()];
+  const date = now.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long'});
+  const rest = (stale ? WEEK : WEEK.filter(d => d !== day))
+                 .map(d => dayBlock(p, d)).join('');
+
+  return `<p class="lede">${esc(date)} · <a href="#plan/${p.slug}">${esc(p.title)}</a></p>
+    ${stale
+      ? `<div class="warn">No Plan covers this week. Showing the latest,
+          <strong>${esc(p.title)}</strong> — <code>plan-the-week</code> writes the next one.</div>`
+      : dayBlock(p, day, 'now', 'Today — ' + cap(day))}
+    <section><h3>${stale ? 'The week' : 'The rest of the week'}</h3>${rest}</section>`;
 }
 
 function planDetail(slug){
   const p = D.plans.find(x => x.slug === slug);
   if (!p) return `<p class="empty">No Plan called ${esc(slug)}.</p>`;
-  const days = WEEK.map(day => {
-    const t = p.totals[day];
-    const cells = D.slots.map(s => {
-      const value = p.days[day][s];
-      const r = byslug[value];
-      return `<dt>${s}</dt><dd>${r
-        ? `<a href="#recipe/${r.slug}">${esc(r.title)}</a>
-           <span class="note">${g(r.protein_g)}</span>`
-        : `<span class="note">${value === 'eaten-out' ? 'eaten out' : '—'}</span>`}</dd>`;
-    }).join('');
-    return `<div class="day"><h4><span>${cap(day)}</span>
-      <span class="macro">${t.cooked
-        ? `${g(t.protein_g)} · ${kc(t.kcal)} kcal ${
-            t.flags.length ? `<span class="flag">↓${t.flags.join(' ')}</span>` : ''}`
-        : 'nothing cooked at home'}</span></h4>
-      <dl>${cells}</dl></div>`;
-  }).join('');
+  const days = WEEK.map(day => dayBlock(p, day)).join('');
 
   return `<a class="back" href="#plans">← Plans</a>
   <article><h2>${esc(p.title)}</h2>
@@ -1280,9 +1341,11 @@ function ordersView(){
 function render(){
   renderNav();
   const app = document.getElementById('app');
-  const v = route.view;
+  /* Today has nothing to say before the first Plan exists; the pool does. */
+  const v = (route.view === 'today' && !D.plans.length) ? 'recipes' : route.view;
   app.innerHTML =
       checkedOut    ? checkoutView()
+    : v === 'today'  ? todayView()
     : v === 'recipe' ? recipeDetail(route.slug)
     : v === 'plans'  ? planList()
     : v === 'plan'   ? planDetail(route.slug)
