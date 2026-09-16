@@ -31,25 +31,25 @@ Named, because the list is the rule:
 - **`bin/shopping-list.py`** aggregates a Plan into its shopping section. Ruled
   in [What The Four Skills Are](.scratch/meal-planning-system/issues/08-what-the-four-skills-are.md).
 - **`bin/browse.py`** generates `index.html`, the browse interface over Recipes,
-  Menus and Orders. Ruled in
+  Plans, Menus and Orders. Ruled in
   [Browse The Pool](.scratch/meal-planning-system/issues/24-browse-the-pool.md).
 
 A **third** `bin/` entry is a decision, not a convenience — raise it as a
 ticket. Everything else is prose, because everything else is judgement.
 
 `index.html` is generated and committed, and regenerating it is manual:
-re-run `bin/browse.py` whenever a Recipe, Menu, Pin or Order changes.
+re-run `bin/browse.py` whenever a Recipe, Plan, Menu, Pin or Order changes.
 `bin/browse.py --check` says whether the committed page has gone stale.
 
 **Parity between the Recipes, `index.html` and GitHub Pages is vital.** The
 page is served from the branch root at `mikebyte00.github.io/recipes`, so the
 committed `index.html` *is* what the household reads on a phone in the kitchen.
-A markdown change that stops there is invisible. Every edit to a Recipe, Menu,
-Pin or Order therefore finishes the same way, and the change is not done until
-it has:
+A markdown change that stops there is invisible. Every edit to a Recipe, Plan,
+Menu, Pin or Order therefore finishes the same way, and the change is not done
+until it has:
 
 1. `python3 bin/browse.py` — regenerate the page.
-2. `python3 tests/test_browse.py` — 54 tests, including the redaction ones.
+2. `python3 tests/test_browse.py` — 62 tests, including the redaction ones.
 3. `git commit` the source change **and** `index.html` in the same commit.
 4. `git push` — Pages serves the pushed commit, so an unpushed commit is a
    stale page.

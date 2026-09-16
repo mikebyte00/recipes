@@ -55,8 +55,23 @@ says so is unchanged.
 - Regenerated **manually**. No CI workflow, no git hook. `bin/browse.py --check`
   fails if the committed page is stale, so the omission is detectable.
 - **Mobile-first**, light-only.
-- `Plans/` is deliberately **out of scope**. A Plan is one week's mess; the
-  interface is for the standing artifacts.
+- `Plans/` was originally **out of scope** — a Plan is one week's mess and the
+  interface was for the standing artifacts. **Overruled on 16 September 2026**:
+  the page is what the household reads on a phone in the kitchen, and the
+  question it is asked most is *what am I cooking tonight, and where is that
+  Recipe*. Only a Plan answers that. `Plans/` now has its own section, in the
+  nav slot `Menus` used to hold.
+
+  The original concern survives as a rule rather than an exclusion: **a Plan is
+  never checked against the Weekly Layout**. A real week deviates on purpose —
+  days away, Slots eaten out, a Recipe swapped — so `layout_violations` stays a
+  Menu-only judgement, and a day with nothing cooked at home is not measured
+  against the daily goals either. Reporting a night out as a nutritional
+  failure is exactly the "one week's mess" noise this was meant to keep out.
+
+  Menus keep their pages and their layout checking; they are simply no longer
+  in the nav. A Recipe's **Used by** still links to them, which is what the
+  orphan count depends on.
 
 ### `tests/` — the repo's first tests, and why
 

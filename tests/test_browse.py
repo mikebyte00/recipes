@@ -12,6 +12,7 @@ import importlib.util
 import json
 import os
 import sys
+import tempfile
 import unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -327,6 +328,52 @@ class OrderAggregate(unittest.TestCase):
 
 
 
+def plan_payload(plans, menus=()):
+    """build_payload over fixture Plans, with everything else stubbed empty."""
+    return browse.build_payload({
+        "recipes": RECIPES, "menus": list(menus), "plans": plans, "pins": {},
+        "bands": {}, "goals": browse.DEFAULT_GOALS, "orders": [], "history": [],
+    })["plans"]
+
+
+class Plans(unittest.TestCase):
+    def setUp(self):
+        days = {day: dict(slots) for day, slots in LEGAL_DAYS.items()}
+        days["monday"] = {slot: browse.EATEN_OUT for slot in browse.SLOTS}
+        days["sunday"]["lunch"] = browse.EATEN_OUT
+        self.plan = {"slug": "2026-09-14", "title": "Week of 2026-09-14",
+                     "menu": "menu-1", "days": days}
+
+    def test_lists_the_latest_week_first(self):
+        with tempfile.TemporaryDirectory() as root:
+            os.mkdir(os.path.join(root, "Plans"))
+            for date in ("2026-08-31", "2026-09-14", "2026-09-07"):
+                with open(os.path.join(root, "Plans", date + ".md"), "w") as handle:
+                    handle.write("---\ntitle: Week of %s\ndays: {}\n---\n" % date)
+            self.assertEqual([p["slug"] for p in browse.load_plans(root)],
+                             ["2026-09-14", "2026-09-07", "2026-08-31"])
+
+    def test_counts_only_the_slots_cooked_at_home(self):
+        self.assertEqual(plan_payload([self.plan])[0]["cooked"], 23)
+
+    def test_a_day_nobody_cooked_is_not_flagged_against_the_goals(self):
+        monday = plan_payload([self.plan])[0]["totals"]["monday"]
+        self.assertEqual(monday["cooked"], 0)
+        self.assertEqual(monday["flags"], [])
+
+    def test_a_day_that_was_cooked_is_still_measured(self):
+        sunday = plan_payload([self.plan])[0]["totals"]["sunday"]
+        self.assertEqual(sunday["cooked"], 3)
+        self.assertEqual(sunday["flags"], ["protein"])
+
+    def test_names_the_menu_the_week_was_copied_from(self):
+        menus = [{"slug": "menu-1", "title": "Menu 1", "days": LEGAL_DAYS}]
+        self.assertEqual(plan_payload([self.plan], menus)[0]["menu_title"], "Menu 1")
+
+    def test_a_plan_is_never_checked_against_the_weekly_layout(self):
+        self.assertNotIn("violations", plan_payload([self.plan])[0])
+
+
 class AgainstTheRealRepo(unittest.TestCase):
     """The pure functions above use fixtures. These read what is actually here."""
 
@@ -371,6 +418,13 @@ class AgainstTheRealRepo(unittest.TestCase):
                              if s not in self.data["recipes"]})
         self.assertEqual(unresolved, [])
 
+    def test_every_plan_slot_is_a_recipe_or_eaten_out(self):
+        self.assertTrue(self.data["plans"], "Plans/ is empty")
+        unresolved = sorted({s for plan in self.data["plans"]
+                             for slots in plan["days"].values() for s in slots.values()
+                             if s != browse.EATEN_OUT and s not in self.data["recipes"]})
+        self.assertEqual(unresolved, [])
+
     def test_reads_every_captured_order(self):
         self.assertEqual(len(self.data["orders"]), 4)
 
@@ -396,6 +450,10 @@ class GeneratedPage(unittest.TestCase):
     def test_the_page_inlines_every_recipe_title(self):
         for recipe in self.data["recipes"].values():
             self.assertIn(json.dumps(recipe["title"])[1:-1], self.html)
+
+    def test_the_page_inlines_every_planned_week(self):
+        for plan in self.data["plans"]:
+            self.assertIn(plan["slug"], self.html)
 
     def test_the_page_inlines_every_order_date(self):
         for order in self.data["orders"]:

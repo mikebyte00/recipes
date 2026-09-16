@@ -4,7 +4,7 @@
 The second and last piece of code this project authorises, ruled in
 .scratch/meal-planning-system/issues/24-browse-the-pool.md.
 
-Reads Recipes/, Menus/, PINS.md, GOALS.md and Orders/, and writes one
+Reads Recipes/, Menus/, Plans/, PINS.md, GOALS.md and Orders/, and writes one
 self-contained index.html at the repo root with every datum inlined as JSON.
 No server, no build step, no runtime fetches -- it opens over file:// and it
 is served by GitHub Pages from the branch root.
@@ -371,6 +371,26 @@ def load_menus(root):
     return menus
 
 
+def load_plans(root):
+    """Every week actually planned, latest first.
+
+    A Plan is never checked against the Weekly Layout the way a Menu is: a real
+    week deviates on purpose -- days away, Slots eaten out, a Recipe swapped.
+    """
+    plans = []
+    for path in sorted(glob.glob(os.path.join(root, "Plans", "*.md")), reverse=True):
+        front, _ = split_document(path)
+        slug = os.path.basename(path)[:-3]
+        source = front.get("menu")
+        plans.append({
+            "slug": slug,
+            "title": front.get("title") or humanise(slug),
+            "menu": os.path.basename(source)[:-3] if source else None,
+            "days": {day: dict(front.get("days", {}).get(day) or {}) for day in DAYS},
+        })
+    return plans
+
+
 def load_orders(root):
     """Every captured order, parsed and redacted, oldest first."""
     parsed, raw = [], []
@@ -420,6 +440,7 @@ def load_all(root):
     return {
         "recipes": load_recipes(root),
         "menus": load_menus(root),
+        "plans": load_plans(root),
         "pins": load_pins(root),
         "bands": parse_bands(goals_text),
         "goals": parse_nutrient_goals(goals_text),
@@ -519,6 +540,31 @@ def build_payload(data):
             "violations": layout_violations(menu["days"], recipes),
         })
 
+    menu_titles = {menu["slug"]: menu["title"] for menu in menus}
+    plan_rows = []
+    for plan in data["plans"]:
+        totals, cooked = {}, 0
+        for day in DAYS:
+            slots = plan["days"].get(day, {})
+            at_home = sum(1 for slot in SLOTS
+                          if slots.get(slot) not in (None, EATEN_OUT))
+            cooked += at_home
+            summed = day_totals(slots, recipes)
+            # A day nobody cooked misses both goals trivially. Flagging it would
+            # report a night out as a nutritional failure.
+            summed["flags"] = goal_flags(summed, data["goals"]) if at_home else []
+            summed["cooked"] = at_home
+            totals[day] = summed
+        plan_rows.append({
+            "slug": plan["slug"],
+            "title": plan["title"],
+            "menu": plan["menu"],
+            "menu_title": menu_titles.get(plan["menu"]),
+            "days": plan["days"],
+            "totals": totals,
+            "cooked": cooked,
+        })
+
     aggregate = order_aggregate(orders, pins)
     bought = {row["line"]: row for row in aggregate}
     pin_rows = []
@@ -545,6 +591,7 @@ def build_payload(data):
     return {
         "recipes": recipe_rows,
         "menus": menu_rows,
+        "plans": plan_rows,
         "orders": orders,
         "aggregate": aggregate,
         "pins": pin_rows,
@@ -676,6 +723,10 @@ ol.method li{margin-bottom:.6rem}
 .day dl{margin:0;display:grid;grid-template-columns:5.2rem 1fr;gap:.2rem .6rem}
 .day dt{font-size:.75rem;color:var(--soft);text-transform:capitalize}
 .day dd{margin:0;font-size:.92rem}
+/* A meal in the day grid is the way into its Recipe, so it has to read as a
+   link -- the global bare `a` would leave it looking like plain text. */
+.day dd a,.tagline a{color:var(--accent)}
+.day dd a{border-bottom:1px solid var(--accent-soft)}
 /* Plan mode. The drawer is its own thing, not a reused .sheet -- .sheet turns
    into a sticky sidebar on wide screens and this must stay at the bottom. */
 .drawer{position:fixed;inset:auto 0 0 0;z-index:40;background:var(--card);
@@ -725,6 +776,10 @@ textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,m
 <script>
 const D = JSON.parse(document.getElementById('data').textContent);
 const byslug = Object.fromEntries(D.recipes.map(r => [r.slug, r]));
+/* The household's week starts Monday; D.days starts Sunday because that is the
+   order a Menu file is written in. */
+const WEEK = D.days.slice(1).concat(D.days.slice(0, 1));
+const SLOT_COUNT = D.days.length * D.slots.length;
 const FACETS = ['slot','protein','effort','appliances','tags'];
 /* Sort is per-group, not global: the Slot headings stay and the order inside
    each changes. An absent value sorts last in every mode -- unrated is
@@ -780,7 +835,7 @@ function writeHash(r, replace){
   if (r.sort !== 'title') p.set('sort', r.sort);
   FACETS.forEach(k => { if ((r.f[k]||[]).length) p.set(k, r.f[k].join(',')); });
   let path = r.view;
-  if (r.view === 'recipe' || r.view === 'menu') path += '/' + r.slug;
+  if (r.view === 'recipe' || r.view === 'menu' || r.view === 'plan') path += '/' + r.slug;
   if (r.view === 'orders' && r.sub && r.sub !== 'orders') path += '/' + r.sub;
   const s = p.toString();
   const hash = '#' + path + (s ? '?' + s : '');
@@ -825,12 +880,14 @@ function scoreDot(kind, r){
 }
 
 function renderNav(){
-  const tabs = [['recipes','Recipes'],['menus','Menus'],['orders','Past orders'],
-                ['plan','Plan']];
+  /* `planmode` is the wizard toggle, not a view -- `plan` is a Plan's own page. */
+  const tabs = [['recipes','Recipes'],['plans','Plans'],['orders','Past orders'],
+                ['planmode','Plan']];
   const here = route.view === 'recipe' ? 'recipes'
-             : route.view === 'menu' ? 'menus' : route.view;
+             : route.view === 'menu' ? 'menus'
+             : route.view === 'plan' ? 'plans' : route.view;
   document.getElementById('nav').innerHTML = tabs.map(([v,label]) =>
-    v === 'plan'
+    v === 'planmode'
       ? `<a class="${planOn?'on':''}" href="#recipes" id="plantoggle"
            aria-pressed="${planOn}">${planOn ? 'Planning' : label}</a>`
       : `<a class="${v===here?'on':''}" href="#${v}">${label}</a>`).join('');
@@ -1014,12 +1071,62 @@ function menuDetail(slug){
   </article>`;
 }
 
+function planList(){
+  if (!D.plans.length) return `<p class="empty">No week has been planned yet.</p>`;
+  return `<p class="lede">${D.plans.length} planned week${D.plans.length>1?'s':''},
+    latest first. A Plan is one real week — Recipes swapped, days away, Slots
+    eaten out.</p>
+    <ul class="list">${D.plans.map(p=>`<li><a href="#plan/${p.slug}">
+      <div class="row"><span class="t">${esc(p.title)}</span>
+      <span class="macro">${p.cooked} / ${SLOT_COUNT} cooked</span></div>
+      <div class="meta">${[p.menu_title ? 'from ' + esc(p.menu_title) : '',
+        SLOT_COUNT - p.cooked ? (SLOT_COUNT - p.cooked) + ' Slot(s) eaten out'
+                              : 'every Slot cooked at home'
+        ].filter(Boolean).join(' · ')}</div>
+    </a></li>`).join('')}</ul>`;
+}
+
+function planDetail(slug){
+  const p = D.plans.find(x => x.slug === slug);
+  if (!p) return `<p class="empty">No Plan called ${esc(slug)}.</p>`;
+  const days = WEEK.map(day => {
+    const t = p.totals[day];
+    const cells = D.slots.map(s => {
+      const value = p.days[day][s];
+      const r = byslug[value];
+      return `<dt>${s}</dt><dd>${r
+        ? `<a href="#recipe/${r.slug}">${esc(r.title)}</a>
+           <span class="note">${g(r.protein_g)}</span>`
+        : `<span class="note">${value === 'eaten-out' ? 'eaten out' : '—'}</span>`}</dd>`;
+    }).join('');
+    return `<div class="day"><h4><span>${cap(day)}</span>
+      <span class="macro">${t.cooked
+        ? `${g(t.protein_g)} · ${kc(t.kcal)} kcal ${
+            t.flags.length ? `<span class="flag">↓${t.flags.join(' ')}</span>` : ''}`
+        : 'nothing cooked at home'}</span></h4>
+      <dl>${cells}</dl></div>`;
+  }).join('');
+
+  return `<a class="back" href="#plans">← Plans</a>
+  <article><h2>${esc(p.title)}</h2>
+    <p class="tagline">${p.cooked} of ${SLOT_COUNT} Slots cooked at home${
+      p.menu_title ? ` · from <a href="#menu/${p.menu}">${esc(p.menu_title)}</a>` : ''}</p>
+
+    <section><h3>The week</h3>
+      <p class="note">Tap a meal to open its Recipe. Day totals are summed from the
+        Recipes each Slot names; a day with nothing cooked at home is not measured
+        against the goals, and a Plan is never checked against the Weekly Layout —
+        a real week deviates on purpose. Floor ${g(D.goals.protein_floor)}/day,
+        ceiling ${kc(D.goals.kcal_ceiling)} kcal/day.</p>
+      ${days}</section>
+  </article>`;
+}
+
 /* Plan mode. The pool stays on screen and the wizard walks: the drawer names
    one Slot, a click on a Recipe fills it and advances. Selections live here for
    the session only -- the page is generated, not an app, and a refresh starting
    clean is honest where a stale grid would not be. */
-const PLAN_SEQ = D.days.slice(1).concat(D.days.slice(0, 1))
-  .flatMap(day => D.slots.map(slot => [day, slot]));
+const PLAN_SEQ = WEEK.flatMap(day => D.slots.map(slot => [day, slot]));
 let plan = {};
 let planOn = false;
 let cursor = 0;
@@ -1177,6 +1284,8 @@ function render(){
   app.innerHTML =
       checkedOut    ? checkoutView()
     : v === 'recipe' ? recipeDetail(route.slug)
+    : v === 'plans'  ? planList()
+    : v === 'plan'   ? planDetail(route.slug)
     : v === 'menus'  ? menuList()
     : v === 'menu'   ? menuDetail(route.slug)
     : v === 'orders' ? ordersView()
@@ -1267,7 +1376,8 @@ def main(argv):
     payload = build_payload(data)
     print(
         f"index.html written: {len(payload['recipes'])} Recipes, "
-        f"{len(payload['menus'])} Menus, {len(payload['orders'])} orders, "
+        f"{len(payload['menus'])} Menus, {len(payload['plans'])} Plans, "
+        f"{len(payload['orders'])} orders, "
         f"{len(payload['aggregate'])} distinct items, {len(html)} bytes."
     )
     return 0
