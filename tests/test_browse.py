@@ -372,7 +372,7 @@ class AgainstTheRealRepo(unittest.TestCase):
         self.assertEqual(unresolved, [])
 
     def test_reads_every_captured_order(self):
-        self.assertEqual(len(self.data["orders"]), 3)
+        self.assertEqual(len(self.data["orders"]), 4)
 
     def test_no_captured_order_carries_a_redacted_category(self):
         for order in self.data["orders"]:

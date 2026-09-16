@@ -14,11 +14,14 @@ Every row here was confirmed by hand in
 the same day — which merged seven near-duplicate slugs and took `staple` off the
 recipe ingredient, leaving the Pin as its only home.
 
-The coverage counts below — the 87-Pin breakdown, [Absences](#absences), and
+The coverage counts below — the 94-Pin breakdown, [Absences](#absences), and
 [Bought, matched nothing](#bought-matched-nothing) — were recounted against the
 pool on 09 September 2026, after five Recipes landed and took the corpus to 42.
 `pancetta` was pinned directly on 16 September 2026 (see [Absences](#absences)),
-taking the catalogue to 88.
+taking the catalogue to 88. The 08 September harvest minted six more —
+`banana`, `blue-cheese`, `chestnut-mushrooms`, `green-beans`, `milk-chocolate`,
+`quorn-pieces` — and added a line number to the existing `tarragon` staple,
+taking the catalogue to 94.
 
 ## Reading a Pin
 
@@ -58,8 +61,8 @@ passes. 19 lines across 7 staple slugs currently take the second branch.
 hand, and adding it puts it in your order history where the next harvest turns
 it into a Pin.
 
-**87 Pins**: 56 with harvested line numbers, 7 counter proteins, 24
-store-cupboard staples not yet seen in an order. 30 of the corpus's 117
+**94 Pins**: 63 with harvested line numbers, 7 counter proteins, 24
+store-cupboard staples not yet seen in an order. 24 of the corpus's 118
 ingredients have no Pin.
 
 ## The catalogue
@@ -103,6 +106,16 @@ balsamic-vinegar:
   staple: true
   confirmed: true
 
+banana:
+  display: Bananas
+  store: waitrose
+  unit: each
+  pack: { qty: 6, unit: each }
+  search_term: Duchy Organic Fairtrade Bananas
+  line_number: "088937"
+  staple: false
+  confirmed: true
+
 black-beans:
   display: Black beans
   store: waitrose
@@ -121,6 +134,16 @@ black-pepper:
   search_term: Cooks' Ingredients Black Peppercorns
   line_number: "785492"
   staple: true
+  confirmed: true
+
+blue-cheese:
+  display: Blue cheese
+  store: waitrose
+  unit: g
+  pack: { qty: 150, unit: g }
+  search_term: Saint Agur Blue Cheese
+  line_number: "062460"
+  staple: false
   confirmed: true
 
 brown-rice:
@@ -198,6 +221,16 @@ cherry-tomatoes:
   pack: { qty: 200, unit: g }
   search_term: Duchy Organic Cherry Vine Tomatoes
   line_number: "097155"
+  staple: false
+  confirmed: true
+
+chestnut-mushrooms:
+  display: Chestnut mushrooms
+  store: waitrose
+  unit: g
+  pack: { qty: 250, unit: g }
+  search_term: Duchy Organic British Chestnut Mushrooms
+  line_number: "085540"
   staple: false
   confirmed: true
 
@@ -362,6 +395,16 @@ greek-yogurt:
   staple: false
   confirmed: true
 
+green-beans:
+  display: Green beans
+  store: waitrose
+  unit: g
+  pack: { qty: 225, unit: g }
+  search_term: Duchy Organic Green Beans
+  line_number: "085542"
+  staple: false
+  confirmed: true
+
 green-pesto:
   display: Green pesto
   store: waitrose
@@ -454,6 +497,16 @@ lime:
   pack: { qty: 4, unit: each }
   search_term: Cooks' Ingredients Unwaxed Limes
   line_number: "011269"
+  staple: false
+  confirmed: true
+
+milk-chocolate:
+  display: Milk chocolate
+  store: waitrose
+  unit: g
+  pack: { qty: 90, unit: g }
+  search_term: Green & Black's Organic 37% Milk Chocolate Bar
+  line_number: "045527"
   staple: false
   confirmed: true
 
@@ -579,6 +632,16 @@ quinoa:
   pack: { qty: 250, unit: g }
   search_term: Merchant Gourmet Red & White Quinoa
   line_number: "544453"
+  staple: false
+  confirmed: true
+
+quorn-pieces:
+  display: Quorn pieces
+  store: waitrose
+  unit: g
+  pack: { qty: 300, unit: g }
+  search_term: Quorn Vegetarian Pieces
+  line_number: "441467"
   staple: false
   confirmed: true
 
@@ -743,6 +806,9 @@ tarragon:
   display: Tarragon
   store: waitrose
   unit: g
+  pack: { qty: 11, unit: g }
+  search_term: Cooks' Ingredients Tarragon
+  line_number: "455285"
   staple: true
   confirmed: true
 
@@ -872,7 +938,7 @@ worcestershire-sauce:
 
 ## Absences
 
-The 29 ingredients with no Pin, and why. Recorded here so the catalogue's
+The 24 ingredients with no Pin, and why. Recorded here so the catalogue's
 coverage is checkable rather than assumed. **This list is the Unpinned flag**:
 an ingredient here is added to the order by hand, and buying it once puts it in
 the order history where the next harvest turns it into a Pin.
@@ -882,62 +948,62 @@ it would never have surfaced through a harvest. Recorded here rather than in
 the counts below, since it broke the assumption the rest of this section rests
 on.
 
-**Never harvested (24)** — real shopping items absent from the three captured
+The 08 September harvest resolved six of these: `banana`, `blue-cheese`,
+`chestnut-mushrooms`, `green-beans`, `milk-chocolate` all matched a harvested
+product and are now Pins; `quorn-pieces` arrived with three new Recipes and
+matched Quorn Vegetarian Pieces (441467) in the same order.
+
+**Never harvested (20)** — real shopping items absent from the four captured
 orders. Each will Pin itself on the next harvest after you buy it.
 
-- `blue-cheese` (Saint Agur light) · `burger-buns` · `chestnut-mushrooms` ·
-  `flaked-almonds` · `green-beans` · `halloumi` · `lettuce` · `parsley` ·
+- `burger-buns` · `flaked-almonds` · `halloumi` · `lettuce` · `parsley` ·
   `pineapple` · `red-onion` · `strawberries` · `waffle-fries` ·
-  `wholewheat-linguine` · `milk-chocolate` · `chilli-oil` · `cinnamon` ·
-  `coconut-milk` · `jerk-seasoning` · `kidney-beans` · `marmalade` ·
-  `rice-vinegar` · `spring-onion` · `sweetheart-cabbage` · `peas`
+  `wholewheat-linguine` · `chilli-oil` · `cinnamon` · `coconut-milk` ·
+  `jerk-seasoning` · `kidney-beans` · `marmalade` · `rice-vinegar` ·
+  `spring-onion` · `sweetheart-cabbage` · `peas`
 
-Four of those eleven additions — `chilli-oil`, `cinnamon`, `jerk-seasoning`,
-`rice-vinegar` — read like store cupboard, and would likely mint as staples.
-Likely is not confirmed, so they sit here until a harvest and a human say
-otherwise.
-
-`milk-chocolate` is the odd one: the only chocolates in the order history are
-dark (789167) and white. The Belgian Dark Chocolate may well be what the
-strawberry pots actually use, but swapping a stated ingredient for a different
-one on a hunch is exactly what `confirmed` exists to prevent.
+Four of those — `chilli-oil`, `cinnamon`, `jerk-seasoning`, `rice-vinegar` —
+read like store cupboard, and would likely mint as staples. Likely is not
+confirmed, so they sit here until a harvest and a human say otherwise.
 
 **Fresh, and deliberately not stapled (3)**
 
 - `garlic` · `ginger` · `black-olives` — cupboard-adjacent but genuinely
   perishable, so they belong on a shopping list. No product harvested yet.
 
-**Harvested, not yet minted (2)**
+**Harvested, not yet minted (1)**
 
-- `banana` (Duchy Organic Fairtrade Bananas, 088937, in all three orders) ·
-  `blueberries` (Duchy Organic Blueberries, 088973, 31 August)
+- `blueberries` (Duchy Organic Blueberries, 088973, 31 August)
 
-These two are the ordinary case running backwards: the product was already in
-the order history, and the ingredient arrived afterwards with the yogurt pots.
-A harvest proposes; a human confirms. Until someone works
-[Orders/HARVEST.md](Orders/HARVEST.md) steps 6-9 over them they have no row,
-so they stay on the Unpinned flag and get added by hand.
+The ordinary case running backwards: the product was already in the order
+history, and the ingredient arrived afterwards with the yogurt pots. A harvest
+proposes; a human confirms. Until someone works
+[Orders/HARVEST.md](Orders/HARVEST.md) steps 6-9 over it, it has no row, so it
+stays on the Unpinned flag and gets added by hand.
 
 ## Bought, matched nothing
 
-24 of the 86 harvested products bind to no Pin. Mostly evidence rather than
+26 of the 95 harvested products bind to no Pin. Mostly evidence rather than
 candidates — matching is slug-driven, so these were never proposed.
 
-Household and personal (6): four cleaning and laundry lines, one personal-care
-refill, one supplement. Not named here — this file is public, and the page
-redacts the whole personal-care category, so listing the products in prose would
-undo that. The order files on disk have them.
+Household and personal (9): three cleaning and laundry lines, four paper/bin
+lines from the 08 September order, one personal-care refill, one supplement.
+Not named here — this file is public, and the page redacts the whole
+personal-care category, so listing the products in prose would undo that. The
+order files on disk have them.
 
 Groceries outside the recipe corpus (15): grapes · kiwi · carrots · peppers ·
 cucumber · radish · watercress · pumpkin seeds · plum tomatoes · blackeye
 beans · beef bone broth · chimichurri marinade · tomato salsa dip · Cooks'
 Ingredients Basil · **Tenderstem broccoli**.
 
-Chocolate (1): Cooks' Ingredients Belgian Dark Chocolate — see the
-`milk-chocolate` note in [Absences](#absences).
+Chocolate (1): Cooks' Ingredients Belgian Dark Chocolate. The only chocolates
+in the order history are dark, milk (now Pinned) and white — this one may well
+be what the strawberry pots actually use, but swapping a stated ingredient for
+a different one on a hunch is exactly what `confirmed` exists to prevent.
 
-Candidates, not evidence (2): bananas · blueberries. Both now answer a corpus
-ingredient and are listed under [Absences](#absences) awaiting a minted Pin.
+Candidates, not evidence (1): blueberries — answers a corpus ingredient and is
+listed under [Absences](#absences) awaiting a minted Pin.
 
 **Tenderstem broccoli** is worth a second look — 200g, bought twice, and no
 Recipe in the corpus uses it. That reads like a dinner side you cook regularly
