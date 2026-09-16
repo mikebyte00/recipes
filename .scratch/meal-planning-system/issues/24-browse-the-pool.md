@@ -54,7 +54,36 @@ says so is unchanged.
   why it is `index.html` and not `browse.html`.
 - Regenerated **manually**. No CI workflow, no git hook. `bin/browse.py --check`
   fails if the committed page is stale, so the omission is detectable.
-- **Mobile-first**, light-only.
+- **Mobile-first.** Originally **light-only**. **Amended on 16 September 2026**:
+  the user asked for both themes and a toggle, and the cost turned out to be
+  the theme block plus three new variables rather than any new machinery.
+
+  The palette is **13 custom properties in two blocks** — one light, one dark —
+  and `data-theme` is always written onto `<html>` by a boot script in `<head>`,
+  so the cascade never consults `prefers-color-scheme` and neither block is
+  duplicated. The boot script runs before first paint; without it the page
+  flashes cream on its way to dark. It is wrapped in `try`/`catch` because
+  `localStorage` throws in some privacy modes and on some `file://` origins,
+  and a theme preference must never be able to stop the page rendering.
+
+  Three variables existed only as hardcoded values before and had to be named
+  to make the dark theme possible: `--on-accent` (white on the light accent,
+  near-black on the lightened dark one — white on `#e09468` sits near 2:1),
+  `--shade` and `--scrim`, whose warm-brown alphas were invisible on a dark
+  ground.
+
+  **The toggle has two states, not three.** The stored value *is* the override
+  and its absence means "follow the system", so there is no separate Auto to
+  explain, and a `change` listener keeps the system's casting vote while no
+  choice is stored. Verified by running the shipped boot script against all
+  seven cases — both stored values against both system preferences, neither
+  stored against both, and `localStorage` throwing.
+
+  The dark palette is a **warm near-black**, not a neutral grey: the light
+  theme is cream paper and burnt sienna, and a cold dark would read as a
+  different site. All 22 foreground/background pairs across both themes were
+  measured against WCAG AA — **0 failures**, the tightest being `--under` on
+  light paper at 4.41:1 against a 3.0 bar for a non-text band indicator.
 - `Plans/` was originally **out of scope** — a Plan is one week's mess and the
   interface was for the standing artifacts. **Overruled on 16 September 2026**:
   the page is what the household reads on a phone in the kitchen, and the

@@ -612,12 +612,42 @@ TEMPLATE = r"""<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Meal Planning</title>
+<!-- Before first paint, or the page flashes cream on the way to dark. The
+     stored value IS the override; its absence means follow the system.
+     localStorage throws in some privacy modes and on some file:// origins,
+     and the page must still render -- hence the catch. -->
+<script>
+(function(){
+  var saved = null;
+  try { saved = localStorage.getItem('theme'); } catch (e) {}
+  var dark = saved ? saved === 'dark'
+                   : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+})();
+</script>
 <style>
+/* Two themes, thirteen variables. `data-theme` is always set on <html> by the
+   boot script in <head>, so the cascade never has to ask the media query --
+   one light block, one dark block, and nothing duplicated between them. */
 :root{
+  color-scheme:light;
   --paper:#faf7f1; --card:#fffdf9; --ink:#332f29; --soft:#6f675c;
   --rule:#e4dccf; --accent:#95462a; --accent-soft:#f2e5dd;
   --under:#9a6a1f; --over:#8d3a3a; --in:#4d6b45;
+  --on-accent:#fff; --shade:rgba(60,45,25,.12); --scrim:rgba(50,40,28,.25);
   --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+}
+/* Warm near-black, not a cold grey: the light theme is cream paper and burnt
+   sienna, and a neutral dark would read as a different site. The accent
+   lightens because #95462a on a dark ground fails contrast; --on-accent goes
+   the other way for the same reason -- white text on the lightened accent
+   would sit near 2:1. */
+:root[data-theme=dark]{
+  color-scheme:dark;
+  --paper:#1a1714; --card:#221e19; --ink:#ece5da; --soft:#a49a8b;
+  --rule:#3a332b; --accent:#e09468; --accent-soft:#3a2a20;
+  --under:#d2a049; --over:#dd8585; --in:#8fbf7f;
+  --on-accent:#1a1714; --shade:rgba(0,0,0,.5); --scrim:rgba(0,0,0,.55);
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);
@@ -636,7 +666,7 @@ header{border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:20;
 nav{display:flex;align-items:center;gap:1.25rem;padding-bottom:.1rem;
   overflow-x:auto;scrollbar-width:none}
 nav::-webkit-scrollbar{display:none}
-nav a{padding:.35rem 0 .55rem;font-size:.95rem;color:var(--soft);
+nav a{padding:.5rem 0 .6rem;font-size:.95rem;color:var(--soft);
   white-space:nowrap;border-bottom:2px solid transparent}
 nav a.on{color:var(--ink);border-bottom-color:var(--accent)}
 /* Plan is a toggle, not a section -- a pill on the right, so it does not read
@@ -645,33 +675,46 @@ nav a#plantoggle{margin-left:auto;padding:.3rem .85rem;border:1px solid var(--ru
   border-radius:999px;background:var(--card);font-size:.85rem;
   margin-bottom:.2rem;cursor:pointer}
 nav a#plantoggle:hover{border-color:var(--accent);color:var(--accent)}
-nav a#plantoggle.on{background:var(--accent);border-color:var(--accent);color:#fff}
+nav a#plantoggle.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 
 main{padding:1.1rem 0 4rem}
 .lede{color:var(--soft);font-size:.87rem;margin:.1rem 0 1rem}
 .tools{display:flex;gap:.5rem;margin-bottom:1rem}
 input[type=search]{flex:1;min-width:0;font:inherit;font-size:.95rem;color:inherit;
-  background:var(--card);border:1px solid var(--rule);border-radius:2px;padding:.5rem .65rem}
-input[type=search]:focus{outline:none;border-color:var(--accent)}
+  background:var(--card);border:1px solid var(--rule);border-radius:5px;padding:.55rem .7rem}
 button,select{font:inherit;font-size:.9rem;color:inherit;background:var(--card);
-  border:1px solid var(--rule);border-radius:2px;padding:.5rem .8rem;cursor:pointer}
-button:hover,select:hover{border-color:var(--accent)}
-select:focus{outline:none;border-color:var(--accent)}
+  border:1px solid var(--rule);border-radius:5px;padding:.55rem .8rem;cursor:pointer}
+button:hover,select:hover{border-color:var(--accent);color:var(--accent)}
+/* The old rules removed the outline and left a border-colour change as the only
+   focus signal, which a keyboard user cannot see on a control that has no
+   border to begin with. :focus-visible keeps the mouse clean and gives the
+   keyboard a ring. */
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:2px solid var(--accent);outline-offset:1px}
+
+/* Theme is a page-level setting, so it sits in the brand row rather than
+   competing with four section tabs for 360px of nav. */
+#theme{margin-left:auto;align-self:center;display:flex;align-items:center;
+  justify-content:center;width:2.4rem;height:2.4rem;padding:0;
+  border-radius:999px;color:var(--soft)}
 .badge{display:inline-block;min-width:1.15rem;margin-left:.35rem;padding:0 .3rem;
-  background:var(--accent);color:#fff;border-radius:999px;font-size:.72rem;text-align:center}
+  background:var(--accent);color:var(--on-accent);border-radius:999px;font-size:.72rem;
+  text-align:center}
 
 .sheet{position:fixed;inset:auto 0 0 0;z-index:30;background:var(--card);
   border-top:1px solid var(--rule);max-height:78vh;overflow:auto;padding:1rem;
-  box-shadow:0 -8px 30px rgba(60,45,25,.12)}
+  box-shadow:0 -8px 30px var(--shade)}
 .sheet[hidden]{display:none}
-.scrim{position:fixed;inset:0;z-index:29;background:rgba(50,40,28,.25)}
+.scrim{position:fixed;inset:0;z-index:29;background:var(--scrim)}
 .scrim[hidden]{display:none}
 .facet{margin-bottom:1rem}
 .facet h3{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;
   color:var(--soft);margin-bottom:.45rem}
 .chips{display:flex;flex-wrap:wrap;gap:.35rem}
 .chip{border:1px solid var(--rule);background:var(--paper);border-radius:999px;
-  padding:.28rem .7rem;font-size:.85rem;cursor:pointer;color:var(--soft)}
+  padding:.45rem .85rem;line-height:1.2;font-size:.85rem;cursor:pointer;color:var(--soft)}
 .chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
 .slider{display:flex;align-items:center;gap:.7rem}
 .slider input{flex:1}
@@ -741,7 +784,7 @@ ol.method li{margin-bottom:.6rem}
 /* Today's card is the page's answer to "what am I cooking tonight". Same .day
    block, lifted off the list and sized to read at arm's length on a worktop. */
 .day.now{border:1px solid var(--rule);border-left:3px solid var(--accent);
-  background:var(--card);border-radius:2px;padding:.9rem 1rem;margin-bottom:1.5rem}
+  background:var(--card);border-radius:6px;padding:.9rem 1rem;margin-bottom:1.5rem}
 .day.now h4{font-size:.9rem;color:var(--accent)}
 .day.now dl{gap:.45rem .6rem}
 .day.now dd{font-size:1.05rem}
@@ -752,7 +795,7 @@ ol.method li{margin-bottom:.6rem}
 /* Plan mode. The drawer is its own thing, not a reused .sheet -- .sheet turns
    into a sticky sidebar on wide screens and this must stay at the bottom. */
 .drawer{position:fixed;inset:auto 0 0 0;z-index:40;background:var(--card);
-  border-top:1px solid var(--rule);box-shadow:0 -2px 14px rgba(50,40,28,.12);
+  border-top:1px solid var(--rule);box-shadow:0 -2px 14px var(--shade);
   padding:.7rem 0}
 .drawer .wrap{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
 .drawer .where{font-size:.95rem}
@@ -766,7 +809,7 @@ button[disabled]{opacity:.45;cursor:not-allowed}
 button[disabled]:hover{border-color:var(--rule)}
 textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
   font-size:.82rem;line-height:1.5;color:inherit;background:var(--card);
-  border:1px solid var(--rule);border-radius:2px;padding:.7rem}
+  border:1px solid var(--rule);border-radius:5px;padding:.7rem}
 .subnav{display:flex;gap:1rem;margin-bottom:1rem;font-size:.85rem}
 .subnav a{color:var(--soft);border-bottom:1px solid transparent;padding-bottom:.15rem}
 .subnav a.on{color:var(--accent);border-bottom-color:var(--accent)}
@@ -775,7 +818,7 @@ textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,m
   body{font-size:17px}
   .layout{display:grid;grid-template-columns:14rem 1fr;gap:2rem;align-items:start}
   .sheet{position:sticky;top:6.2rem;inset:auto;max-height:none;overflow:visible;
-    box-shadow:none;border:1px solid var(--rule);border-radius:2px;padding:.9rem}
+    box-shadow:none;border:1px solid var(--rule);border-radius:6px;padding:.9rem}
   .sheet[hidden]{display:block}
   .scrim{display:none!important}
   .sheet-foot .close{display:none}
@@ -790,7 +833,8 @@ textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,m
 </head>
 <body>
 <header><div class="wrap">
-  <div class="brand"><h1>Meal Planning</h1><span>plan the week, buy it once</span></div>
+  <div class="brand"><h1>Meal Planning</h1><span>plan the week, buy it once</span>
+    <button id="theme" type="button"></button></div>
   <nav id="nav"></nav>
 </div></header>
 <main class="wrap"><div id="app"></div></main>
@@ -1403,6 +1447,49 @@ function wireFilters(){
     route.f = {}; route.q = ''; route.min = 0; writeHash(route, true); render(); };
 }
 
+/* Theme toggle. Two states, not three: the stored value IS the override and
+   its absence means "follow the system", so there is no separate Auto to
+   explain. The icon shows the theme you would switch TO. The button lives in
+   the static header, so it is wired once and survives every render(). */
+const ICON = {
+/* Keyed by the theme the icon OFFERS, not the one it depicts: a moon means
+   "go dark", so it is what you see while light. */
+  dark: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"'
+      + ' stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+      + '<path d="M20.5 14.3A8.5 8.5 0 0 1 9.7 3.5a8.5 8.5 0 1 0 10.8 10.8z"/></svg>',
+  light: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"'
+      + ' stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+      + '<circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.1M12 19.3v2.1M4.2 4.2l1.5 1.5'
+      + 'M18.3 18.3l1.5 1.5M2.6 12h2.1M19.3 12h2.1M4.2 19.8l1.5-1.5M18.3 5.7l1.5-1.5"/></svg>',
+};
+
+function paintTheme(){
+  const dark = document.documentElement.dataset.theme === 'dark';
+  const btn = document.getElementById('theme');
+  btn.innerHTML = dark ? ICON.light : ICON.dark;
+  const label = dark ? 'Switch to the light theme' : 'Switch to the dark theme';
+  btn.setAttribute('aria-label', label);
+  btn.title = label;
+}
+
+document.getElementById('theme').onclick = () => {
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem('theme', next); } catch (e) {}
+  paintTheme();
+};
+
+/* Until the reader has chosen, the system keeps the casting vote -- including
+   when it changes at dusk with the page still open. */
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+  let saved = null;
+  try { saved = localStorage.getItem('theme'); } catch (e) {}
+  if (saved) return;
+  document.documentElement.dataset.theme = event.matches ? 'dark' : 'light';
+  paintTheme();
+});
+
+paintTheme();
 addEventListener('hashchange', () => { route = readHash(); render(); });
 route = readHash();
 render();
