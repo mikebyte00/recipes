@@ -11,6 +11,9 @@ stops redacting is the failure this file is here to catch.
 import importlib.util
 import json
 import os
+import re
+import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -488,6 +491,84 @@ class Search(unittest.TestCase):
 
     def test_finds_a_recipe_by_an_ingredient_slug(self):
         self.assertTrue(self.hits("greek-yogurt"))
+
+
+BOOT = re.compile(r"\(function\(\)\{\s*var saved = null;.*?\}\)\(\);", re.S)
+
+HARNESS = """
+const results = {};
+for (const [saved, sysDark] of CASES) {
+  globalThis.document = {documentElement: {dataset: {}}};
+  globalThis.localStorage = {getItem() {
+    if (saved === 'THROW') throw new Error('localStorage is denied here');
+    return saved;
+  }};
+  globalThis.matchMedia = () => ({matches: sysDark});
+  BOOT
+  results[saved + '|' + sysDark] = document.documentElement.dataset.theme;
+}
+console.log(JSON.stringify(results));
+"""
+
+CASES = [
+    ("dark", False), ("dark", True),
+    ("light", False), ("light", True),
+    (None, False), (None, True),
+    ("THROW", True),
+]
+
+
+@unittest.skipUnless(shutil.which("node"), "node is not installed")
+class ThemeBootScript(unittest.TestCase):
+    """The theme is decided before first paint by a script in <head>, and the
+    branch it takes is the difference between a dark kitchen at 6am and a
+    faceful of cream. Python cannot reach it, so node runs the real thing --
+    lifted out of TEMPLATE, never retyped, so the test cannot drift from what
+    ships.
+
+    Two states, not three: a stored value IS the override, and its absence
+    means follow the system.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        boot = BOOT.search(browse.TEMPLATE)
+        assert boot, "the theme boot script is no longer in TEMPLATE"
+        script = (HARNESS
+                  .replace("CASES", json.dumps(CASES))
+                  .replace("BOOT", boot.group(0)))
+        with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as handle:
+            handle.write(script)
+            path = handle.name
+        try:
+            out = subprocess.run([shutil.which("node"), path], check=True,
+                                 capture_output=True, text=True).stdout
+        finally:
+            os.unlink(path)
+        cls.themes = json.loads(out)
+
+    def test_a_stored_dark_beats_a_light_system(self):
+        self.assertEqual(self.themes["dark|false"], "dark")
+
+    def test_a_stored_dark_agrees_with_a_dark_system(self):
+        self.assertEqual(self.themes["dark|true"], "dark")
+
+    def test_a_stored_light_overrides_a_dark_system(self):
+        self.assertEqual(self.themes["light|true"], "light")
+
+    def test_a_stored_light_agrees_with_a_light_system(self):
+        self.assertEqual(self.themes["light|false"], "light")
+
+    def test_no_stored_choice_follows_a_dark_system(self):
+        self.assertEqual(self.themes["null|true"], "dark")
+
+    def test_no_stored_choice_follows_a_light_system(self):
+        self.assertEqual(self.themes["null|false"], "light")
+
+    def test_a_refusing_localstorage_still_renders_a_theme(self):
+        """Privacy modes and some file:// origins throw. A theme preference
+        must never be able to stop the page rendering."""
+        self.assertEqual(self.themes["THROW|true"], "dark")
 
 
 if __name__ == "__main__":

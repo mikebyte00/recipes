@@ -143,6 +143,16 @@ still has no tests and needs none; its failure mode is a wrong shopping list.
 `tests/` is not a `bin/` entry. It is not invoked, it produces nothing, and it
 is not part of the workflow.
 
+**Grown to 69 on 16 September 2026**, seven of them covering the theme boot
+script. Those seven are the file's one departure from stdlib-only, and the
+departure is bounded on purpose: the script decides, before first paint, what
+the reader sees, and Python cannot reach it. They shell out to `node`, they
+are `skipUnless(shutil.which("node"))` so a machine without it reports skips
+rather than failures, and they lift the script **out of `TEMPLATE` rather than
+restating it** — a test holding its own copy of the logic passes forever after
+the real one breaks. Verified by mutation: inverting `saved === 'dark'` turns
+four of the seven red, and reverting turns them green.
+
 ### Redaction, twice over
 
 The published page omits **order numbers, the collection branch and postcode,

@@ -49,7 +49,9 @@ Menu, Pin or Order therefore finishes the same way, and the change is not done
 until it has:
 
 1. `python3 bin/browse.py` — regenerate the page.
-2. `python3 tests/test_browse.py` — 62 tests, including the redaction ones.
+2. `python3 tests/test_browse.py` — 69 tests, including the redaction ones.
+   Seven of them shell out to `node` to run the page's theme boot script and
+   skip cleanly when it is absent; the suite itself stays stdlib Python.
 3. `git commit` the source change **and** `index.html` in the same commit.
 4. `git push` — Pages serves the pushed commit, so an unpushed commit is a
    stale page.
