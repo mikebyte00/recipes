@@ -10,7 +10,7 @@ which holds the reasoning. This file is the operative list.
 | Field | Cardinality | Values |
 |---|---|---|
 | `slot` | one | `breakfast` `lunch` `dinner` `pudding` |
-| `protein` | one, or absent on a pudding | `sausage` `egg` `tofu` `quorn` `chicken` `white-fish` `oily-fish` `beef` |
+| `protein` | one, or absent on a pudding | `sausage` `egg` `tofu` `quorn` `chicken` `white-fish` `oily-fish` `beef` `dairy` |
 | `effort` | one | `low` `medium` `high` |
 | `rating` | one, or absent | `1` `2` `3` `4` `5` |
 | `appliances` | list | `skillet` `air-fryer` `ninja-sizzle` `rice-cooker` `pot` `toaster` `poacher` |
