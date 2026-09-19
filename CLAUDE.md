@@ -48,16 +48,24 @@ A markdown change that stops there is invisible. Every edit to a Recipe, Plan,
 Pin or Order therefore finishes the same way, and the change is not done
 until it has:
 
-1. `python3 bin/browse.py` — regenerate the page.
-2. `python3 tests/test_browse.py` — 59 tests, including the redaction ones.
-   Seven of them shell out to `node` to run the page's theme boot script and
-   skip cleanly when it is absent; the suite itself stays stdlib Python, but
-   `bin/browse.py` needs PyYAML. `test_reads_every_captured_order` fails on a
+1. `.venv/bin/python bin/browse.py` — regenerate the page.
+2. `.venv/bin/python tests/test_browse.py` — 59 tests, including the redaction
+   ones. Seven shell out to `node` to run the page's theme boot script and skip
+   cleanly when it is absent. `test_reads_every_captured_order` fails on a
    checkout with no harvested `Orders/*.md`, which are gitignored — that is the
    environment, not the code.
 3. `git commit` the source change **and** `index.html` in the same commit.
 4. `git push` — Pages serves the pushed commit, so an unpushed commit is a
    stale page.
+
+**Use `.venv/bin/python`, not bare `python3`.** The test suite is stdlib, but
+`bin/browse.py` needs PyYAML and Homebrew's python refuses to install into
+itself (PEP 668). The venv is gitignored and per-machine, so a fresh clone
+builds it once:
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install pyyaml
+```
 
 Committing a Recipe without its regenerated page is the failure mode this
 guards against: `--check` then reports stale on someone else's unrelated run,
@@ -65,7 +73,7 @@ and the live page quietly disagrees with the repo.
 
 **The page publishes a redacted view of `Orders/`**, which hold real personal
 data. Read [Browse The Pool](.scratch/meal-planning-system/issues/24-browse-the-pool.md)
-before touching that redaction, and run `python3 tests/test_browse.py`
+before touching that redaction, and run `.venv/bin/python tests/test_browse.py`
 afterwards — those tests exist to catch a redaction that stops redacting.
 
 

@@ -41,7 +41,7 @@ Bands.
    ingredient is a `lower-kebab-case` key, and the Pin decides the unit:
 
    ```bash
-   python3 - <slug> <slug> ... <<'PY'
+   .venv/bin/python - <slug> <slug> ... <<'PY'
    import sys; sys.path.insert(0, 'bin')
    pins = __import__('shopping-list').load_pins('.')
    for key in sys.argv[1:]:
@@ -88,7 +88,7 @@ Bands.
 5. **Check it, then report.**
 
    ```bash
-   python3 - Recipes/<slug>.md <<'PY'
+   .venv/bin/python - Recipes/<slug>.md <<'PY'
    import sys, os, re; sys.path.insert(0, 'bin')
    sl = __import__('shopping-list')
    path = sys.argv[1]; slug = os.path.basename(path)[:-3]

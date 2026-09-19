@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for bin/browse.py.
 
-Run: python3 tests/test_browse.py
+Run: .venv/bin/python tests/test_browse.py
 
 These exist for one reason above all others: `Orders/*.md` hold real personal
 data and `index.html` is committed and published. A redaction that silently

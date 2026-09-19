@@ -21,7 +21,7 @@ the planning conversation — that is the whole reason this is not part of
 2. **Run it and read the output.**
 
    ```bash
-   python3 bin/shopping-list.py Plans/<date>.md
+   .venv/bin/python bin/shopping-list.py Plans/<date>.md
    ```
 
    Exit 1 is a hard failure — a Recipe's `unit` disagreeing with its Pin, a slug
@@ -34,7 +34,7 @@ the planning conversation — that is the whole reason this is not part of
 
    ```bash
    { awk '/^## Shopping$/{exit} {print}' Plans/<date>.md | sed -E '${/^$/d;}'; echo; \
-     python3 bin/shopping-list.py Plans/<date>.md; } > /tmp/plan.md \
+     .venv/bin/python bin/shopping-list.py Plans/<date>.md; } > /tmp/plan.md \
      && mv /tmp/plan.md Plans/<date>.md
    ```
 

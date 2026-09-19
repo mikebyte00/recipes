@@ -66,7 +66,7 @@ Read `VOCABULARY.md` — *The Plan grid* — and `GOALS.md` before editing a gri
 4. **Sum the days and report.** Bands are checked at the day, not the Recipe.
 
    ```bash
-   python3 - Plans/<Monday>.md <<'PY'
+   .venv/bin/python - Plans/<Monday>.md <<'PY'
    import sys; sys.path.insert(0, 'bin')
    sl = __import__('shopping-list')
    front, grid = sl.load_grid(sys.argv[1])

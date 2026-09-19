@@ -7,6 +7,10 @@
 __pycache__/
 *.pyc
 
+# bin/browse.py needs PyYAML, and Homebrew's python refuses to install into
+# itself (PEP 668). The venv is per-machine, so it is built, not committed.
+.venv/
+
 # Harvested Waitrose orders hold real personal data — order numbers, the
 # collection branch and postcode, collection windows, and a personal-care
 # category. bin/browse.py reads them from disk and publishes a redacted view;
