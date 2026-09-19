@@ -636,6 +636,8 @@ TEMPLATE = r"""<!doctype html>
   --under:#9a6a1f; --over:#8d3a3a; --in:#4d6b45;
   --on-accent:#fff; --shade:rgba(60,45,25,.12); --scrim:rgba(50,40,28,.25);
   --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --radius:12px;
 }
 /* Warm near-black, not a cold grey: the light theme is cream paper and burnt
    sienna, and a neutral dark would read as a different site. The accent
@@ -650,40 +652,47 @@ TEMPLATE = r"""<!doctype html>
   --on-accent:#1a1714; --shade:rgba(0,0,0,.5); --scrim:rgba(0,0,0,.55);
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);
-  font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%}
+/* Two roles: serif carries the identity -- the wordmark and a Recipe/Menu/Plan's
+   own title, the closest thing this page has to a dish on a plate. Everything
+   you use to navigate, scan or filter is sans -- a serif at 13px is where
+   "distinctive" turns into "scratchy". */
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 a{color:inherit;text-decoration:none}
-h1,h2,h3{font-weight:600;letter-spacing:-.01em;margin:0}
-.wrap{max-width:60rem;margin:0 auto;padding:0 1rem}
+h1,h2,h3{font-weight:600;margin:0}
+.wrap{max-width:64rem;margin:0 auto;padding:0 clamp(1rem,4vw,2rem)}
 
 header{border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:20;
   background:var(--paper)}
-.brand{display:flex;align-items:baseline;gap:.6rem;padding:.9rem 0 .5rem}
-.brand h1{font-size:1.15rem}
-.brand span{font-size:.75rem;color:var(--soft);letter-spacing:.06em;text-transform:uppercase}
+.brand{display:flex;align-items:center;gap:.7rem;padding:1.15rem 0 .7rem}
+.brand h1{font-family:var(--serif);font-size:1.3rem;letter-spacing:-.01em}
+.brand span{font-size:.85rem;color:var(--soft)}
 /* Four tabs plus the pill overflow 360px. Scroll rather than wrap -- a wrapped
    nav pushes the list down the fold on the smallest phone. */
-nav{display:flex;align-items:center;gap:1.25rem;padding-bottom:.1rem;
+nav{display:flex;align-items:center;gap:1.5rem;padding-bottom:.2rem;
   overflow-x:auto;scrollbar-width:none}
 nav::-webkit-scrollbar{display:none}
-nav a{padding:.5rem 0 .6rem;font-size:.95rem;color:var(--soft);
-  white-space:nowrap;border-bottom:2px solid transparent}
+nav a{padding:.65rem 0 .75rem;font-size:1rem;color:var(--soft);
+  white-space:nowrap;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
 nav a.on{color:var(--ink);border-bottom-color:var(--accent)}
 /* Plan is a toggle, not a section -- a pill on the right, so it does not read
    as a fourth heading in a row of three. */
-nav a#plantoggle{margin-left:auto;padding:.3rem .85rem;border:1px solid var(--rule);
-  border-radius:999px;background:var(--card);font-size:.85rem;
-  margin-bottom:.2rem;cursor:pointer}
+nav a#plantoggle{margin-left:auto;padding:.45rem 1.1rem;border:1px solid var(--rule);
+  border-radius:999px;background:var(--card);font-size:.9rem;
+  margin-bottom:.3rem;cursor:pointer}
 nav a#plantoggle:hover{border-color:var(--accent);color:var(--accent)}
 nav a#plantoggle.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 
-main{padding:1.1rem 0 4rem}
-.lede{color:var(--soft);font-size:.87rem;margin:.1rem 0 1rem}
-.tools{display:flex;gap:.5rem;margin-bottom:1rem}
-input[type=search]{flex:1;min-width:0;font:inherit;font-size:.95rem;color:inherit;
-  background:var(--card);border:1px solid var(--rule);border-radius:5px;padding:.55rem .7rem}
-button,select{font:inherit;font-size:.9rem;color:inherit;background:var(--card);
-  border:1px solid var(--rule);border-radius:5px;padding:.55rem .8rem;cursor:pointer}
+main{padding:clamp(1.4rem,2vw,2.2rem) 0 5rem}
+.lede{color:var(--soft);font-size:.95rem;line-height:1.6;margin:.1rem 0 1.5rem}
+.tools{display:flex;gap:.6rem;margin-bottom:1.5rem;flex-wrap:wrap}
+input[type=search]{flex:1;min-width:10rem;font:inherit;font-size:1rem;color:inherit;
+  background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:.7rem .9rem;
+  transition:border-color .15s}
+button,select{font:inherit;font-size:.95rem;color:inherit;background:var(--card);
+  border:1px solid var(--rule);border-radius:9px;padding:.65rem 1rem;cursor:pointer;
+  transition:border-color .15s,color .15s}
 button:hover,select:hover{border-color:var(--accent);color:var(--accent)}
 /* The old rules removed the outline and left a border-colour change as the only
    focus signal, which a keyboard user cannot see on a control that has no
@@ -697,97 +706,106 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 /* Theme is a page-level setting, so it sits in the brand row rather than
    competing with four section tabs for 360px of nav. */
 #theme{margin-left:auto;align-self:center;display:flex;align-items:center;
-  justify-content:center;width:2.4rem;height:2.4rem;padding:0;
+  justify-content:center;width:2.5rem;height:2.5rem;padding:0;
   border-radius:999px;color:var(--soft)}
 .badge{display:inline-block;min-width:1.15rem;margin-left:.35rem;padding:0 .3rem;
   background:var(--accent);color:var(--on-accent);border-radius:999px;font-size:.72rem;
   text-align:center}
 
 .sheet{position:fixed;inset:auto 0 0 0;z-index:30;background:var(--card);
-  border-top:1px solid var(--rule);max-height:78vh;overflow:auto;padding:1rem;
+  border-top:1px solid var(--rule);max-height:78vh;overflow:auto;padding:1.3rem;
   box-shadow:0 -8px 30px var(--shade)}
 .sheet[hidden]{display:none}
 .scrim{position:fixed;inset:0;z-index:29;background:var(--scrim)}
 .scrim[hidden]{display:none}
-.facet{margin-bottom:1rem}
-.facet h3{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;
-  color:var(--soft);margin-bottom:.45rem}
-.chips{display:flex;flex-wrap:wrap;gap:.35rem}
+.facet{margin-bottom:1.3rem}
+.facet h3{font-size:.85rem;font-weight:600;color:var(--soft);margin-bottom:.6rem}
+.chips{display:flex;flex-wrap:wrap;gap:.45rem}
 .chip{border:1px solid var(--rule);background:var(--paper);border-radius:999px;
-  padding:.45rem .85rem;line-height:1.2;font-size:.85rem;cursor:pointer;color:var(--soft)}
+  padding:.5rem 1rem;line-height:1.2;font-size:.9rem;cursor:pointer;color:var(--soft);
+  transition:background .15s,border-color .15s,color .15s}
 .chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
-.slider{display:flex;align-items:center;gap:.7rem}
+.slider{display:flex;align-items:center;gap:.8rem}
 .slider input{flex:1}
-.sheet-foot{display:flex;gap:.5rem;justify-content:space-between;
-  border-top:1px solid var(--rule);padding-top:.75rem;margin-top:.5rem}
+.sheet-foot{display:flex;gap:.6rem;justify-content:space-between;
+  border-top:1px solid var(--rule);padding-top:.9rem;margin-top:.6rem}
 
-.group{margin:1.6rem 0 .5rem;display:flex;align-items:baseline;gap:.6rem;
-  border-bottom:1px solid var(--rule);padding-bottom:.3rem}
-.group h2{font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
-.group em{font-style:normal;font-size:.78rem;color:var(--soft)}
+.group{margin:2.4rem 0 .8rem;display:flex;align-items:baseline;gap:.6rem;
+  border-bottom:1px solid var(--rule);padding-bottom:.5rem}
+.group h2{font-size:1.05rem;font-weight:600;color:var(--accent)}
+.group em{font-style:normal;font-size:.85rem;color:var(--soft)}
 ul.list{list-style:none;margin:0;padding:0}
 ul.list li{border-bottom:1px solid var(--rule)}
 /* A list row is title / macro / meta. On a phone the title takes the whole
    width and the macro drops onto the meta line -- squeezing it into a right
    column wrapped nearly every title onto two lines. Wide enough, and the macro
    returns to its right-aligned column where a sorted list can be scanned. */
-ul.list a{display:flex;flex-wrap:wrap;align-items:baseline;gap:.15rem .5rem;
-  padding:.55rem .2rem}
+ul.list a{display:flex;flex-wrap:wrap;align-items:baseline;gap:.2rem .6rem;
+  padding:.9rem .3rem;border-radius:9px;transition:background .15s}
 ul.list a:hover{background:var(--card)}
-ul.list a .t{flex:1 0 100%;font-size:1rem}
+ul.list a .t{flex:1 0 100%;font-size:1.05rem;font-weight:500}
 ul.list a .macro{order:2}
 ul.list a .meta{order:3;flex:1;margin-top:0}
-.macro{white-space:nowrap;font-size:.85rem;color:var(--soft);font-variant-numeric:tabular-nums}
-.meta{font-size:.78rem;color:var(--soft);margin-top:.15rem}
+/* The macro is the payload -- the number a household actually scans for --
+   so it reads in ink at full weight, not muted into the meta line beneath it. */
+.macro{white-space:nowrap;font-size:.92rem;font-weight:600;color:var(--ink);
+  font-variant-numeric:tabular-nums}
+.meta{font-size:.85rem;color:var(--soft);margin-top:.25rem;line-height:1.5}
 .dot{display:inline-block;width:.42rem;height:.42rem;border-radius:50%;
-  vertical-align:.06rem;margin-right:.25rem}
+  vertical-align:.06rem;margin-right:.3rem}
 .dot.in{background:var(--in)} .dot.under{background:var(--under)} .dot.over{background:var(--over)}
-.empty{color:var(--soft);padding:2rem 0;text-align:center;font-style:italic}
+.empty{color:var(--soft);padding:3rem 0;text-align:center;font-style:italic}
 
-.back{display:inline-block;font-size:.85rem;color:var(--soft);margin-bottom:.7rem}
+.back{display:inline-block;font-size:.9rem;color:var(--soft);margin-bottom:1rem}
 .back:hover{color:var(--accent)}
-article h2{font-size:1.35rem;line-height:1.25;margin-bottom:.35rem}
-.tagline{font-size:.82rem;color:var(--soft);margin-bottom:1.1rem}
-section{margin:1.6rem 0}
-section > h3{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;
-  color:var(--accent);border-bottom:1px solid var(--rule);padding-bottom:.25rem;
-  margin-bottom:.7rem}
-table{width:100%;border-collapse:collapse;font-size:.88rem}
-th{text-align:left;font-weight:600;font-size:.72rem;letter-spacing:.06em;
-  text-transform:uppercase;color:var(--soft);padding:.3rem .7rem;
-  border-bottom:1px solid var(--rule)}
-td{padding:.42rem .7rem;border-bottom:1px solid var(--rule);vertical-align:top}
+article h2{font-family:var(--serif);font-size:clamp(1.5rem,1.15rem + 1.6vw,2rem);
+  line-height:1.2;margin-bottom:.4rem}
+.tagline{font-size:.88rem;color:var(--soft);margin-bottom:1.6rem;line-height:1.6}
+section{margin:2.2rem 0}
+section > h3{font-size:1.05rem;font-weight:600;color:var(--accent);
+  border-bottom:1px solid var(--rule);padding-bottom:.5rem;margin-bottom:1rem}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th{text-align:left;font-weight:600;font-size:.8rem;color:var(--soft);
+  padding:.5rem .8rem;border-bottom:1px solid var(--rule)}
+td{padding:.65rem .8rem;border-bottom:1px solid var(--rule);vertical-align:top}
 th:first-child,td:first-child{padding-left:0}
 th:last-child,td:last-child{padding-right:0}
 td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .scroller{overflow-x:auto;-webkit-overflow-scrolling:touch}
-ol.method{margin:0;padding-left:1.3rem}
-ol.method li{margin-bottom:.6rem}
-.note{font-size:.82rem;color:var(--soft)}
-.warn{border-left:2px solid var(--accent);background:var(--accent-soft);
-  padding:.6rem .8rem;font-size:.85rem;margin:.6rem 0}
-.flag{color:var(--over);font-size:.78rem}
+ol.method{margin:0;padding-left:1.4rem}
+ol.method li{margin-bottom:.85rem;line-height:1.6}
+.note{font-size:.85rem;color:var(--soft);line-height:1.5}
+.warn{border-left:3px solid var(--accent);background:var(--accent-soft);
+  border-radius:0 var(--radius) var(--radius) 0;
+  padding:.8rem 1rem;font-size:.9rem;line-height:1.55;margin:.8rem 0}
+.flag{color:var(--over);font-size:.82rem;font-weight:600}
 .pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;
-  padding:.05rem .55rem;font-size:.75rem;color:var(--soft);margin:0 .25rem .25rem 0}
+  padding:.15rem .7rem;font-size:.8rem;color:var(--soft);margin:0 .3rem .3rem 0}
 .pill.un{border-color:var(--accent);color:var(--accent)}
-.day{border-bottom:1px solid var(--rule);padding:.8rem 0}
-.day h4{margin:0 0 .35rem;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--soft);display:flex;flex-wrap:wrap;gap:0 .7rem;
+.day{border-bottom:1px solid var(--rule);padding:1.1rem 0}
+.day h4{margin:0 0 .55rem;font-size:.9rem;font-weight:600;color:var(--soft);
+  display:flex;flex-wrap:wrap;gap:.2rem .8rem;
   justify-content:space-between;align-items:baseline}
-/* The day's totals are a macro, not a heading: they keep their own case, and
-   they wrap onto their own line rather than running off a 360px screen when a
-   goal flag joins them. */
-.day h4 .macro{text-transform:none;letter-spacing:0;white-space:normal}
-.day dl{margin:0;display:grid;grid-template-columns:5.2rem 1fr;gap:.2rem .6rem}
-.day dt{font-size:.75rem;color:var(--soft);text-transform:capitalize}
-.day dd{margin:0;font-size:.92rem}
-/* Today's card is the page's answer to "what am I cooking tonight". Same .day
-   block, lifted off the list and sized to read at arm's length on a worktop. */
-.day.now{border:1px solid var(--rule);border-left:3px solid var(--accent);
-  background:var(--card);border-radius:6px;padding:.9rem 1rem;margin-bottom:1.5rem}
-.day.now h4{font-size:.9rem;color:var(--accent)}
-.day.now dl{gap:.45rem .6rem}
-.day.now dd{font-size:1.05rem}
+.day h4 span:first-child{color:var(--ink)}
+.day dl{margin:0;display:grid;grid-template-columns:5.6rem 1fr;gap:.35rem .7rem}
+.day dt{font-size:.8rem;color:var(--soft);text-transform:capitalize}
+.day dd{margin:0;font-size:.95rem}
+/* Today's card is the page's answer to "what am I cooking tonight" -- the
+   thing the household actually opens the page for, so it is the one place the
+   two daily numbers get to be the biggest text on the page rather than a
+   line of muted meta. */
+.day.now{border:1px solid var(--rule);border-left:4px solid var(--accent);
+  background:var(--card);border-radius:var(--radius);
+  padding:1.5rem 1.6rem;margin-bottom:2.2rem;box-shadow:0 1px 3px var(--shade)}
+.day.now h4{font-family:var(--serif);font-size:1.15rem;color:var(--accent);font-weight:600}
+.day.now dl{gap:.6rem .7rem}
+.day.now dd{font-size:1.1rem}
+.stats{display:flex;gap:clamp(1.6rem,5vw,2.6rem);flex-wrap:wrap;margin:1rem 0 1.4rem}
+.stat{display:flex;flex-direction:column}
+.stat b{font-family:var(--serif);font-weight:600;line-height:1;color:var(--ink);
+  font-size:clamp(1.9rem,1.5rem + 1.6vw,2.4rem);font-variant-numeric:tabular-nums}
+.stat span{font-size:.82rem;color:var(--soft);margin-top:.35rem}
+.stat.flag b{color:var(--over)}
 /* A meal in the day grid is the way into its Recipe, so it has to read as a
    link -- the global bare `a` would leave it looking like plain text. */
 .day dd a,.tagline a{color:var(--accent)}
@@ -796,34 +814,34 @@ ol.method li{margin-bottom:.6rem}
    into a sticky sidebar on wide screens and this must stay at the bottom. */
 .drawer{position:fixed;inset:auto 0 0 0;z-index:40;background:var(--card);
   border-top:1px solid var(--rule);box-shadow:0 -2px 14px var(--shade);
-  padding:.7rem 0}
-.drawer .wrap{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
-.drawer .where{font-size:.95rem}
+  padding:.85rem 0}
+.drawer .wrap{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+.drawer .where{font-size:1rem}
 .drawer .where b{text-transform:capitalize}
-.drawer .rest{margin-left:auto;display:flex;gap:.5rem}
-body.plan-on{padding-bottom:6rem}
+.drawer .rest{margin-left:auto;display:flex;gap:.6rem}
+body.plan-on{padding-bottom:6.5rem}
 body.plan-on .list a{cursor:pointer}
 body.plan-on .list a:hover{background:var(--accent-soft)}
 body.plan-on .list a:hover .t{color:var(--accent)}
 button[disabled]{opacity:.45;cursor:not-allowed}
 button[disabled]:hover{border-color:var(--rule)}
 textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-  font-size:.82rem;line-height:1.5;color:inherit;background:var(--card);
-  border:1px solid var(--rule);border-radius:5px;padding:.7rem}
-.subnav{display:flex;gap:1rem;margin-bottom:1rem;font-size:.85rem}
-.subnav a{color:var(--soft);border-bottom:1px solid transparent;padding-bottom:.15rem}
+  font-size:.85rem;line-height:1.6;color:inherit;background:var(--card);
+  border:1px solid var(--rule);border-radius:9px;padding:.85rem}
+.subnav{display:flex;gap:1.2rem;margin-bottom:1.3rem;font-size:.9rem}
+.subnav a{color:var(--soft);border-bottom:1px solid transparent;padding-bottom:.2rem}
 .subnav a.on{color:var(--accent);border-bottom-color:var(--accent)}
 
 @media(min-width:56rem){
-  body{font-size:17px}
-  .layout{display:grid;grid-template-columns:14rem 1fr;gap:2rem;align-items:start}
-  .sheet{position:sticky;top:6.2rem;inset:auto;max-height:none;overflow:visible;
-    box-shadow:none;border:1px solid var(--rule);border-radius:6px;padding:.9rem}
+  body{font-size:17.5px}
+  .layout{display:grid;grid-template-columns:15rem 1fr;gap:2.5rem;align-items:start}
+  .sheet{position:sticky;top:6.4rem;inset:auto;max-height:none;overflow:visible;
+    box-shadow:none;border:1px solid var(--rule);border-radius:var(--radius);padding:1.1rem}
   .sheet[hidden]{display:block}
   .scrim{display:none!important}
   .sheet-foot .close{display:none}
   #filterbtn{display:none}
-  .day dl{grid-template-columns:6rem 1fr}
+  .day dl{grid-template-columns:6.5rem 1fr}
   ul.list a .t{flex:1 1 auto}
   ul.list a .macro{margin-left:auto}
   ul.list a .meta{flex:1 0 100%}
@@ -1168,12 +1186,23 @@ function dayBlock(p, day, cls, label){
          <span class="note">${g(r.protein_g)}</span>`
       : `<span class="note">${value === 'eaten-out' ? 'eaten out' : '—'}</span>`}</dd>`;
   }).join('');
+  // The hero card (`.now`, today's own card) gets the day's two numbers as a
+  // stat row -- the biggest text on the page, because it's the answer the
+  // household actually opened the page for. Every other day keeps them as a
+  // quiet macro line; showing both would just repeat the same two figures.
+  const hero = cls === 'now' && t.cooked;
+  const headMacro = hero ? '' : t.cooked
+    ? `${g(t.protein_g)} · ${kc(t.kcal)} kcal ${
+        t.flags.length ? `<span class="flag">↓${t.flags.join(' ')}</span>` : ''}`
+    : 'nothing cooked at home';
+  const stats = hero ? `<div class="stats">
+      <div class="stat"><b>${g(t.protein_g)}</b><span>protein</span></div>
+      <div class="stat"><b>${kc(t.kcal)}</b><span>kcal</span></div>
+      ${t.flags.length ? `<div class="stat flag"><b>↓</b><span>${t.flags.join(' &amp; ')}</span></div>` : ''}
+    </div>` : '';
   return `<div class="day${cls ? ' ' + cls : ''}"><h4><span>${esc(label || cap(day))}</span>
-    <span class="macro">${t.cooked
-      ? `${g(t.protein_g)} · ${kc(t.kcal)} kcal ${
-          t.flags.length ? `<span class="flag">↓${t.flags.join(' ')}</span>` : ''}`
-      : 'nothing cooked at home'}</span></h4>
-    <dl>${cells}</dl></div>`;
+    ${headMacro ? `<span class="macro">${headMacro}</span>` : ''}</h4>
+    ${stats}<dl>${cells}</dl></div>`;
 }
 
 /* The Monday of the week containing `d`, as YYYY-MM-DD in local time -- a Plan
