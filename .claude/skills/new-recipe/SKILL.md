@@ -1,6 +1,6 @@
 ---
 name: new-recipe
-description: "Write or edit a Recipe in Recipes/ — the only writer to the Recipe pool. Holds the corpus bar, resolves every ingredient against PINS.md, and checks the result against VOCABULARY.md and GOALS.md. Use when a Recipe is wanted, when a Menu or a Plan names a gap the pool cannot cover, or when an existing Recipe changes."
+description: "Write or edit a Recipe in Recipes/ — the only writer to the Recipe pool. Holds the corpus bar, resolves every ingredient against PINS.md, and checks the result against VOCABULARY.md and GOALS.md. Use when a Recipe is wanted, when a Plan names a gap the pool cannot cover, or when an existing Recipe changes."
 ---
 
 # New recipe
@@ -9,9 +9,9 @@ The pool has 37 Recipes and **they define the bar**. This skill's whole job is
 holding it: the format is a template, but a Recipe that out-cooks its neighbours
 fails the project even when it hits the macros.
 
-**Writing to the pool is the user's decision.** `new-menu` and `plan-the-week`
-name a gap and point here; neither mints a Recipe on its own. Confirm the brief
-before writing a file.
+**Writing to the pool is the user's decision.** `plan-the-week` names a gap and
+points here; it never mints a Recipe on its own. Confirm the brief before
+writing a file.
 
 Read `VOCABULARY.md` for the closed value lists and `GOALS.md` for the Macro
 Bands.
@@ -20,8 +20,8 @@ Bands.
 
 1. **Fix the brief.** A Recipe is a `slot`, a `protein` and a band. Say all
    three back to the user before going further — *"a chicken lunch at ~45g /
-   ~380 kcal"*. A gap handed over by `new-menu` or `plan-the-week` arrives
-   precise; a gap the user describes in food terms usually does not.
+   ~380 kcal"*. A gap handed over by `plan-the-week` arrives precise; a gap the
+   user describes in food terms usually does not.
 
 2. **Read the neighbours.** The Recipes already in that slot with that protein:
 
@@ -59,7 +59,7 @@ Bands.
    passing through your memory. See [The Recipe/Pin rule](#the-recipepin-rule).
 
 4. **Write `Recipes/<slug>.md`.** The slug is the title in `lower-kebab-case`,
-   and the **filename is the Recipe's identity** — a Menu and a Plan cite it.
+   and the **filename is the Recipe's identity** — a Plan cites it.
    Fields in this order, `protein` omitted on a pudding:
 
    ```markdown
@@ -173,7 +173,7 @@ bought. `PINS.md` is written by harvesting, not by Recipe authoring.
 ## The macros are approximations
 
 Estimate `protein_g` and `kcal` per person for a serving of 2, store them as
-bare numbers so a Menu and a Plan can sum them, and write `~` on every figure
+bare numbers so a Plan can sum them, and write `~` on every figure
 you show the user. The band is a target, not a gate — bands are checked at the
 **day**, in `plan-the-week`, and a Recipe at the edge of its range is fine when
 the day still clears ~120g protein under ~1800 kcal.

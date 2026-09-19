@@ -4,7 +4,7 @@
 The second and last piece of code this project authorises, ruled in
 .scratch/meal-planning-system/issues/24-browse-the-pool.md.
 
-Reads Recipes/, Menus/, Plans/, PINS.md, GOALS.md and Orders/, and writes one
+Reads Recipes/, Plans/, PINS.md, GOALS.md and Orders/, and writes one
 self-contained index.html at the repo root with every datum inlined as JSON.
 No server, no build step, no runtime fetches -- it opens over file:// and it
 is served by GitHub Pages from the branch root.
@@ -140,20 +140,6 @@ DEFAULT_GOALS = {"protein_floor": 120.0, "kcal_ceiling": 1800.0}
 DAYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
 SLOTS = ["breakfast", "lunch", "dinner", "pudding"]
 
-# GOALS.md's Weekly Layout, as something a page can check a Menu against.
-BREAKFAST_SPLIT = {"sausage": 3, "egg": 4}
-LUNCH_TYPES = {"tofu", "chicken"}
-LUNCH_FLOOR = 2
-FIXED_DINNERS = {
-    "sunday": "white-fish",
-    "monday": "white-fish",
-    "tuesday": "chicken",
-    "wednesday": "oily-fish",
-    "thursday": "beef",
-}
-FAKEAWAY_DAY = "friday"
-FREE_DINNER_DAY = "saturday"
-
 # A Plan Slot the household did not cook. VOCABULARY.md, The Plan grid.
 EATEN_OUT = "eaten-out"
 
@@ -224,7 +210,7 @@ def annotate_ingredient(line, pins):
 
 
 def day_totals(slots, recipes):
-    """Sum a day from its Recipes -- never from a Menu's hand-written table."""
+    """Sum a day from its Recipes -- never from a grid's hand-written table."""
     protein = kcal = 0.0
     for slug in slots.values():
         if slug == EATEN_OUT or slug not in recipes:
@@ -244,59 +230,6 @@ def goal_flags(totals, goals=None):
     if totals["kcal"] > goals["kcal_ceiling"]:
         flags.append("kcal")
     return flags
-
-
-def _protein_of(slug, recipes):
-    return (recipes.get(slug) or {}).get("protein")
-
-
-def layout_violations(days, recipes):
-    """Where a Menu departs from GOALS.md's Weekly Layout."""
-    out = []
-
-    breakfasts = {}
-    for day in DAYS:
-        kind = _protein_of(days.get(day, {}).get("breakfast"), recipes)
-        breakfasts[kind] = breakfasts.get(kind, 0) + 1
-    for kind, want in BREAKFAST_SPLIT.items():
-        got = breakfasts.get(kind, 0)
-        if got != want:
-            out.append(f"breakfast: {got}x {kind}, layout wants {want}x")
-    stray = sorted(k for k in breakfasts if k not in BREAKFAST_SPLIT)
-    if stray:
-        out.append("breakfast: " + ", ".join(f"{k} is not a breakfast type" for k in stray))
-
-    lunches = {}
-    for day in DAYS:
-        kind = _protein_of(days.get(day, {}).get("lunch"), recipes)
-        lunches[kind] = lunches.get(kind, 0) + 1
-    for kind in sorted(LUNCH_TYPES):
-        if lunches.get(kind, 0) < LUNCH_FLOOR:
-            out.append(f"lunch: {lunches.get(kind, 0)}x {kind}, layout wants at least {LUNCH_FLOOR}")
-    for kind in sorted(k for k in lunches if k not in LUNCH_TYPES):
-        out.append(f"lunch: {kind} is neither tofu nor chicken")
-
-    for day, want in FIXED_DINNERS.items():
-        got = _protein_of(days.get(day, {}).get("dinner"), recipes)
-        if got != want:
-            out.append(f"{day.capitalize()} dinner: {got or 'nothing'}, layout fixes {want}")
-    friday = days.get(FAKEAWAY_DAY, {}).get("dinner")
-    if "fakeaway" not in ((recipes.get(friday) or {}).get("tags") or []):
-        out.append("Friday dinner: not tagged fakeaway")
-
-    for day in DAYS:
-        pudding = days.get(day, {}).get("pudding")
-        if _protein_of(pudding, recipes):
-            out.append(f"{day.capitalize()} pudding: carries a protein type")
-
-    return out
-
-
-def orphans(recipes, menus):
-    """Recipes no Menu uses. The pool's own dead weight, made visible."""
-    used = {slug for menu in menus for slots in menu["days"].values()
-            for slug in slots.values()}
-    return sorted(slug for slug in recipes if slug not in used)
 
 
 def order_aggregate(orders, pins):
@@ -332,7 +265,7 @@ def read(path):
 
 
 def split_document(path):
-    """Frontmatter as a dict, body as text. The shape every Recipe and Menu has."""
+    """Frontmatter as a dict, body as text. The shape every Recipe and Plan has."""
     match = FRONTMATTER.match(read(path))
     if not match:
         raise Failure(f"{path} has no frontmatter block")
@@ -359,33 +292,19 @@ def load_recipes(root):
     return recipes
 
 
-def load_menus(root):
-    menus = []
-    for path in sorted(glob.glob(os.path.join(root, "Menus", "*.md"))):
-        front, _ = split_document(path)
-        menus.append({
-            "slug": os.path.basename(path)[:-3],
-            "title": front.get("title") or humanise(os.path.basename(path)[:-3]),
-            "days": {day: dict(front.get("days", {}).get(day) or {}) for day in DAYS},
-        })
-    return menus
-
-
 def load_plans(root):
     """Every week actually planned, latest first.
 
-    A Plan is never checked against the Weekly Layout the way a Menu is: a real
-    week deviates on purpose -- days away, Slots eaten out, a Recipe swapped.
+    A Plan is never checked against a layout: a real week deviates on purpose --
+    days away, Slots eaten out, a Recipe swapped.
     """
     plans = []
     for path in sorted(glob.glob(os.path.join(root, "Plans", "*.md")), reverse=True):
         front, _ = split_document(path)
         slug = os.path.basename(path)[:-3]
-        source = front.get("menu")
         plans.append({
             "slug": slug,
             "title": front.get("title") or humanise(slug),
-            "menu": os.path.basename(source)[:-3] if source else None,
             "days": {day: dict(front.get("days", {}).get(day) or {}) for day in DAYS},
         })
     return plans
@@ -439,7 +358,6 @@ def load_all(root):
     orders, raw_orders = load_orders(root)
     return {
         "recipes": load_recipes(root),
-        "menus": load_menus(root),
         "plans": load_plans(root),
         "pins": load_pins(root),
         "bands": parse_bands(goals_text),
@@ -453,19 +371,7 @@ def load_all(root):
 def build_payload(data):
     """Everything the page shows, resolved once here so the browser only renders."""
     recipes, pins, bands = data["recipes"], data["pins"], data["bands"]
-    menus, orders = data["menus"], data["orders"]
-
-    # Which Menus use a Recipe, and where. The Menu is the cross-link's owner,
-    # so it is walked once and the answer hung on the Recipe.
-    used_by = {slug: [] for slug in recipes}
-    for menu in menus:
-        for day in DAYS:
-            for slot in SLOTS:
-                slug = menu["days"].get(day, {}).get(slot)
-                if slug in used_by:
-                    used_by[slug].append(
-                        {"menu": menu["slug"], "title": menu["title"],
-                         "day": day, "slot": slot})
+    orders = data["orders"]
 
     recipe_rows = []
     for slug in sorted(recipes):
@@ -507,40 +413,9 @@ def build_payload(data):
             "ingredients": ingredients,
             "unpinned": sorted({i["ingredient"] for i in ingredients if not i["pinned"]}),
             "method": method,
-            "used_by": used_by[slug],
             "haystack": haystack,
         })
 
-    menu_rows = []
-    for menu in menus:
-        totals = {}
-        for day in DAYS:
-            day_slots = menu["days"].get(day, {})
-            summed = day_totals(day_slots, recipes)
-            summed["flags"] = goal_flags(summed, data["goals"])
-            totals[day] = summed
-        composition = {}
-        for slot in SLOTS:
-            counts = {}
-            for day in DAYS:
-                slug = menu["days"].get(day, {}).get(slot)
-                kind = (recipes.get(slug) or {}).get("protein") or "—"
-                counts[kind] = counts.get(kind, 0) + 1
-            composition[slot] = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))
-        menu_rows.append({
-            "slug": menu["slug"],
-            "title": menu["title"],
-            "days": menu["days"],
-            "totals": totals,
-            "week": {
-                "protein_g": round(sum(t["protein_g"] for t in totals.values()), 1),
-                "kcal": round(sum(t["kcal"] for t in totals.values()), 1),
-            },
-            "composition": composition,
-            "violations": layout_violations(menu["days"], recipes),
-        })
-
-    menu_titles = {menu["slug"]: menu["title"] for menu in menus}
     plan_rows = []
     for plan in data["plans"]:
         totals, cooked = {}, 0
@@ -558,8 +433,6 @@ def build_payload(data):
         plan_rows.append({
             "slug": plan["slug"],
             "title": plan["title"],
-            "menu": plan["menu"],
-            "menu_title": menu_titles.get(plan["menu"]),
             "days": plan["days"],
             "totals": totals,
             "cooked": cooked,
@@ -590,7 +463,6 @@ def build_payload(data):
 
     return {
         "recipes": recipe_rows,
-        "menus": menu_rows,
         "plans": plan_rows,
         "orders": orders,
         "aggregate": aggregate,
@@ -601,7 +473,6 @@ def build_payload(data):
         "facets": facets,
         "days": DAYS,
         "slots": SLOTS,
-        "orphans": orphans(recipes, menus),
         "redacted": sorted(REDACTED_CATEGORIES),
     }
 
@@ -652,7 +523,7 @@ TEMPLATE = r"""<!doctype html>
   --on-accent:#1a1714; --shade:rgba(0,0,0,.5); --scrim:rgba(0,0,0,.55);
 }
 *{box-sizing:border-box}
-/* Two roles: serif carries the identity -- the wordmark and a Recipe/Menu/Plan's
+/* Two roles: serif carries the identity -- the wordmark and a Recipe/Plan's
    own title, the closest thing this page has to a dish on a plate. Everything
    you use to navigate, scan or filter is sans -- a serif at 13px is where
    "distinctive" turns into "scratchy". */
@@ -864,7 +735,7 @@ textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,m
 const D = JSON.parse(document.getElementById('data').textContent);
 const byslug = Object.fromEntries(D.recipes.map(r => [r.slug, r]));
 /* The household's week starts Monday; D.days starts Sunday because that is the
-   order a Menu file is written in. */
+   order a Plan's grid is written in. */
 const WEEK = D.days.slice(1).concat(D.days.slice(0, 1));
 const SLOT_COUNT = D.days.length * D.slots.length;
 const FACETS = ['slot','protein','effort','appliances','tags'];
@@ -922,7 +793,7 @@ function writeHash(r, replace){
   if (r.sort !== 'title') p.set('sort', r.sort);
   FACETS.forEach(k => { if ((r.f[k]||[]).length) p.set(k, r.f[k].join(',')); });
   let path = r.view;
-  if (r.view === 'recipe' || r.view === 'menu' || r.view === 'plan') path += '/' + r.slug;
+  if (r.view === 'recipe' || r.view === 'plan') path += '/' + r.slug;
   if (r.view === 'orders' && r.sub && r.sub !== 'orders') path += '/' + r.sub;
   const s = p.toString();
   const hash = '#' + path + (s ? '?' + s : '');
@@ -971,7 +842,6 @@ function renderNav(){
   const tabs = [['today','Today'],['recipes','Recipes'],['plans','Plans'],
                 ['orders','Orders'],['planmode','Plan']];
   const here = route.view === 'recipe' ? 'recipes'
-             : route.view === 'menu' ? 'menus'
              : route.view === 'plan' ? 'plans' : route.view;
   document.getElementById('nav').innerHTML = tabs.map(([v,label]) =>
     v === 'planmode'
@@ -1025,9 +895,7 @@ function recipeList(){
     : `<p class="empty">No Recipe matches those filters.</p>`;
 
   const n = activeCount();
-  return `<p class="lede">${D.recipes.length} Recipes${
-      D.orphans.length ? ` · ${D.orphans.length} used by no Menu` : ''}.
-      Showing ${hits.length}.</p>
+  return `<p class="lede">${D.recipes.length} Recipes. Showing ${hits.length}.</p>
     <div class="tools">
       <input type="search" id="q" placeholder="Search recipes"
              title="Searches titles, ingredients, Pinned products and method"
@@ -1092,70 +960,6 @@ function recipeDetail(slug){
 
     <section><h3>Method</h3>
       <ol class="method">${r.method.map(s=>`<li>${esc(s)}</li>`).join('')}</ol></section>
-
-    <section><h3>Used by</h3>
-      ${r.used_by.length ? `<ul class="list">${r.used_by.map(u=>`<li><a href="#menu/${u.menu}">
-        <span class="t">${esc(u.title)}</span>
-        <span class="macro">${cap(u.day)} ${u.slot}</span></a></li>`).join('')}</ul>`
-      : `<div class="warn">No Menu uses this Recipe. It is in the pool and in no
-          rotation — an orphan.</div>`}</section>
-  </article>`;
-}
-
-function menuList(){
-  return `<p class="lede">${D.menus.length} Menus. Every one is 28 Slots — a Menu is
-    never partial; a real week's deviation belongs to a Plan.</p>
-    <ul class="list">${D.menus.map(m=>`<li><a href="#menu/${m.slug}">
-      <span class="t">${esc(m.title)}</span>
-      <span class="macro">${g((m.week.protein_g/7).toFixed(1))} · ${kc(m.week.kcal/7)} kcal / day</span>
-      <span class="meta">${m.violations.length
-        ? `<span class="flag">${m.violations.length} layout violation${m.violations.length>1?'s':''}</span>`
-        : 'clears the Weekly Layout'} · ${
-        Object.values(m.totals).filter(t=>t.flags.length).length} day(s) missing a goal</span>
-    </a></li>`).join('')}</ul>`;
-}
-
-function menuDetail(slug){
-  const m = D.menus.find(x => x.slug === slug);
-  if (!m) return `<p class="empty">No Menu called ${esc(slug)}.</p>`;
-  const days = D.days.map(day => {
-    const t = m.totals[day];
-    const cells = D.slots.map(s => {
-      const r = byslug[m.days[day][s]];
-      return `<dt>${s}</dt><dd>${r ? `<a href="#recipe/${r.slug}">${esc(r.title)}</a>
-        <span class="note">${g(r.protein_g)}</span>` : '<span class="note">—</span>'}</dd>`;
-    }).join('');
-    return `<div class="day"><h4><span>${cap(day)}</span>
-      <span class="macro">${g(t.protein_g)} · ${kc(t.kcal)} kcal
-      ${t.flags.length ? `<span class="flag">↓${t.flags.join(' ')}</span>` : ''}</span></h4>
-      <dl>${cells}</dl></div>`;
-  }).join('');
-
-  const comp = D.slots.map(s => `<tr><td>${cap(s)}</td><td>${
-    m.composition[s].map(([k,n]) => `<span class="pill">${n}× ${nice(k)}</span>`).join('')
-  }</td></tr>`).join('');
-
-  return `<a class="back" href="#menus">← Menus</a>
-  <article><h2>${esc(m.title)}</h2>
-    <p class="tagline">28 Slots · ${g((m.week.protein_g/7).toFixed(1))} and
-      ${kc(m.week.kcal/7)} kcal a day on average</p>
-
-    <section><h3>Weekly Layout</h3>
-      ${m.violations.length
-        ? `<div class="warn"><strong>This Menu departs from GOALS.md:</strong><ul>${
-            m.violations.map(v=>`<li>${esc(v)}</li>`).join('')}</ul></div>`
-        : `<p class="note">Clean: 3 sausage / 4 egg breakfasts, at least 2 tofu and
-            2 chicken lunches, the six fixed dinners in place and Saturday free.</p>`}
-      <table><tbody>${comp}</tbody></table>
-      <p class="note">Composition is computed from the Recipes, not read from any
-        written table.</p></section>
-
-    <section><h3>The week</h3>
-      <p class="note">Day totals are summed from the Recipes each Slot names. If they
-        disagree with the table written into <code>${esc(m.slug)}.md</code>, that drift
-        is a bug worth seeing. Floor ${g(D.goals.protein_floor)}/day,
-        ceiling ${kc(D.goals.kcal_ceiling)} kcal/day.</p>
-      ${days}</section>
   </article>`;
 }
 
@@ -1167,10 +971,9 @@ function planList(){
     <ul class="list">${D.plans.map(p=>`<li><a href="#plan/${p.slug}">
       <span class="t">${esc(p.title)}</span>
       <span class="macro">${p.cooked} / ${SLOT_COUNT} cooked</span>
-      <span class="meta">${[p.menu_title ? 'from ' + esc(p.menu_title) : '',
-        SLOT_COUNT - p.cooked ? (SLOT_COUNT - p.cooked) + ' Slot(s) eaten out'
-                              : 'every Slot cooked at home'
-        ].filter(Boolean).join(' · ')}</span>
+      <span class="meta">${SLOT_COUNT - p.cooked
+        ? (SLOT_COUNT - p.cooked) + ' Slot(s) eaten out'
+        : 'every Slot cooked at home'}</span>
     </a></li>`).join('')}</ul>`;
 }
 
@@ -1243,13 +1046,12 @@ function planDetail(slug){
 
   return `<a class="back" href="#plans">← Plans</a>
   <article><h2>${esc(p.title)}</h2>
-    <p class="tagline">${p.cooked} of ${SLOT_COUNT} Slots cooked at home${
-      p.menu_title ? ` · from <a href="#menu/${p.menu}">${esc(p.menu_title)}</a>` : ''}</p>
+    <p class="tagline">${p.cooked} of ${SLOT_COUNT} Slots cooked at home</p>
 
     <section><h3>The week</h3>
       <p class="note">Tap a meal to open its Recipe. Day totals are summed from the
         Recipes each Slot names; a day with nothing cooked at home is not measured
-        against the goals, and a Plan is never checked against the Weekly Layout —
+        against the goals, and a Plan is never checked against a layout —
         a real week deviates on purpose. Floor ${g(D.goals.protein_floor)}/day,
         ceiling ${kc(D.goals.kcal_ceiling)} kcal/day.</p>
       ${days}</section>
@@ -1294,7 +1096,7 @@ function checkoutView(){
   return `<p class="lede">28 Slots, Monday first. A skipped Slot reads
       <code>eaten-out</code> — the grid's one reserved value, and the only thing
       besides a Recipe slug the shopping list accepts. It buys nothing. Paste this
-      into <code>plan-the-week</code> at step 3, in place of the copied Menu grid.</p>
+      into <code>plan-the-week</code> at step 2, where a Plan's grid starts.</p>
     <div class="tools"><button id="edit">← Back to the week</button>
       <button id="startover">Start over</button></div>
     <textarea id="out" rows="32" readonly>${esc(planYaml())}</textarea>`;
@@ -1422,8 +1224,6 @@ function render(){
     : v === 'recipe' ? recipeDetail(route.slug)
     : v === 'plans'  ? planList()
     : v === 'plan'   ? planDetail(route.slug)
-    : v === 'menus'  ? menuList()
-    : v === 'menu'   ? menuDetail(route.slug)
     : v === 'orders' ? ordersView()
     : recipeList();
   renderDrawer();
@@ -1555,8 +1355,7 @@ def main(argv):
     payload = build_payload(data)
     print(
         f"index.html written: {len(payload['recipes'])} Recipes, "
-        f"{len(payload['menus'])} Menus, {len(payload['plans'])} Plans, "
-        f"{len(payload['orders'])} orders, "
+        f"{len(payload['plans'])} Plans, {len(payload['orders'])} orders, "
         f"{len(payload['aggregate'])} distinct items, {len(html)} bytes."
     )
     return 0

@@ -4,9 +4,9 @@
 The only code in this repo, authorised by
 .scratch/meal-planning-system/issues/08-what-the-four-skills-are.md.
 
-Reads PINS.md, Recipes/ and a Plan (or a Menu -- the grids are identical),
-aggregates every ingredient across the resolved grid, divides into packs,
-splits by store, drops Staples, and prints the shopping section to stdout.
+Reads PINS.md, Recipes/ and a Plan, aggregates every ingredient across the
+resolved grid, divides into packs, splits by store, drops Staples, and prints
+the shopping section to stdout.
 The shopping-list skill writes that output into the Plan.
 
 Usage: bin/shopping-list.py Plans/2026-09-07.md
@@ -233,16 +233,15 @@ def build(totals, quantified, pins):
     return shoppable, sorted(staples), sorted(unpinned)
 
 
-def render(source, front, grid, shoppable, staples, unpinned):
+def render(source, grid, shoppable, staples, unpinned):
     out = []
     lines = sum(len(rows) for rows in shoppable.values())
     eaten_out = sum(1 for _, _, v in grid if v == EATEN_OUT)
 
     out.append("## Shopping")
     out.append("")
-    provenance = front.get("menu") or source
     summary = (
-        f"Generated from `{provenance}`. **{lines} lines** across "
+        f"Generated from `{source}`. **{lines} lines** across "
         f"{sum(1 for rows in shoppable.values() if rows)} stores, "
         f"**{len(unpinned)} to add by hand**, {len(staples)} Staples left out."
     )
@@ -330,12 +329,12 @@ def main(argv):
 
     root = repo_root()
     pins = load_pins(root)
-    front, grid = load_grid(argv[1])
+    _, grid = load_grid(argv[1])
     recipes = load_recipes(root, grid)
     check_rule(recipes, pins)
     totals, quantified, _ = aggregate(grid, recipes)
     shoppable, staples, unpinned = build(totals, quantified, pins)
-    print(render(argv[1], front, grid, shoppable, staples, unpinned))
+    print(render(argv[1], grid, shoppable, staples, unpinned))
     return 0
 
 

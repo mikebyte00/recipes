@@ -9,6 +9,11 @@ tagged Recipe pool, `GOALS.md` driving generation, and four skills — new Recip
 new Menu, weekly Plan, and a shopping output that pastes straight into
 Waitrose's Multi-search — proven by using them to plan and shop a real week.
 
+**Reached, then amended to three skills.** `new-menu` and Menus were retired
+once the browse page's Plan mode replaced them; see
+[Retire Menus](issues/25-retire-menus.md). Entries below that predate it still
+speak of Menus, and are kept as the record of what was true when written.
+
 The shopping output is the payoff and the hard part: turning canonical
 ingredient names into search terms that actually find the right product.
 
@@ -401,6 +406,24 @@ naming a cause, especially when the pattern is your own.
   works **before the first push**, since GitHub keeps unreachable objects
   addressable by SHA afterwards. The cost accepted is that a redaction failure
   is now internet-facing, and a fresh clone cannot regenerate the page.
+
+- [Retire Menus](issues/25-retire-menus.md), settled 19 September 2026: **Plan
+  mode fully replaced Menus, so Menus, `new-menu` and the Weekly Layout are
+  gone.** The first architectural *reversal* on this map: it deletes a skill the
+  map itself records as completing the four-skill set, and the four skills
+  become three. Chosen over keeping Menus as dead weight or just loosening the
+  breakfast split. What made it clear-cut was checking the call graph rather
+  than the prose — `layout_violations()` was only ever called against a Menu,
+  and `new-menu` was its only other reader, so **the Weekly Layout had already
+  stopped gating what the household eats** long before anyone proposed removing
+  it. The trigger was a `protein: dairy` breakfast finding no room in a rigid
+  `3x sausage, 4x egg` split; the split was a symptom, the dead layout the
+  cause. `plan-the-week` loses its "choose a Menu, copy its grid" step and takes
+  Plan mode's pasted grid instead. **The orphan check was not re-pointed at
+  `Plans/`** — against weeks actually eaten it would flag nearly the whole pool,
+  and a warning that fires on everything is noise. One narrowing is named and
+  left open: `new-recipe` now takes gaps from `plan-the-week` alone, so the pool
+  grows only when a real week has a hole in it.
 
 
 ## Not yet specified

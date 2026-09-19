@@ -30,13 +30,13 @@ which holds the reasoning. This file is the operative list.
 ## Tags
 
 - **`fakeaway`** — restaurant-style dish cooked at home. Independent of
-  `protein`: chicken in menu 1, lemon sole in menu 2.
+  `protein`: chicken in one, lemon sole in the other.
 - **`bulk-cook`** — can be cooked 4+ portions in one go.
 - **`eat-cold`** — fit to eat cold the next day, where no reheat is available.
 
 **`bulk-cook` and `eat-cold` have no consumer.** They are labels a human reads.
-Recipe generation, Menu building, weekly planning and the shopping list all
-ignore them. Acting on either is a Plan-time decision, and a Plan spells it by
+Recipe generation, weekly planning and the shopping list all ignore them.
+Acting on either is a Plan-time decision, and a Plan spells it by
 holding the **same Recipe in both Slots** — which sums to exactly one doubled
 batch, because the shopping list adds quantities before it rounds up to packs.
 See [How A Plan Records Bulk-Cook And
@@ -44,7 +44,7 @@ Eat-Cold](.scratch/meal-planning-system/issues/22-bulk-cook-and-eat-cold.md).
 
 ## The Plan grid
 
-A Plan's grid holds the same 28 Slots as the Menu it came from. A Slot holds a
+A Plan's grid holds 28 Slots — seven days, four Slots each. A Slot holds a
 Recipe slug, or the one reserved value:
 
 - **`eaten-out`** — the household did not cook this Slot. It buys nothing.
@@ -96,5 +96,5 @@ unrated and will stay that way for a while.
 
 Absent is not zero. `bin/browse.py` sorts unrated Recipes last under every sort
 order, because a blank must not read as a bad score. Nothing else consumes the
-field: Menu building, weekly planning and the shopping list all ignore it, and
-it is the browse page's sort control alone that gives it a consumer.
+field: weekly planning and the shopping list both ignore it, and it is the
+browse page's sort control alone that gives it a consumer.

@@ -215,7 +215,7 @@ RECIPES = {
     "mousse": {"slot": "pudding", "macros": {"protein_g": 13, "kcal": 165}, "tags": []},
 }
 
-LEGAL_DAYS = {
+WEEK_DAYS = {
     "sunday": {"breakfast": "egg-scramble", "lunch": "tofu-pan",
                "dinner": "bream", "pudding": "mousse"},
     "monday": {"breakfast": "egg-scramble", "lunch": "tofu-pan",
@@ -235,7 +235,7 @@ LEGAL_DAYS = {
 
 class DayTotals(unittest.TestCase):
     def test_sums_a_days_four_slots_from_the_recipes(self):
-        totals = browse.day_totals(LEGAL_DAYS["thursday"], RECIPES)
+        totals = browse.day_totals(WEEK_DAYS["thursday"], RECIPES)
         self.assertEqual(totals, {"protein_g": 140.0, "kcal": 1705.0})
 
     def test_a_day_clearing_the_floor_and_the_ceiling_is_flagged_neither_way(self):
@@ -250,50 +250,6 @@ class DayTotals(unittest.TestCase):
         self.assertEqual(
             browse.goal_flags({"protein_g": 140.0, "kcal": 1900.0}), ["kcal"]
         )
-
-
-class WeeklyLayout(unittest.TestCase):
-    def test_a_legal_week_reports_no_violation(self):
-        self.assertEqual(browse.layout_violations(LEGAL_DAYS, RECIPES), [])
-
-    def test_flags_a_breakfast_split_that_is_not_three_sausage_and_four_egg(self):
-        days = {d: dict(s) for d, s in LEGAL_DAYS.items()}
-        days["saturday"]["breakfast"] = "egg-scramble"
-        self.assertIn("breakfast", " ".join(browse.layout_violations(days, RECIPES)))
-
-    def test_flags_a_lunch_week_with_fewer_than_two_of_a_type(self):
-        days = {d: dict(s) for d, s in LEGAL_DAYS.items()}
-        for day in ("tuesday", "wednesday", "saturday"):
-            days[day]["lunch"] = "tofu-pan"
-        self.assertIn("chicken", " ".join(browse.layout_violations(days, RECIPES)))
-
-    def test_flags_a_fixed_dinner_on_the_wrong_day(self):
-        days = {d: dict(s) for d, s in LEGAL_DAYS.items()}
-        days["tuesday"]["dinner"] = "salmon"
-        self.assertIn("Tuesday", " ".join(browse.layout_violations(days, RECIPES)))
-
-    def test_flags_a_friday_dinner_that_is_not_a_fakeaway(self):
-        days = {d: dict(s) for d, s in LEGAL_DAYS.items()}
-        days["friday"]["dinner"] = "roast-chicken"
-        self.assertIn("Friday", " ".join(browse.layout_violations(days, RECIPES)))
-
-    def test_leaves_saturday_dinner_free(self):
-        days = {d: dict(s) for d, s in LEGAL_DAYS.items()}
-        days["saturday"]["dinner"] = "steak"
-        self.assertEqual(browse.layout_violations(days, RECIPES), [])
-
-
-class Orphans(unittest.TestCase):
-    def test_names_a_recipe_no_menu_uses(self):
-        menus = [{"slug": "menu-1", "days": LEGAL_DAYS}]
-        self.assertEqual(browse.orphans(RECIPES, menus), [])
-
-    def test_finds_the_recipe_left_out(self):
-        menus = [{"slug": "menu-1", "days": LEGAL_DAYS}]
-        recipes = dict(RECIPES)
-        recipes["lonely-pudding"] = {"slot": "pudding",
-                                     "macros": {"protein_g": 12, "kcal": 150}, "tags": []}
-        self.assertEqual(browse.orphans(recipes, menus), ["lonely-pudding"])
 
 
 class OrderAggregate(unittest.TestCase):
@@ -331,21 +287,21 @@ class OrderAggregate(unittest.TestCase):
 
 
 
-def plan_payload(plans, menus=()):
+def plan_payload(plans):
     """build_payload over fixture Plans, with everything else stubbed empty."""
     return browse.build_payload({
-        "recipes": RECIPES, "menus": list(menus), "plans": plans, "pins": {},
+        "recipes": RECIPES, "plans": plans, "pins": {},
         "bands": {}, "goals": browse.DEFAULT_GOALS, "orders": [], "history": [],
     })["plans"]
 
 
 class Plans(unittest.TestCase):
     def setUp(self):
-        days = {day: dict(slots) for day, slots in LEGAL_DAYS.items()}
+        days = {day: dict(slots) for day, slots in WEEK_DAYS.items()}
         days["monday"] = {slot: browse.EATEN_OUT for slot in browse.SLOTS}
         days["sunday"]["lunch"] = browse.EATEN_OUT
         self.plan = {"slug": "2026-09-14", "title": "Week of 2026-09-14",
-                     "menu": "menu-1", "days": days}
+                     "days": days}
 
     def test_lists_the_latest_week_first(self):
         with tempfile.TemporaryDirectory() as root:
@@ -369,11 +325,7 @@ class Plans(unittest.TestCase):
         self.assertEqual(sunday["cooked"], 3)
         self.assertEqual(sunday["flags"], ["protein"])
 
-    def test_names_the_menu_the_week_was_copied_from(self):
-        menus = [{"slug": "menu-1", "title": "Menu 1", "days": LEGAL_DAYS}]
-        self.assertEqual(plan_payload([self.plan], menus)[0]["menu_title"], "Menu 1")
-
-    def test_a_plan_is_never_checked_against_the_weekly_layout(self):
+    def test_a_plan_is_never_checked_against_a_layout(self):
         self.assertNotIn("violations", plan_payload([self.plan])[0])
 
 
@@ -409,17 +361,13 @@ class AgainstTheRealRepo(unittest.TestCase):
         for row in unrated:
             self.assertIsNone(row["rating"], row["slug"])
 
-    def test_reads_both_menus_as_twenty_eight_filled_slots(self):
-        self.assertEqual(len(self.data["menus"]), 2)
-        for menu in self.data["menus"]:
-            filled = [s for slots in menu["days"].values() for s in slots.values() if s]
-            self.assertEqual(len(filled), 28, menu["slug"])
-
-    def test_every_menu_slot_resolves_to_a_recipe(self):
-        unresolved = sorted({s for menu in self.data["menus"]
-                             for slots in menu["days"].values() for s in slots.values()
-                             if s not in self.data["recipes"]})
-        self.assertEqual(unresolved, [])
+    def test_every_plan_fills_all_twenty_eight_slots(self):
+        # bin/shopping-list.py treats a short grid as fatal, so a Slot nobody
+        # cooked is spelled eaten-out rather than emptied.
+        self.assertTrue(self.data["plans"], "Plans/ is empty")
+        for plan in self.data["plans"]:
+            filled = [s for slots in plan["days"].values() for s in slots.values() if s]
+            self.assertEqual(len(filled), 28, plan["slug"])
 
     def test_every_plan_slot_is_a_recipe_or_eaten_out(self):
         self.assertTrue(self.data["plans"], "Plans/ is empty")

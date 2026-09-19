@@ -6,7 +6,7 @@ The glossary for this project. Terms only — no implementation detail, no specs
 
 A single dish, scaled to a fixed number of servings, carrying its method and its
 per-serving protein and kcal. The unit that lives in the pool and gets reused
-across many [Menus](#menu).
+across many [Plans](#plan).
 
 ## Slot
 
@@ -14,31 +14,28 @@ A position in a day that a [Recipe](#recipe) fills: breakfast, lunch, dinner,
 pudding. Macro targets are expressed per slot, not only per day, because the
 existing corpus already clusters tightly by slot.
 
-## Menu
-
-A **complete** seven-day rotation: every day, every slot, filled with a
-[Recipe](#recipe). Never partial. Menus are reusable and go into rotation —
-`Menus/menu-1.md` and `Menus/menu-2.md` are the first two.
-
-A Menu is a template. It is not tied to any particular calendar week.
-
 ## Plan
 
-A [Menu](#menu) selected for one specific week, then edited: days removed,
-[Recipes](#recipe) swapped, meals eaten out. A Plan is where deviation from the
-template is recorded.
+One specific week, assembled Slot by Slot: 28 Slots, every one holding a
+[Recipe](#recipe) or `eaten-out`. A Plan is tied to a calendar week and names
+its file for that week's Monday.
 
-**The shopping list is generated from a Plan, never from a Menu.** This is the
-distinction that makes the weekly workflow tractable: the Menu stays clean and
-reusable, the Plan absorbs the mess of a real week.
+A Plan is **built, not derived**. There is no reusable template behind it — the
+browse page's Plan mode walks the 28 Slots and hands over a finished grid, and
+the week's own shape (days away, meals out, a Recipe swapped) goes in as it is
+built rather than as a deviation from something.
+
+**The shopping list is generated from a Plan**, and a Plan stores its own full
+resolved grid rather than a pointer, so nothing edited later can change what a
+past week says it ate.
 
 ## Fakeaway
 
 A [Recipe](#recipe) tag: a restaurant-style dish cooked at home. **Not a
-protein type** — a Fakeaway still has one, and is counted under it. Both
-existing Menus put theirs on Friday: a chicken burger in Menu 1, a lemon sole
-plate with chips in Menu 2. The burger was recorded as `'Nandos'` in the old
-spreadsheet, which was shorthand for the recipe, not a note about eating out.
+protein type** — a Fakeaway still has one, and is counted under it. The corpus
+holds two: a peri peri chicken burger and a lemon sole plate with chips. The
+burger was recorded as `'Nandos'` in the old spreadsheet, which was shorthand
+for the recipe, not a note about eating out.
 
 ## Macros
 
