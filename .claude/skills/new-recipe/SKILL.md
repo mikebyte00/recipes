@@ -5,9 +5,9 @@ description: "Write or edit a Recipe in Recipes/ — the only writer to the Reci
 
 # New recipe
 
-The pool has 37 Recipes and **they define the bar**. This skill's whole job is
-holding it: the format is a template, but a Recipe that out-cooks its neighbours
-fails the project even when it hits the macros.
+The Recipes in `Recipes/` **define the bar**. This skill's whole job is holding
+it: the format is a template, but a Recipe that out-cooks its neighbours fails
+the project even when it hits the macros.
 
 **Writing to the pool is the user's decision.** `plan-the-week` names a gap and
 points here; it never mints a Recipe on its own. Confirm the brief before
@@ -35,7 +35,8 @@ Bands.
    [The bar](#the-bar) is not reading the neighbours; a corpus median steers a
    draft far harder than an adjective does.
 
-   Puddings have four members and no protein: read all four.
+   Puddings carry no protein, so `grep -l '^slot: pudding' Recipes/*.md` is the
+   whole set. It is the smallest slot — read all of it.
 
 3. **Resolve every ingredient against `PINS.md`** before drafting a line. Each
    ingredient is a `lower-kebab-case` key, and the Pin decides the unit:
@@ -132,15 +133,19 @@ seen its counts, its macros and its Unpinned ingredients.
 
 ## The bar
 
-Measured across the 37, not remembered. **Land inside your slot's row**, and
+Measured across the pool, not remembered. **Land inside your slot's row**, and
 inside the neighbours' numbers where those are tighter.
 
 | Slot | Ingredients | Appliances | Steps |
 | --- | --- | --- | --- |
-| Breakfast (13) | 3–8, median 6 | 1–3 | 2–5 |
-| Lunch (8) | 4–7, median 6 | 1–2 | 3–5 |
-| Dinner (12) | 7–12, median 9 | 1–3 | 3–6 |
-| Pudding (4) | 4–5 | 0 | 4 |
+| Breakfast | 3–8, median 6 | 1–3 | 2–5 |
+| Lunch | 4–7, median 6 | 1–2 | 3–5 |
+| Dinner | 7–12, median 9 | 1–3 | 3–6 |
+| Pudding | 4–5 | 0 | 4 |
+
+These ranges were measured when the pool was smaller. If a slot's neighbours
+now sit outside its row, **the corpus is right and the row is stale** — say so
+rather than forcing a draft to match the table.
 
 `CLAUDE.md`'s "three to six ingredients" describes breakfast, lunch and pudding.
 A **dinner** plates a protein, a grain and a green, and runs 7–12 — the corpus
