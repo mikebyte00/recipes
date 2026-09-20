@@ -47,9 +47,19 @@ says so is unchanged.
 - **`bin/browse.py`** parses `Recipes/`, `Menus/`, `PINS.md`, `GOALS.md` and
   `Orders/`. PyYAML for frontmatter — already a dependency — and regex for the
   Order tables, which have no frontmatter.
-- It emits **one self-contained `index.html` at the repo root**, every datum
-  inlined as JSON. No server, no build step, no runtime fetch: `file://` CORS
-  would block them, and Pages should not need a pipeline.
+- It emits **one `index.html` at the repo root**, every datum inlined as JSON.
+  No server, no build step: `file://` CORS ruled out a fetch of local files,
+  and Pages should not need a pipeline.
+
+  **Amended on 20 September 2026**: "no runtime fetch" is narrowed to "no
+  fetch of the page's own data." The user asked for a more out-of-the-box
+  mobile UI than hand-rolled CSS was giving the sheet/drawer/chip components,
+  and chose Bootstrap 5 loaded from a CDN over vendoring it or staying
+  vanilla. That is a runtime fetch — the page now needs network access to
+  render and behave correctly, and degrades on `file://` or offline. The part
+  of the original concern that survives: the page's own data is still fully
+  inlined JSON, never fetched, so `bin/browse.py`'s output remains a single
+  generated artifact with no build tool and no server-side pipeline.
 - **Committed** to git, so Pages can serve it from the branch root — which is
   why it is `index.html` and not `browse.html`.
 - Regenerated **manually**. No CI workflow, no git hook. `bin/browse.py --check`
