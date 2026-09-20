@@ -558,6 +558,12 @@ nav a#plantoggle.on{background:var(--accent);border-color:var(--accent);color:va
 main{padding:clamp(1.4rem,2vw,2.2rem) 0 5rem}
 .lede{color:var(--soft);font-size:.95rem;line-height:1.6;margin:.1rem 0 1.5rem}
 .tools{display:flex;gap:.6rem;margin-bottom:1.5rem;flex-wrap:wrap}
+/* Quick Slot filtering below the search bar so it survives the sheet
+   collapsing behind Filters on narrow screens. The sheet keeps its own Slot
+   group too -- .facet[data-facet=slot] and .quickbar swap visibility at the
+   same breakpoint the sheet itself collapses at, so wide screens are
+   unchanged and narrow ones see Slot exactly once. */
+.quickbar{display:flex;flex-wrap:wrap;gap:.45rem;margin:-.9rem 0 1.5rem}
 input[type=search]{flex:1;min-width:10rem;font:inherit;font-size:1rem;color:inherit;
   background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:.7rem .9rem;
   transition:border-color .15s}
@@ -590,6 +596,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
 .scrim{position:fixed;inset:0;z-index:29;background:var(--scrim)}
 .scrim[hidden]{display:none}
 .facet{margin-bottom:1.3rem}
+.facet[data-facet="slot"]{display:none}
 .facet h3{font-size:.85rem;font-weight:600;color:var(--soft);margin-bottom:.6rem}
 .chips{display:flex;flex-wrap:wrap;gap:.45rem}
 .chip{border:1px solid var(--rule);background:var(--paper);border-radius:999px;
@@ -712,6 +719,8 @@ textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,m
   .scrim{display:none!important}
   .sheet-foot .close{display:none}
   #filterbtn{display:none}
+  .quickbar{display:none}
+  .facet[data-facet="slot"]{display:block}
   .day dl{grid-template-columns:6.5rem 1fr}
   ul.list a .t{flex:1 1 auto}
   ul.list a .macro{margin-left:auto}
@@ -859,7 +868,7 @@ function renderNav(){
 }
 
 function facetPanel(){
-  const rows = FACETS.map(k => `<div class="facet"><h3>${k}</h3><div class="chips">` +
+  const rows = FACETS.map(k => `<div class="facet" data-facet="${k}"><h3>${k}</h3><div class="chips">` +
     D.facets[k].map(v => {
       const on = (route.f[k]||[]).includes(v);
       return `<button class="chip ${on?'on':''}" data-facet="${k}" data-value="${v}">${nice(v)}</button>`;
@@ -874,6 +883,13 @@ function facetPanel(){
       <button id="clear">Clear all</button>
       <button class="close" id="done">Done</button>
     </div></div>`;
+}
+
+function quickbar(){
+  const on = v => (route.f.slot||[]).includes(v);
+  return `<div class="quickbar">${D.facets.slot.map(v =>
+    `<button class="chip ${on(v)?'on':''}" data-facet="slot" data-value="${v}">${nice(v)}</button>`
+  ).join('')}</div>`;
 }
 
 function recipeList(){
@@ -906,6 +922,7 @@ function recipeList(){
         ).join('')}</select>
       <button id="filterbtn">Filters${n ? `<span class="badge">${n}</span>` : ''}</button>
     </div>
+    ${quickbar()}
     <div class="layout">${facetPanel()}<div>${body}</div></div>`;
 }
 
@@ -1253,7 +1270,7 @@ function wireFilters(){
   const sort = document.getElementById('sort');
   sort.onchange = () => { route.sort = sort.value; writeHash(route, true); render(); };
 
-  sheet.querySelectorAll('.chip').forEach(chip => chip.onclick = () => {
+  document.querySelectorAll('.chip').forEach(chip => chip.onclick = () => {
     const {facet, value} = chip.dataset;
     const cur = new Set(route.f[facet] || []);
     cur.has(value) ? cur.delete(value) : cur.add(value);
