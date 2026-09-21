@@ -254,6 +254,9 @@ textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,m
 .subnav a{color:var(--soft);border-bottom:1px solid transparent;padding-bottom:.2rem}
 .subnav a.on{color:var(--accent);border-bottom-color:var(--accent)}
 
+@media(max-width:991.98px){
+  #sheet{--bs-offcanvas-height:78vh}
+}
 @media(min-width:992px){
   body{font-size:17.5px}
   .layout{display:grid;grid-template-columns:15rem 1fr;gap:2.5rem;align-items:start}
@@ -262,6 +265,7 @@ textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,m
      the list scrolls past it. */
   #sheet{position:sticky;top:6.4rem;border:1px solid var(--rule);
     border-radius:var(--radius);padding:1.1rem}
+  #sheet .offcanvas-body{display:block}
   #filterbtn{display:none}
   .quickbar{display:none}
   .facet[data-facet="slot"]{display:block}
@@ -418,7 +422,7 @@ function facetPanel(){
       const on = (route.f[k]||[]).includes(v);
       return `<button class="chip ${on?'on':''}" data-facet="${k}" data-value="${v}">${nice(v)}</button>`;
     }).join('') + `</div></div>`).join('');
-  return `<div class="offcanvas offcanvas-bottom offcanvas-lg" tabindex="-1" id="sheet">
+  return `<div class="offcanvas-bottom offcanvas-lg" tabindex="-1" id="sheet">
     <div class="offcanvas-header">
       <h2 class="h6 mb-0">Filters</h2>
       <button class="btn-close" id="done" aria-label="Close"></button>
@@ -810,7 +814,7 @@ function wireFilters(){
      node itself, so asking for "the instance for this node, creating one if
      there isn't one yet" is always correct, whether this is the first
      render or the fiftieth. */
-  const offcanvas = () => bootstrap.Offcanvas.getOrCreateInstance(sheet);
+  const offcanvas = () => bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('sheet'));
   const isShown = () => sheet.classList.contains('show');
 
   document.getElementById('done').onclick = () => offcanvas().hide();
