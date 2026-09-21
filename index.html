@@ -156,18 +156,18 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
   border-bottom:1px solid var(--rule);padding-bottom:.5rem}
 .group h2{font-size:1.05rem;font-weight:600;color:var(--accent)}
 .group em{font-style:normal;font-size:.85rem;color:var(--soft)}
-ul.list{list-style:none;margin:0;padding:0}
-ul.list li{border-bottom:1px solid var(--rule)}
-/* A list row is title / macro / meta. On a phone the title takes the whole
-   width and the macro drops onto the meta line -- squeezing it into a right
-   column wrapped nearly every title onto two lines. Wide enough, and the macro
-   returns to its right-aligned column where a sorted list can be scanned. */
-ul.list a{display:flex;flex-wrap:wrap;align-items:baseline;gap:.2rem .6rem;
-  padding:.9rem .3rem;border-radius:9px;transition:background .15s}
-ul.list a:hover{background:var(--card)}
-ul.list a .t{flex:1 0 100%;font-size:1.05rem;font-weight:500}
-ul.list a .macro{order:2}
-ul.list a .meta{order:3;flex:1;margin-top:0}
+/* list-group-flush already gives every row its bottom border and strips the
+   outer box; this only adds back the row's internal flex layout, since a
+   title/macro/meta row isn't something Bootstrap's list-group has an
+   opinion about. On a phone the title takes the whole width and the macro
+   drops onto the meta line -- squeezing it into a right column wrapped
+   nearly every title onto two lines. Wide enough, and the macro returns to
+   its right-aligned column where a sorted list can be scanned. */
+.list-group-item{display:flex;flex-wrap:wrap;align-items:baseline;gap:.2rem .6rem;
+  padding:.9rem .3rem;background:transparent}
+.list-group-item .t{flex:1 0 100%;font-size:1.05rem;font-weight:500;color:var(--ink)}
+.list-group-item .macro{order:2}
+.list-group-item .meta{order:3;flex:1;margin-top:0}
 /* The macro is the payload -- the number a household actually scans for --
    so it reads in ink at full weight, not muted into the meta line beneath it. */
 .macro{white-space:nowrap;font-size:.92rem;font-weight:600;color:var(--ink);
@@ -242,9 +242,9 @@ ol.method li{margin-bottom:.85rem;line-height:1.6}
 .drawer .where b{text-transform:capitalize}
 .drawer .rest{margin-left:auto;display:flex;gap:.6rem}
 body.plan-on{padding-bottom:6.5rem}
-body.plan-on .list a{cursor:pointer}
-body.plan-on .list a:hover{background:var(--accent-soft)}
-body.plan-on .list a:hover .t{color:var(--accent)}
+body.plan-on .list-group-item{cursor:pointer}
+body.plan-on .list-group-item:hover{background:var(--accent-soft)}
+body.plan-on .list-group-item:hover .t{color:var(--accent)}
 button[disabled]{opacity:.45;cursor:not-allowed}
 button[disabled]:hover{border-color:var(--rule)}
 textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -270,9 +270,9 @@ textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,m
   .quickbar{display:none}
   .facet[data-facet="slot"]{display:block}
   .day dl{grid-template-columns:6.5rem 1fr}
-  ul.list a .t{flex:1 1 auto}
-  ul.list a .macro{margin-left:auto}
-  ul.list a .meta{flex:1 0 100%}
+  .list-group-item .t{flex:1 1 auto}
+  .list-group-item .macro{margin-left:auto}
+  .list-group-item .meta{flex:1 0 100%}
 }
 </style>
 
@@ -455,13 +455,14 @@ function recipeList(){
                         .filter(([,rs]) => rs.length);
   const body = groups.length ? groups.map(([slot, rs]) => `
     <div class="group"><h2>${slot}</h2><em>${rs.length}</em></div>
-    <ul class="list">${rs.map(r => `<li><a href="#recipe/${r.slug}${qs()}">
+    <div class="list-group list-group-flush">${rs.map(r => `<a class="list-group-item list-group-item-action"
+      href="#recipe/${r.slug}${qs()}">
       <span class="t">${esc(r.title)}</span>
       <span class="macro">${scoreDot('protein',r)}${g(r.protein_g)} · ${kc(r.kcal)} kcal</span>
       <span class="meta">${[star(r.rating), nice(r.protein), r.effort ? r.effort+' effort' : '',
         (r.appliances||[]).map(nice).join(', ') || 'no appliance',
         (r.tags||[]).map(nice).join(', ')].filter(Boolean).join(' · ')}</span>
-    </a></li>`).join('')}</ul>`).join('')
+    </a>`).join('')}</div>`).join('')
     : `<p class="empty">No Recipe matches those filters.</p>`;
 
   const n = activeCount();
