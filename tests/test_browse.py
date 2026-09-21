@@ -391,9 +391,19 @@ class GeneratedPage(unittest.TestCase):
         cls.data = browse.load_all(ROOT)
         cls.html = browse.render(cls.data)
 
-    def test_the_page_is_self_contained(self):
-        self.assertNotIn("<script src=", self.html)
-        self.assertNotIn("<link rel=\"stylesheet\"", self.html)
+    def test_the_page_only_fetches_its_pinned_ui_library(self):
+        """Ticket 24's amendment allows exactly one runtime fetch: the pinned
+        Bootstrap build, by exact URL. Anything else external creeping in --
+        an accidental second CDN dependency, a typo'd version -- is what
+        this test exists to catch, same as the old absolute-zero version did
+        before there was a reason to allow one."""
+        bootstrap_css = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        bootstrap_js = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        scripts = re.findall(r'<script src="([^"]+)"', self.html)
+        links = re.findall(r'<link[^>]*rel="stylesheet"[^>]*>', self.html)
+        self.assertEqual(scripts, [bootstrap_js])
+        self.assertEqual(len(links), 1)
+        self.assertIn(bootstrap_css, links[0])
 
     def test_the_page_carries_no_redacted_string(self):
         browse.assert_no_pii(self.html, self.data["raw_orders"])
