@@ -87,27 +87,62 @@ render();
 
 (The bundle loads *after* the page's own inline `<script>` runs, which is fine here — nothing in that inline script calls into `bootstrap.*` yet. Task 4 is the first task that does, and it runs from `wireFilters()`, which fires on every `render()`, well after page load.)
 
-- [ ] **Step 3: Regenerate and verify nothing broke**
+- [ ] **Step 3: Update the self-containment test for the one approved CDN fetch**
+
+**Discovered during Task 1's implementation, not anticipated when this plan was written**: `tests/test_browse.py` already has a test that encodes the page's *old* self-contained rule as a hard assertion — it predates ticket 24's amendment and this plan. Left alone, it fails forever after this task, for a reason that has nothing to do with a regression.
+
+In `tests/test_browse.py`, find:
+
+```python
+    def test_the_page_is_self_contained(self):
+        self.assertNotIn("<script src=", self.html)
+        self.assertNotIn("<link rel=\"stylesheet\"", self.html)
+```
+
+Replace with:
+
+```python
+    def test_the_page_only_fetches_its_pinned_ui_library(self):
+        """Ticket 24's amendment allows exactly one runtime fetch: the pinned
+        Bootstrap build, by exact URL. Anything else external creeping in --
+        an accidental second CDN dependency, a typo'd version -- is what
+        this test exists to catch, same as the old absolute-zero version did
+        before there was a reason to allow one."""
+        bootstrap_css = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        bootstrap_js = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        scripts = re.findall(r'<script src="([^"]+)"', self.html)
+        links = re.findall(r'<link[^>]*rel="stylesheet"[^>]*>', self.html)
+        self.assertEqual(scripts, [bootstrap_js])
+        self.assertEqual(len(links), 1)
+        self.assertIn(bootstrap_css, links[0])
+```
+
+(`re` is already imported at the top of `tests/test_browse.py` for the `BOOT` pattern — no new import needed. This test still fails on any *other* external resource, which is the property that made the original test worth having.)
+
+- [ ] **Step 4: Regenerate and verify nothing broke**
 
 Run:
 ```bash
 .venv/bin/python bin/browse.py
 .venv/bin/python tests/test_browse.py
 ```
-Expected: `index.html written: ...` then `Ran 59 tests ... OK`.
+Expected: `index.html written: ...` then `Ran 59 tests ... OK` (the test renamed in Step 3 keeps the total at 59 — it's a rename plus a rewritten body, not a new test).
 
-- [ ] **Step 4: Manual check**
+- [ ] **Step 5: Manual check**
 
 Open `index.html` in a browser (or serve it locally). Confirm: the page looks visually identical to before (Bootstrap's CSS resets `margin`/`font` on elements the page doesn't yet use Bootstrap classes on — if anything shifted, it's almost certainly Bootstrap's `*, *::before, *::after{box-sizing:border-box}` or a base `body` font-family colliding; the page already sets both itself at higher specificity via its own `<style>` block, which loads *after* Bootstrap's, so it should win). Open devtools console: confirm no errors, and confirm `typeof bootstrap === 'object'`.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
-git add bin/browse.py index.html
+git add bin/browse.py tests/test_browse.py index.html
 git commit -m "Load Bootstrap 5.3.8 from jsDelivr, pinned with SRI
 
 No markup uses it yet -- this only proves the CDN load doesn't
-regress anything before later tasks build on it."
+regress anything before later tasks build on it. Updates the
+self-containment test (predates ticket 24's amendment) to allow-list
+exactly this one pinned URL rather than asserting zero external
+resources."
 ```
 
 ---
