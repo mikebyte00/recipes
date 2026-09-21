@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Meal Planning</title>
+<!-- Pinned to an exact patch release with Subresource Integrity: a compromised
+     CDN response is rejected by the browser rather than executed. Ticket 24's
+     amendment accepts this as the page's one runtime fetch -- everything else
+     it needs is still the inlined JSON payload below. -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous">
 <!-- Before first paint, or the page flashes cream on the way to dark. The
      stored value IS the override; its absence means follow the system.
      localStorage throws in some privacy modes and on some file:// origins,
@@ -861,5 +869,8 @@ addEventListener('hashchange', () => { route = readHash(); render(); });
 route = readHash();
 render();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
 </body>
 </html>
