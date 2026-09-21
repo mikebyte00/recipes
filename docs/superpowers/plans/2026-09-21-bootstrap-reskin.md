@@ -652,7 +652,7 @@ function facetPanel(){
       const on = (route.f[k]||[]).includes(v);
       return `<button class="chip ${on?'on':''}" data-facet="${k}" data-value="${v}">${nice(v)}</button>`;
     }).join('') + `</div></div>`).join('');
-  return `<div class="offcanvas-bottom offcanvas-lg" tabindex="-1" id="sheet">
+  return `<div class="offcanvas-bottom offcanvas-lg" data-bs-scroll="true" tabindex="-1" id="sheet">
     <div class="offcanvas-header">
       <h2 class="h6 mb-0">Filters</h2>
       <button class="btn-close" id="done" aria-label="Close"></button>
@@ -670,7 +670,7 @@ function facetPanel(){
 }
 ```
 
-(`.btn-close` is Bootstrap's standard dismiss icon — it replaces the old text "Done" button at the top, matching how Offcanvas is conventionally closed. `#done`'s id is kept on the close button so `wireFilters()`'s existing `document.getElementById('done')` lookup keeps working. `.offcanvas-lg` is the class that makes it a sliding bottom overlay below 992px and a static inline block at 992px and up — see the plan's Global Constraints on the breakpoint move. **Deliberately no bare `.offcanvas` class**: caught in Task 4's task review — `.offcanvas` alone carries its own unconditional `visibility:hidden`/`transform:translateY(100%)` that `.offcanvas-lg`'s media-gated rules never reset, which would leave the panel permanently hidden at ≥992px. `.offcanvas-lg` is self-sufficient at both breakpoints on its own — Bootstrap's own responsive-offcanvas documentation never combines the two.)
+(`.btn-close` is Bootstrap's standard dismiss icon — it replaces the old text "Done" button at the top, matching how Offcanvas is conventionally closed. `#done`'s id is kept on the close button so `wireFilters()`'s existing `document.getElementById('done')` lookup keeps working. `.offcanvas-lg` is the class that makes it a sliding bottom overlay below 992px and a static inline block at 992px and up — see the plan's Global Constraints on the breakpoint move. **Deliberately no bare `.offcanvas` class**: caught in Task 4's task review — `.offcanvas` alone carries its own unconditional `visibility:hidden`/`transform:translateY(100%)` that `.offcanvas-lg`'s media-gated rules never reset, which would leave the panel permanently hidden at ≥992px. `.offcanvas-lg` is self-sufficient at both breakpoints on its own — Bootstrap's own responsive-offcanvas documentation never combines the two. **`data-bs-scroll="true"`**: caught in the fix round's re-review — every `render()` call detaches `#sheet` without disposing its Offcanvas instance, and once `.show()`/`.hide()` genuinely fire (fix round 1 made them fire again, correctly), a detached instance's scroll-lock bookkeeping can leak `overflow:hidden` onto `<body>` permanently after a filter/close cycle. `data-bs-scroll="true"` tells Bootstrap to skip its scroll-lock machinery entirely for this Offcanvas — which also matches the pre-Bootstrap `.sheet`, which never locked page scroll either.)
 
 - [ ] **Step 2: Restyle the quickbar's and facet panel's chip buttons onto the new variables**
 
