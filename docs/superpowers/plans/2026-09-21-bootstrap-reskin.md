@@ -1084,6 +1084,39 @@ These are shared with other views (recipe detail, plan detail) and already read 
 
 Read `wirePlanClicks()` in `bin/browse.py` (find `function wirePlanClicks(){`). Confirm its click handler resolves the clicked Recipe via `event.target.closest('a[href^="#recipe/"]')` or equivalent — not via `li` or `ul.list` — so the tag change from Step 1 doesn't affect it. (If it turns out to reference `li` anywhere, that's a real finding: stop and fix it here rather than in a later task, since this is the task that changed the tag it would be matching against.)
 
+- [ ] **Step 4b: Convert `planList()`'s rows too — it shares the same deleted CSS**
+
+**Found in task review, a real gap in this task's original scope**: `planList()` (the Plans/weeks list, a separate view from the Recipes list) renders `<ul class="list"><li><a>` rows with the identical `.t`/`.macro`/`.meta` shape — and depends on the exact `ul.list`/`ul.list li`/`ul.list a` CSS that Step 2 deletes. Left alone, the Plans list silently loses its flex layout, padding, hover state, and row borders — a real, untested visual regression, since `tests/test_browse.py` has no assertions on either view's markup shape.
+
+Converting it to match, rather than resurrecting a second styling system for one leftover view, is the smaller and more consistent fix — it's the same row shape already converted in Step 1, three lines of markup.
+
+In `bin/browse.py`, find (in `planList()`):
+
+```python
+    <ul class="list">${D.plans.map(p=>`<li><a href="#plan/${p.slug}">
+      <span class="t">${esc(p.title)}</span>
+      <span class="macro">${p.cooked} / ${SLOT_COUNT} cooked</span>
+      <span class="meta">${SLOT_COUNT - p.cooked
+        ? (SLOT_COUNT - p.cooked) + ' Slot(s) eaten out'
+        : 'every Slot cooked at home'}</span>
+    </a></li>`).join('')}</ul>`;
+```
+
+Replace with:
+
+```python
+    <div class="list-group list-group-flush">${D.plans.map(p=>`<a class="list-group-item list-group-item-action"
+      href="#plan/${p.slug}">
+      <span class="t">${esc(p.title)}</span>
+      <span class="macro">${p.cooked} / ${SLOT_COUNT} cooked</span>
+      <span class="meta">${SLOT_COUNT - p.cooked
+        ? (SLOT_COUNT - p.cooked) + ' Slot(s) eaten out'
+        : 'every Slot cooked at home'}</span>
+    </a>`).join('')}</div>`;
+```
+
+No other function reads or routes based on `planList()`'s markup shape — its links are plain navigation (`href="#plan/${p.slug}"`), not delegated-click targets like `wirePlanClicks()`'s Recipe rows, so there is no equivalent to Step 4's verification needed here.
+
 - [ ] **Step 5: Regenerate and run the full suite**
 
 ```bash
@@ -1094,7 +1127,7 @@ Expected: `Ran 60 tests ... OK`.
 
 - [ ] **Step 6: Manual check**
 
-Open the Recipes list. Confirm rows still show title/macro/meta in the same layout at both phone and desktop width, hovering a row still highlights it, and clicking a row still opens the Recipe. Turn on Plan mode and confirm clicking a row still fills the current Slot instead of navigating.
+Open the Recipes list. Confirm rows still show title/macro/meta in the same layout at both phone and desktop width, hovering a row still highlights it, and clicking a row still opens the Recipe. Turn on Plan mode and confirm clicking a row still fills the current Slot instead of navigating. Open the Plans list too (Step 4b's conversion) and confirm its rows show the same title/macro/meta layout and hover state, and clicking one opens that Plan.
 
 - [ ] **Step 7: Commit**
 
