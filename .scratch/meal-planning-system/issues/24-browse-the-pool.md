@@ -60,6 +60,13 @@ says so is unchanged.
   of the original concern that survives: the page's own data is still fully
   inlined JSON, never fetched, so `bin/browse.py`'s output remains a single
   generated artifact with no build tool and no server-side pipeline.
+
+  **Carried out the same day**: the filter sheet, nav, recipe list, and
+  Plan-mode wizard bar all now render as Bootstrap 5.3.8 components
+  (Offcanvas, navbar, list-group, and utility classes respectively),
+  restyled onto this page's own palette rather than Bootstrap's defaults.
+  See `docs/superpowers/specs/2026-09-20-bootstrap-reskin-design.md` and
+  `docs/superpowers/plans/2026-09-21-bootstrap-reskin.md`.
 - **Committed** to git, so Pages can serve it from the branch root — which is
   why it is `index.html` and not `browse.html`.
 - Regenerated **manually**. No CI workflow, no git hook. `bin/browse.py --check`
