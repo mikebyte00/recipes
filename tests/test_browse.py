@@ -455,6 +455,7 @@ BOOT = re.compile(r"\(function\(\)\{\s*var saved = null;.*?\}\)\(\);", re.S)
 
 HARNESS = """
 const results = {};
+const bsResults = {};
 for (const [saved, sysDark] of CASES) {
   globalThis.document = {documentElement: {dataset: {}}};
   globalThis.localStorage = {getItem() {
@@ -464,8 +465,9 @@ for (const [saved, sysDark] of CASES) {
   globalThis.matchMedia = () => ({matches: sysDark});
   BOOT
   results[saved + '|' + sysDark] = document.documentElement.dataset.theme;
+  bsResults[saved + '|' + sysDark] = document.documentElement.dataset.bsTheme;
 }
-console.log(JSON.stringify(results));
+console.log(JSON.stringify({theme: results, bsTheme: bsResults}));
 """
 
 CASES = [
@@ -503,7 +505,9 @@ class ThemeBootScript(unittest.TestCase):
                                  capture_output=True, text=True).stdout
         finally:
             os.unlink(path)
-        cls.themes = json.loads(out)
+        data = json.loads(out)
+        cls.themes = data["theme"]
+        cls.bs_themes = data["bsTheme"]
 
     def test_a_stored_dark_beats_a_light_system(self):
         self.assertEqual(self.themes["dark|false"], "dark")
@@ -527,6 +531,11 @@ class ThemeBootScript(unittest.TestCase):
         """Privacy modes and some file:// origins throw. A theme preference
         must never be able to stop the page rendering."""
         self.assertEqual(self.themes["THROW|true"], "dark")
+
+    def test_bs_theme_mirrors_theme(self):
+        """Bootstrap's own color-mode CSS reads data-bs-theme, not data-theme
+        -- the two must never disagree, in every one of the seven cases."""
+        self.assertEqual(self.bs_themes, self.themes)
 
 
 if __name__ == "__main__":

@@ -22,7 +22,9 @@
   try { saved = localStorage.getItem('theme'); } catch (e) {}
   var dark = saved ? saved === 'dark'
                    : matchMedia('(prefers-color-scheme: dark)').matches;
-  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  var theme = dark ? 'dark' : 'light';
+  document.documentElement.dataset.theme = theme;
+  document.documentElement.dataset.bsTheme = theme;
 })();
 </script>
 <style>
@@ -38,6 +40,19 @@
   --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   --radius:12px;
+  /* Bootstrap components read these, not the page's own --paper/--ink/etc,
+     so every --bs-* variable a component actually formulas from (navbar
+     colors, list-group hover/active, offcanvas chrome, form focus rings)
+     is repointed here rather than overriding each component's own variable
+     one by one. */
+  --bs-body-bg: var(--paper); --bs-body-bg-rgb: 250,247,241;
+  --bs-body-color: var(--ink); --bs-body-color-rgb: 51,47,41;
+  --bs-emphasis-color: var(--ink); --bs-emphasis-color-rgb: 51,47,41;
+  --bs-secondary-color: var(--soft); --bs-secondary-color-rgb: 111,103,92;
+  --bs-tertiary-bg: var(--card); --bs-tertiary-bg-rgb: 255,253,249;
+  --bs-border-color: var(--rule);
+  --bs-border-color-translucent: var(--rule);
+  --bs-primary: var(--accent); --bs-primary-rgb: 149,70,42;
 }
 /* Warm near-black, not a cold grey: the light theme is cream paper and burnt
    sienna, and a neutral dark would read as a different site. The accent
@@ -50,6 +65,14 @@
   --rule:#3a332b; --accent:#e09468; --accent-soft:#3a2a20;
   --under:#d2a049; --over:#dd8585; --in:#8fbf7f;
   --on-accent:#1a1714; --shade:rgba(0,0,0,.5); --scrim:rgba(0,0,0,.55);
+  --bs-body-bg: var(--paper); --bs-body-bg-rgb: 26,23,20;
+  --bs-body-color: var(--ink); --bs-body-color-rgb: 236,229,218;
+  --bs-emphasis-color: var(--ink); --bs-emphasis-color-rgb: 236,229,218;
+  --bs-secondary-color: var(--soft); --bs-secondary-color-rgb: 164,154,139;
+  --bs-tertiary-bg: var(--card); --bs-tertiary-bg-rgb: 34,30,25;
+  --bs-border-color: var(--rule);
+  --bs-border-color-translucent: var(--rule);
+  --bs-primary: var(--accent); --bs-primary-rgb: 224,148,104;
 }
 *{box-sizing:border-box}
 /* Two roles: serif carries the identity -- the wordmark and a Recipe/Plan's
@@ -838,6 +861,14 @@ const ICON = {
       + 'M18.3 18.3l1.5 1.5M2.6 12h2.1M19.3 12h2.1M4.2 19.8l1.5-1.5M18.3 5.7l1.5-1.5"/></svg>',
 };
 
+/* Both attributes always move together -- data-theme drives the page's own
+   13 variables, data-bs-theme drives Bootstrap's. One setter, so nothing can
+   set one and forget the other. */
+function setTheme(value){
+  document.documentElement.dataset.theme = value;
+  document.documentElement.dataset.bsTheme = value;
+}
+
 function paintTheme(){
   const dark = document.documentElement.dataset.theme === 'dark';
   const btn = document.getElementById('theme');
@@ -849,7 +880,7 @@ function paintTheme(){
 
 document.getElementById('theme').onclick = () => {
   const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-  document.documentElement.dataset.theme = next;
+  setTheme(next);
   try { localStorage.setItem('theme', next); } catch (e) {}
   paintTheme();
 };
@@ -860,7 +891,7 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
   let saved = null;
   try { saved = localStorage.getItem('theme'); } catch (e) {}
   if (saved) return;
-  document.documentElement.dataset.theme = event.matches ? 'dark' : 'light';
+  setTheme(event.matches ? 'dark' : 'light');
   paintTheme();
 });
 
