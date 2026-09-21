@@ -652,7 +652,7 @@ function facetPanel(){
       const on = (route.f[k]||[]).includes(v);
       return `<button class="chip ${on?'on':''}" data-facet="${k}" data-value="${v}">${nice(v)}</button>`;
     }).join('') + `</div></div>`).join('');
-  return `<div class="offcanvas offcanvas-bottom offcanvas-lg" tabindex="-1" id="sheet">
+  return `<div class="offcanvas-bottom offcanvas-lg" tabindex="-1" id="sheet">
     <div class="offcanvas-header">
       <h2 class="h6 mb-0">Filters</h2>
       <button class="btn-close" id="done" aria-label="Close"></button>
@@ -670,7 +670,7 @@ function facetPanel(){
 }
 ```
 
-(`.btn-close` is Bootstrap's standard dismiss icon — it replaces the old text "Done" button at the top, matching how Offcanvas is conventionally closed. `#done`'s id is kept on the close button so `wireFilters()`'s existing `document.getElementById('done')` lookup keeps working. `.offcanvas-lg` is the class that makes it a sliding bottom overlay below 992px and a static inline block at 992px and up — see the plan's Global Constraints on the breakpoint move.)
+(`.btn-close` is Bootstrap's standard dismiss icon — it replaces the old text "Done" button at the top, matching how Offcanvas is conventionally closed. `#done`'s id is kept on the close button so `wireFilters()`'s existing `document.getElementById('done')` lookup keeps working. `.offcanvas-lg` is the class that makes it a sliding bottom overlay below 992px and a static inline block at 992px and up — see the plan's Global Constraints on the breakpoint move. **Deliberately no bare `.offcanvas` class**: caught in Task 4's task review — `.offcanvas` alone carries its own unconditional `visibility:hidden`/`transform:translateY(100%)` that `.offcanvas-lg`'s media-gated rules never reset, which would leave the panel permanently hidden at ≥992px. `.offcanvas-lg` is self-sufficient at both breakpoints on its own — Bootstrap's own responsive-offcanvas documentation never combines the two.)
 
 - [ ] **Step 2: Restyle the quickbar's and facet panel's chip buttons onto the new variables**
 
@@ -792,8 +792,15 @@ function wireFilters(){
      node is already gone with it. Bootstrap tracks the instance on the DOM
      node itself, so asking for "the instance for this node, creating one if
      there isn't one yet" is always correct, whether this is the first
-     render or the fiftieth. */
-  const offcanvas = () => bootstrap.Offcanvas.getOrCreateInstance(sheet);
+     render or the fiftieth.
+
+     getOrCreateInstance alone is not enough, though: it still needs the
+     CURRENT node, not the one this closure was built against. render()
+     detaches the #sheet this function started with, so offcanvas() looks
+     the element up fresh every call rather than closing over the `sheet`
+     variable -- caught in task review, the closed-over version resolved a
+     detached node after every re-render and silently no-op'd .show(). */
+  const offcanvas = () => bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('sheet'));
   const isShown = () => sheet.classList.contains('show');
 
   document.getElementById('done').onclick = () => offcanvas().hide();
@@ -896,6 +903,16 @@ Find (inside the `@media(min-width:56rem)` block from Task 3's not-yet-renamed s
 Replace with:
 
 ```python
+@media(max-width:991.98px){
+  /* Bootstrap's own Offcanvas default (--bs-offcanvas-height: 30vh) is a
+     cramped scroller for every facet group plus the slider plus Clear all
+     on the primary device -- a phone. Restores the old .sheet rule's
+     78vh, scoped below 992px only: .offcanvas-lg sets its own
+     --bs-offcanvas-height:auto at 992px and up, and an unscoped override
+     here would outspecify that and break the sticky sidebar's height.
+     Caught in task review. */
+  #sheet{--bs-offcanvas-height:78vh}
+}
 @media(min-width:992px){
   body{font-size:17.5px}
   .layout{display:grid;grid-template-columns:15rem 1fr;gap:2.5rem;align-items:start}
@@ -904,6 +921,10 @@ Replace with:
      the list scrolls past it. */
   #sheet{position:sticky;top:6.4rem;border:1px solid var(--rule);
     border-radius:var(--radius);padding:1.1rem}
+  /* .offcanvas-lg's own ≥992px rule makes .offcanvas-body flex (row
+     direction by default), laying the facet groups out horizontally in a
+     15rem column. Caught in task review -- restack them. */
+  #sheet .offcanvas-body{display:block}
   #filterbtn{display:none}
   .quickbar{display:none}
   .facet[data-facet="slot"]{display:block}
