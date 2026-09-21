@@ -565,26 +565,23 @@ a{color:inherit;text-decoration:none}
 h1,h2,h3{font-weight:600;margin:0}
 .wrap{max-width:64rem;margin:0 auto;padding:0 clamp(1rem,4vw,2rem)}
 
-header{border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:20;
-  background:var(--paper)}
 .brand{display:flex;align-items:center;gap:.7rem;padding:1.15rem 0 .7rem}
 .brand h1{font-family:var(--serif);font-size:1.3rem;letter-spacing:-.01em}
 .brand span{font-size:.85rem;color:var(--soft)}
 /* Four tabs plus the pill overflow 360px. Scroll rather than wrap -- a wrapped
    nav pushes the list down the fold on the smallest phone. */
-nav{display:flex;align-items:center;gap:1.5rem;padding-bottom:.2rem;
-  overflow-x:auto;scrollbar-width:none}
-nav::-webkit-scrollbar{display:none}
-nav a{padding:.65rem 0 .75rem;font-size:1rem;color:var(--soft);
+#nav{gap:1.5rem;padding-bottom:.2rem;overflow-x:auto;scrollbar-width:none}
+#nav::-webkit-scrollbar{display:none}
+#nav a{padding:.65rem 0 .75rem;font-size:1rem;color:var(--soft);
   white-space:nowrap;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
-nav a.on{color:var(--ink);border-bottom-color:var(--accent)}
+#nav a.on{color:var(--ink);border-bottom-color:var(--accent)}
 /* Plan is a toggle, not a section -- a pill on the right, so it does not read
    as a fourth heading in a row of three. */
-nav a#plantoggle{margin-left:auto;padding:.45rem 1.1rem;border:1px solid var(--rule);
+#nav a#plantoggle{margin-left:auto;padding:.45rem 1.1rem;border:1px solid var(--rule);
   border-radius:999px;background:var(--card);font-size:.9rem;
   margin-bottom:.3rem;cursor:pointer}
-nav a#plantoggle:hover{border-color:var(--accent);color:var(--accent)}
-nav a#plantoggle.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+#nav a#plantoggle:hover{border-color:var(--accent);color:var(--accent)}
+#nav a#plantoggle.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 
 main{padding:clamp(1.4rem,2vw,2.2rem) 0 5rem}
 .lede{color:var(--soft);font-size:.95rem;line-height:1.6;margin:.1rem 0 1.5rem}
@@ -612,10 +609,11 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
   outline:2px solid var(--accent);outline-offset:1px}
 
 /* Theme is a page-level setting, so it sits in the brand row rather than
-   competing with four section tabs for 360px of nav. */
+   competing with four section tabs for 360px of nav. .btn already gives it a
+   border and hover state -- this rule only fixes the circle's size and
+   centers the icon inside it. */
 #theme{margin-left:auto;align-self:center;display:flex;align-items:center;
-  justify-content:center;width:2.5rem;height:2.5rem;padding:0;
-  border-radius:999px;color:var(--soft)}
+  justify-content:center;width:2.5rem;height:2.5rem;padding:0;color:var(--soft)}
 .badge{display:inline-block;min-width:1.15rem;margin-left:.35rem;padding:0 .3rem;
   background:var(--accent);color:var(--on-accent);border-radius:999px;font-size:.72rem;
   text-align:center}
@@ -761,11 +759,13 @@ textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,m
 
 </head>
 <body>
-<header><div class="wrap">
-  <div class="brand"><h1>Meal Planning</h1><span>plan the week, buy it once</span>
-    <button id="theme" type="button"></button></div>
-  <nav id="nav"></nav>
-</div></header>
+<nav class="navbar navbar-expand sticky-top border-bottom bg-body py-0">
+  <div class="wrap d-flex flex-wrap align-items-center w-100">
+    <div class="brand"><h1>Meal Planning</h1><span>plan the week, buy it once</span>
+      <button id="theme" type="button" class="btn btn-sm rounded-circle"></button></div>
+    <div id="nav" class="navbar-nav d-flex flex-row flex-wrap"></div>
+  </div>
+</nav>
 <main class="wrap"><div id="app"></div></main>
 <div class="scrim" id="scrim" hidden></div>
 <div class="drawer" id="drawer" hidden></div>
