@@ -442,7 +442,7 @@ In `bin/browse.py`, find:
 Replace with:
 
 ```python
-<nav class="navbar navbar-expand sticky-top border-bottom py-0">
+<nav class="navbar navbar-expand sticky-top border-bottom bg-body py-0">
   <div class="wrap d-flex flex-wrap align-items-center w-100">
     <div class="brand"><h1>Meal Planning</h1><span>plan the week, buy it once</span>
       <button id="theme" type="button" class="btn btn-sm rounded-circle"></button></div>
@@ -451,7 +451,7 @@ Replace with:
 </nav>
 ```
 
-(`renderNav()` fills `#nav` — it targeted `document.getElementById('nav')` before, which was a bare `<nav>` element; now it's a `<div id="nav">`, no JS change needed since `getElementById` doesn't care about tag name. The outer element is now the actual `<nav class="navbar">`, so there are no longer two nested `<nav>` tags.)
+(`renderNav()` fills `#nav` — it targeted `document.getElementById('nav')` before, which was a bare `<nav>` element; now it's a `<div id="nav">`, no JS change needed since `getElementById` doesn't care about tag name. The outer element is now the actual `<nav class="navbar">`, so there are no longer two nested `<nav>` tags. **`bg-body` is load-bearing, not decoration**: confirmed by reading the downloaded Bootstrap CSS that the bare `.navbar` class sets no `background-color` of its own — without `bg-body` (which resolves to `--bs-body-bg`, i.e. `--paper`, via Task 2) the sticky nav would be transparent, and anything with its own background scrolling underneath it (e.g. `.day.now`'s card, `.warn` blocks) would visibly show through the header while it's stuck to the top.)
 
 - [ ] **Step 2: Drop the now-redundant custom header/nav positioning CSS, keep the rest**
 
