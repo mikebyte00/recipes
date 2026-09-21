@@ -712,10 +712,11 @@ ol.method li{margin-bottom:.85rem;line-height:1.6}
 .day dd a,.tagline a{color:var(--accent)}
 .day dd a{border-bottom:1px solid var(--accent-soft)}
 /* Plan mode. The drawer is its own thing, not a reused .sheet -- .sheet turns
-   into a sticky sidebar on wide screens and this must stay at the bottom. */
-.drawer{position:fixed;inset:auto 0 0 0;z-index:40;background:var(--card);
-  border-top:1px solid var(--rule);box-shadow:0 -2px 14px var(--shade);
-  padding:.85rem 0}
+   into a sticky sidebar on wide screens and this must stay at the bottom.
+   .fixed-bottom/.border-top/.shadow (on the element itself, in the HTML)
+   now do the positioning and chrome this rule used to; --bs-tertiary-bg and
+   --bs-border-color, from Task 2, keep the colors the same as before. */
+.drawer{background:var(--bs-tertiary-bg);padding:.85rem 0}
 .drawer .wrap{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
 .drawer .where{font-size:1rem}
 .drawer .where b{text-transform:capitalize}
@@ -765,7 +766,7 @@ textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,m
   </div>
 </nav>
 <main class="wrap"><div id="app"></div></main>
-<div class="drawer" id="drawer" hidden></div>
+<div class="drawer fixed-bottom border-top shadow" id="drawer" hidden></div>
 
 <script id="data" type="application/json">__PAYLOAD__</script>
 <script>
@@ -1175,10 +1176,10 @@ function renderDrawer(){
     <span class="where">${here}</span>
     <span class="macro">${done} / ${PLAN_SEQ.length}</span>
     <span class="rest">
-      <button id="planback"${cursor ? '' : ' disabled'}>← Back</button>
-      ${at ? `<button id="planskip">Skip</button>` : ''}
-      <button id="planout"${done < PLAN_SEQ.length ? ' disabled' : ''}>Checkout</button>
-      <button id="planexit">Exit</button>
+      <button id="planback" class="btn btn-outline-secondary btn-sm"${cursor ? '' : ' disabled'}>← Back</button>
+      ${at ? `<button id="planskip" class="btn btn-outline-secondary btn-sm">Skip</button>` : ''}
+      <button id="planout" class="btn btn-outline-primary btn-sm"${done < PLAN_SEQ.length ? ' disabled' : ''}>Checkout</button>
+      <button id="planexit" class="btn btn-outline-secondary btn-sm">Exit</button>
     </span></div>`;
 
   document.getElementById('planback').onclick = () => { cursor--; render(); };
