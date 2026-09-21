@@ -542,13 +542,14 @@ function planList(){
   return `<p class="lede">${D.plans.length} planned week${D.plans.length>1?'s':''},
     latest first. A Plan is one real week — Recipes swapped, days away, Slots
     eaten out.</p>
-    <ul class="list">${D.plans.map(p=>`<li><a href="#plan/${p.slug}">
+    <div class="list-group list-group-flush">${D.plans.map(p=>`<a class="list-group-item list-group-item-action"
+      href="#plan/${p.slug}">
       <span class="t">${esc(p.title)}</span>
       <span class="macro">${p.cooked} / ${SLOT_COUNT} cooked</span>
       <span class="meta">${SLOT_COUNT - p.cooked
         ? (SLOT_COUNT - p.cooked) + ' Slot(s) eaten out'
         : 'every Slot cooked at home'}</span>
-    </a></li>`).join('')}</ul>`;
+    </a>`).join('')}</div>`;
 }
 
 /* One day of a Plan. Today is the same block lifted out and marked `.now`,
