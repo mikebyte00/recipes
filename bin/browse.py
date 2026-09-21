@@ -901,7 +901,7 @@ function facetPanel(){
       const on = (route.f[k]||[]).includes(v);
       return `<button class="chip ${on?'on':''}" data-facet="${k}" data-value="${v}">${nice(v)}</button>`;
     }).join('') + `</div></div>`).join('');
-  return `<div class="offcanvas-bottom offcanvas-lg" tabindex="-1" id="sheet">
+  return `<div class="offcanvas-bottom offcanvas-lg" data-bs-scroll="true" tabindex="-1" id="sheet">
     <div class="offcanvas-header">
       <h2 class="h6 mb-0">Filters</h2>
       <button class="btn-close" id="done" aria-label="Close"></button>
