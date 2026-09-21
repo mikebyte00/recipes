@@ -72,7 +72,7 @@ own color-mode CSS activates in step with the existing one.
 
 | Current | Bootstrap replacement | Notes |
 |---|---|---|
-| `.sheet` (Filters bottom panel) + `.scrim` | `Offcanvas`, bottom placement | Offcanvas ships its own backdrop — `.scrim` and the manual `open()`/hidden-attribute toggling in `wireFilters()` are replaced by Bootstrap's JS API |
+| `.sheet` (Filters bottom panel) + `.scrim` | `Offcanvas`, bottom placement, responsive via `.offcanvas-lg` | Offcanvas ships its own backdrop — `.scrim` and the manual `open()`/hidden-attribute toggling in `wireFilters()` are replaced by Bootstrap's JS API. **Breakpoint moves from the page's custom `56rem` (896px) to Bootstrap's fixed `lg` step (992px)**, decided during plan-writing: `.offcanvas-lg`'s sidebar/overlay split only happens at Bootstrap's own grid breakpoints, and retuning them needs a Sass build this project doesn't have. The page's other `@media(min-width:56rem)` rules (nav, list column layout) move to `992px` too, so there's one breakpoint, not two. |
 | `.drawer` (Plan-mode wizard bar) | `.fixed-bottom` + `.shadow` utilities | Always-visible during Plan mode, never collapses — no JS component, just repositioned with utility classes |
 | `.chip` toggle buttons (Slot quickbar + facet panel) | Stays a custom `.chip` class, restyled onto Bootstrap variables | No Bootstrap primitive fits multi-select toggle pills cleanly; `btn-check` groups are single-select-shaped |
 | `<select id="sort">`, `<input type=range id="min">` | `.form-select`, `.form-range` | |
