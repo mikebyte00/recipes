@@ -618,12 +618,6 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
   background:var(--accent);color:var(--on-accent);border-radius:999px;font-size:.72rem;
   text-align:center}
 
-.sheet{position:fixed;inset:auto 0 0 0;z-index:30;background:var(--card);
-  border-top:1px solid var(--rule);max-height:78vh;overflow:auto;padding:1.3rem;
-  box-shadow:0 -8px 30px var(--shade)}
-.sheet[hidden]{display:none}
-.scrim{position:fixed;inset:0;z-index:29;background:var(--scrim)}
-.scrim[hidden]{display:none}
 .facet{margin-bottom:1.3rem}
 .facet[data-facet="slot"]{display:none}
 .facet h3{font-size:.85rem;font-weight:600;color:var(--soft);margin-bottom:.6rem}
@@ -739,14 +733,14 @@ textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,m
 .subnav a{color:var(--soft);border-bottom:1px solid transparent;padding-bottom:.2rem}
 .subnav a.on{color:var(--accent);border-bottom-color:var(--accent)}
 
-@media(min-width:56rem){
+@media(min-width:992px){
   body{font-size:17.5px}
   .layout{display:grid;grid-template-columns:15rem 1fr;gap:2.5rem;align-items:start}
-  .sheet{position:sticky;top:6.4rem;inset:auto;max-height:none;overflow:visible;
-    box-shadow:none;border:1px solid var(--rule);border-radius:var(--radius);padding:1.1rem}
-  .sheet[hidden]{display:block}
-  .scrim{display:none!important}
-  .sheet-foot .close{display:none}
+  /* .offcanvas-lg already goes static and undecorated at this width -- this
+     adds back the one thing it doesn't do on its own: staying in view while
+     the list scrolls past it. */
+  #sheet{position:sticky;top:6.4rem;border:1px solid var(--rule);
+    border-radius:var(--radius);padding:1.1rem}
   #filterbtn{display:none}
   .quickbar{display:none}
   .facet[data-facet="slot"]{display:block}
@@ -767,7 +761,6 @@ textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,m
   </div>
 </nav>
 <main class="wrap"><div id="app"></div></main>
-<div class="scrim" id="scrim" hidden></div>
 <div class="drawer" id="drawer" hidden></div>
 
 <script id="data" type="application/json">__PAYLOAD__</script>
@@ -904,15 +897,20 @@ function facetPanel(){
       const on = (route.f[k]||[]).includes(v);
       return `<button class="chip ${on?'on':''}" data-facet="${k}" data-value="${v}">${nice(v)}</button>`;
     }).join('') + `</div></div>`).join('');
-  return `<div class="sheet" id="sheet" hidden>
+  return `<div class="offcanvas offcanvas-bottom offcanvas-lg" tabindex="-1" id="sheet">
+    <div class="offcanvas-header">
+      <h2 class="h6 mb-0">Filters</h2>
+      <button class="btn-close" id="done" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
     ${rows}
     <div class="facet"><h3>Protein floor</h3><div class="slider">
-      <input type="range" id="min" min="0" max="60" step="5" value="${route.min}">
+      <input type="range" class="form-range" id="min" min="0" max="60" step="5" value="${route.min}">
       <span class="macro" id="minlabel">${route.min ? g(route.min)+'+' : 'any'}</span>
     </div></div>
     <div class="sheet-foot">
-      <button id="clear">Clear all</button>
-      <button class="close" id="done">Done</button>
+      <button class="btn btn-outline-secondary" id="clear">Clear all</button>
+    </div>
     </div></div>`;
 }
 
@@ -944,14 +942,16 @@ function recipeList(){
   const n = activeCount();
   return `<p class="lede">${D.recipes.length} Recipes. Showing ${hits.length}.</p>
     <div class="tools">
-      <input type="search" id="q" placeholder="Search recipes"
+      <input type="search" id="q" class="form-control" placeholder="Search recipes"
              title="Searches titles, ingredients, Pinned products and method"
              value="${esc(route.q)}">
-      <select id="sort" aria-label="Sort within each Slot">${
+      <select id="sort" class="form-select" aria-label="Sort within each Slot" style="flex:0 1 auto">${
         Object.entries(SORTS).map(([k,v]) =>
           `<option value="${k}"${k === route.sort ? ' selected' : ''}>${v.label}</option>`
         ).join('')}</select>
-      <button id="filterbtn">Filters${n ? `<span class="badge">${n}</span>` : ''}</button>
+      <button id="filterbtn" class="btn btn-outline-secondary" type="button"
+              data-bs-toggle="offcanvas" data-bs-target="#sheet" aria-controls="sheet">
+        Filters${n ? `<span class="badge">${n}</span>` : ''}</button>
     </div>
     ${quickbar()}
     <div class="layout">${facetPanel()}<div>${body}</div></div>`;
@@ -1282,13 +1282,17 @@ function render(){
 
 function wireFilters(){
   const sheet = document.getElementById('sheet');
-  const scrim = document.getElementById('scrim');
-  const wide = () => matchMedia('(min-width:56rem)').matches;
-  const open = on => { sheet.hidden = !on; scrim.hidden = !on || wide(); };
+  const wide = () => matchMedia('(min-width:992px)').matches;
+  /* getOrCreateInstance, not `new` -- recipeList() rebuilds #sheet's markup
+     from scratch on every render(), so any instance tied to the previous
+     node is already gone with it. Bootstrap tracks the instance on the DOM
+     node itself, so asking for "the instance for this node, creating one if
+     there isn't one yet" is always correct, whether this is the first
+     render or the fiftieth. */
+  const offcanvas = () => bootstrap.Offcanvas.getOrCreateInstance(sheet);
+  const isShown = () => sheet.classList.contains('show');
 
-  document.getElementById('filterbtn').onclick = () => open(sheet.hidden);
-  document.getElementById('done').onclick = () => open(false);
-  scrim.onclick = () => open(false);
+  document.getElementById('done').onclick = () => offcanvas().hide();
 
   const q = document.getElementById('q');
   let timer;
@@ -1307,18 +1311,16 @@ function wireFilters(){
     cur.has(value) ? cur.delete(value) : cur.add(value);
     route.f[facet] = [...cur];
     if (!route.f[facet].length) delete route.f[facet];
-    writeHash(route, true); const wasOpen = !sheet.hidden;
-    render(); if (wasOpen && !wide()) { document.getElementById('sheet').hidden = false;
-      document.getElementById('scrim').hidden = false; }
+    writeHash(route, true); const wasOpen = isShown();
+    render(); if (wasOpen && !wide()) offcanvas().show();
   });
 
   const min = document.getElementById('min');
   min.oninput = () => { document.getElementById('minlabel').textContent =
     +min.value ? '~' + min.value + 'g+' : 'any'; };
   min.onchange = () => { route.min = +min.value; writeHash(route, true);
-    const wasOpen = !sheet.hidden; render();
-    if (wasOpen && !wide()) { document.getElementById('sheet').hidden = false;
-      document.getElementById('scrim').hidden = false; } };
+    const wasOpen = isShown(); render();
+    if (wasOpen && !wide()) offcanvas().show(); };
 
   document.getElementById('clear').onclick = () => {
     route.f = {}; route.q = ''; route.min = 0; writeHash(route, true); render(); };
