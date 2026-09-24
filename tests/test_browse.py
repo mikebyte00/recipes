@@ -329,6 +329,53 @@ class Plans(unittest.TestCase):
         self.assertNotIn("violations", plan_payload([self.plan])[0])
 
 
+class LastEaten(unittest.TestCase):
+    """Variety is measured against weeks actually eaten, so each Recipe carries
+    the last day a Plan put it on the table. Plan mode compares that with the
+    reader's clock -- the page is committed, so "recent" cannot be baked in."""
+
+    def plan(self, slug, days):
+        return {"slug": slug, "title": "Week of " + slug, "days": days}
+
+    def eaten(self, plans):
+        return browse.last_eaten(plans)
+
+    def test_dates_a_slot_from_the_plans_monday(self):
+        dates = self.eaten([self.plan("2026-09-14", {"thursday": {"dinner": "steak"}})])
+        self.assertEqual(dates["steak"], "2026-09-17")
+
+    def test_a_plans_sunday_ends_its_week_rather_than_starting_it(self):
+        dates = self.eaten([self.plan("2026-09-14", {"sunday": {"dinner": "steak"}})])
+        self.assertEqual(dates["steak"], "2026-09-20")
+
+    def test_the_latest_day_wins_across_plans(self):
+        dates = self.eaten([
+            self.plan("2026-09-14", {"monday": {"dinner": "steak"}}),
+            self.plan("2026-09-07", {"saturday": {"dinner": "steak"}}),
+            self.plan("2026-09-14", {"tuesday": {"lunch": "steak"}}),
+        ])
+        self.assertEqual(dates["steak"], "2026-09-15")
+
+    def test_eaten_out_is_never_a_recipe(self):
+        dates = self.eaten([self.plan("2026-09-14",
+                                      {"monday": {s: browse.EATEN_OUT for s in browse.SLOTS}})])
+        self.assertEqual(dates, {})
+
+    def test_a_plan_not_named_for_a_date_is_ignored(self):
+        dates = self.eaten([self.plan("draft", {"monday": {"dinner": "steak"}})])
+        self.assertEqual(dates, {})
+
+    def test_the_payload_carries_the_date_and_none_for_a_recipe_never_planned(self):
+        rows = {r["slug"]: r for r in browse.build_payload({
+            "recipes": RECIPES,
+            "plans": [self.plan("2026-09-14", {"monday": {"dinner": "steak"}})],
+            "pins": {}, "bands": {}, "goals": browse.DEFAULT_GOALS,
+            "orders": [], "history": [],
+        })["recipes"]}
+        self.assertEqual(rows["steak"]["last_eaten"], "2026-09-14")
+        self.assertIsNone(rows["bream"]["last_eaten"])
+
+
 class AgainstTheRealRepo(unittest.TestCase):
     """The pure functions above use fixtures. These read what is actually here."""
 
@@ -536,6 +583,73 @@ class ThemeBootScript(unittest.TestCase):
         """Bootstrap's own color-mode CSS reads data-bs-theme, not data-theme
         -- the two must never disagree, in every one of the seven cases."""
         self.assertEqual(self.bs_themes, self.themes)
+
+
+EATEN_AGO = re.compile(r"function eatenAgo\(iso, now\)\{.*?\n\}", re.S)
+
+# Local noon, so no case sits on a midnight a timezone could tip over.
+AGO_CASES = {
+    "today": ["2026-09-24", [2026, 8, 24, 12]],
+    "yesterday": ["2026-09-23", [2026, 8, 24, 12]],
+    "fourteen": ["2026-09-10", [2026, 8, 24, 12]],
+    "fifteen": ["2026-09-09", [2026, 8, 24, 12]],
+    "tomorrow": ["2026-09-25", [2026, 8, 24, 12]],
+    "never": [None, [2026, 8, 24, 12]],
+    "across_bst_end": ["2026-10-20", [2026, 9, 27, 12]],
+}
+
+
+@unittest.skipUnless(shutil.which("node"), "node is not installed")
+class EatenAgo(unittest.TestCase):
+    """Plan mode's badge: days since a Recipe was last eaten, within the two
+    weeks variety is judged over, or nothing. Lifted out of TEMPLATE like the
+    theme boot script, so the test runs what ships."""
+
+    @classmethod
+    def setUpClass(cls):
+        fn = EATEN_AGO.search(browse.TEMPLATE)
+        assert fn, "eatenAgo is no longer in TEMPLATE"
+        script = fn.group(0) + """
+const out = {};
+for (const [k, [iso, d]] of Object.entries(%s)) out[k] = eatenAgo(iso, new Date(...d));
+console.log(JSON.stringify(out));
+""" % json.dumps(AGO_CASES)
+        with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as handle:
+            handle.write(script)
+            path = handle.name
+        try:
+            # The household's clock, so the clock-change case has a clock change.
+            env = dict(os.environ, TZ="Europe/London")
+            out = subprocess.run([shutil.which("node"), path], check=True,
+                                 capture_output=True, text=True, env=env).stdout
+        finally:
+            os.unlink(path)
+        cls.ago = json.loads(out)
+
+    def test_eaten_today_is_zero_days_ago(self):
+        self.assertEqual(self.ago["today"], 0)
+
+    def test_eaten_yesterday_is_one_day_ago(self):
+        self.assertEqual(self.ago["yesterday"], 1)
+
+    def test_fourteen_days_ago_is_still_recent(self):
+        self.assertEqual(self.ago["fourteen"], 14)
+
+    def test_fifteen_days_ago_is_not(self):
+        self.assertIsNone(self.ago["fifteen"])
+
+    def test_a_day_not_yet_reached_was_not_eaten(self):
+        """A Plan already written for this week must not flag its own
+        Recipes as eaten before the day comes."""
+        self.assertIsNone(self.ago["tomorrow"])
+
+    def test_a_recipe_never_planned_has_no_badge(self):
+        self.assertIsNone(self.ago["never"])
+
+    def test_counts_calendar_days_across_a_clock_change(self):
+        """The clocks go back on 25 October; a 23- or 25-hour day is still
+        one day."""
+        self.assertEqual(self.ago["across_bst_end"], 7)
 
 
 if __name__ == "__main__":

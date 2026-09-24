@@ -16,6 +16,7 @@ string. Run tests/test_browse.py after touching any of it.
 Usage: bin/browse.py [--check]
 """
 
+import datetime
 import glob
 import json
 import os
@@ -221,6 +222,29 @@ def day_totals(slots, recipes):
     return {"protein_g": round(protein, 1), "kcal": round(kcal, 1)}
 
 
+def last_eaten(plans):
+    """The last day each Recipe was on a Plan, as an ISO date.
+
+    A Plan is named for its Monday and runs to Sunday -- DAYS lists Sunday
+    first, but a Plan's Sunday ends its week. A Plan not named for a date has
+    no days to place, so it is skipped.
+    """
+    dates = {}
+    for plan in plans:
+        try:
+            monday = datetime.date.fromisoformat(plan["slug"])
+        except ValueError:
+            continue
+        for day, slots in plan["days"].items():
+            if day not in DAYS:
+                continue
+            date = (monday + datetime.timedelta(days=(DAYS.index(day) + 6) % 7)).isoformat()
+            for slug in slots.values():
+                if slug and slug != EATEN_OUT and date > dates.get(slug, ""):
+                    dates[slug] = date
+    return dates
+
+
 def goal_flags(totals, goals=None):
     """Which of the two daily goals a day misses. Reported, never enforced."""
     goals = goals or DEFAULT_GOALS
@@ -373,6 +397,7 @@ def build_payload(data):
     recipes, pins, bands = data["recipes"], data["pins"], data["bands"]
     orders = data["orders"]
 
+    eaten = last_eaten(data["plans"])
     recipe_rows = []
     for slug in sorted(recipes):
         recipe = recipes[slug]
@@ -401,6 +426,8 @@ def build_payload(data):
             # Human-only, and absent on most Recipes. VOCABULARY.md: nothing
             # infers a rating, so an unrated Recipe carries None and sorts last.
             "rating": recipe.get("rating"),
+            # Plan mode judges "recent" against the reader's clock, not here.
+            "last_eaten": eaten.get(slug),
             "appliances": recipe.get("appliances") or [],
             "tags": recipe.get("tags") or [],
             "protein_g": macros.get("protein_g"),
@@ -691,6 +718,7 @@ ol.method li{margin-bottom:.85rem;line-height:1.6}
 .pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;
   padding:.15rem .7rem;font-size:.8rem;color:var(--soft);margin:0 .3rem .3rem 0}
 .pill.un{border-color:var(--accent);color:var(--accent)}
+.pill.eaten{margin:0 .4rem 0 0;padding:0 .55rem;font-size:.75rem}
 .day{border-bottom:1px solid var(--rule);padding:1.1rem 0}
 .day h4{margin:0 0 .55rem;font-size:.9rem;font-weight:600;color:var(--soft);
   display:flex;flex-wrap:wrap;gap:.2rem .8rem;
@@ -939,6 +967,14 @@ function recipeList(){
      the facets and the search box still apply on top. */
   const only = planOn && !checkedOut ? planSlot() : null;
   const hits = D.recipes.filter(r => (!only || r.slot === only) && matches(r));
+  const now = new Date();
+  /* A hint, never a gate: a Recipe eaten lately stays pickable, and the list
+     keeps its order. Only while picking, since only then is variety the question. */
+  const eaten = r => {
+    const n = only ? eatenAgo(r.last_eaten, now) : null;
+    return n == null ? '' : `<span class="pill eaten">eaten ${
+      n === 0 ? 'today' : n === 1 ? 'yesterday' : n + ' days ago'}</span>`;
+  };
   const groups = D.slots.map(slot => [slot, sorted(hits.filter(r => r.slot === slot))])
                         .filter(([,rs]) => rs.length);
   const body = groups.length ? groups.map(([slot, rs]) => `
@@ -947,7 +983,7 @@ function recipeList(){
       href="#recipe/${r.slug}${qs()}">
       <span class="t">${esc(r.title)}</span>
       <span class="macro">${scoreDot('protein',r)}${g(r.protein_g)} · ${kc(r.kcal)} kcal</span>
-      <span class="meta">${[star(r.rating), nice(r.protein), r.effort ? r.effort+' effort' : '',
+      <span class="meta">${eaten(r)}${[star(r.rating), nice(r.protein), r.effort ? r.effort+' effort' : '',
         (r.appliances||[]).map(nice).join(', ') || 'no appliance',
         (r.tags||[]).map(nice).join(', ')].filter(Boolean).join(' · ')}</span>
     </a>`).join('')}</div>`).join('')
@@ -1078,6 +1114,18 @@ function mondayISO(d){
   const x = new Date(d.getFullYear(), d.getMonth(), d.getDate() - ((d.getDay() + 6) % 7));
   const pad = n => String(n).padStart(2,'0');
   return x.getFullYear() + '-' + pad(x.getMonth()+1) + '-' + pad(x.getDate());
+}
+
+/* Days since a Recipe was last on a Plan, within the two weeks variety is
+   judged over -- otherwise null. Counted in calendar days of the reader's own
+   clock, so a clock change never makes a day of 23 or 25 hours count wrong. A
+   day not reached yet was not eaten, however it was planned. */
+function eatenAgo(iso, now){
+  if (!iso) return null;
+  const [y, m, d] = iso.split('-').map(Number);
+  const days = Math.round((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())
+                           - Date.UTC(y, m - 1, d)) / 864e5);
+  return days >= 0 && days <= 14 ? days : null;
 }
 
 /* What am I cooking tonight, and where is that Recipe. The page's most-asked

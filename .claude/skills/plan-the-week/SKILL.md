@@ -23,8 +23,10 @@ Read `VOCABULARY.md` — *The Plan grid* — and `GOALS.md` before editing a gri
    chosen: it walks all 28 Slots against the pool and its checkout hands back a
    finished `days:` block. Ask the user to paste that block.
 
-   `ls Plans/` says what the last few weeks ran — variety is measured against
-   weeks actually eaten, so say what is still fresh before they start clicking.
+   Variety is measured against weeks actually eaten, and Plan mode shows it:
+   while a Slot is being picked, a Recipe eaten in the last two weeks carries an
+   *eaten N days ago* pill. It is a hint, not a gate — a flagged Recipe is still
+   pickable.
 
    Name the file for the week's Monday — `date -d monday +%F` — and confirm that
    date with the user before writing. Paste the block in verbatim, all 28 Slots:
@@ -45,7 +47,9 @@ Read `VOCABULARY.md` — *The Plan grid* — and `GOALS.md` before editing a gri
 
    **A week that skips Plan mode** starts from a blank 28-Slot grid, every Slot
    written `eaten-out`, and fills it at step 3. That is the slower path and it
-   is the one to offer only if they decline the page.
+   is the one to offer only if they decline the page. It also loses the pills,
+   so read the last two Plans in `Plans/` and say what is still fresh before
+   filling the grid.
 
 3. **Edit it into the real week.** The judgement step: ask what is different
    about this week, then make each difference one of three edits.
