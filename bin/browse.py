@@ -483,6 +483,12 @@ TEMPLATE = r"""<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Meal Planning</title>
+<!-- Static files at the repo root, not generated: the SVG is the tab icon, the
+     PNG is what "Add to Home Screen" uses, since iOS will not take an SVG. -->
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Meals">
+<meta name="theme-color" content="#95462a">
 <!-- Before first paint, or the page flashes cream on the way to dark. The
      stored value IS the override; its absence means follow the system.
      localStorage throws in some privacy modes and on some file:// origins,
