@@ -768,7 +768,7 @@ textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,m
   <div class="wrap d-flex flex-wrap align-items-center w-100">
     <div class="brand"><h1>Meal Planning</h1><span>plan the week, buy it once</span>
       <button id="theme" type="button" class="btn btn-sm rounded-circle"></button></div>
-    <div id="nav" class="navbar-nav d-flex flex-row flex-wrap"></div>
+    <div id="nav" class="navbar-nav flex-row flex-nowrap align-items-center w-100"></div>
   </div>
 </nav>
 <main class="wrap"><div id="app"></div></main>
