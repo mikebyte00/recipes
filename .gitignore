@@ -7,6 +7,9 @@
 __pycache__/
 *.pyc
 
+# Scratch mockups from a brainstorming session's visual companion.
+.superpowers/
+
 # bin/browse.py needs PyYAML, and Homebrew's python refuses to install into
 # itself (PEP 668). The venv is per-machine, so it is built, not committed.
 .venv/

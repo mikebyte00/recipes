@@ -489,6 +489,14 @@ TEMPLATE = r"""<!doctype html>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="Meals">
 <meta name="theme-color" content="#95462a">
+<!-- Pinned to an exact patch release with Subresource Integrity: a compromised
+     CDN response is rejected by the browser rather than executed. Ticket 24's
+     amendment accepts this as the page's one runtime fetch -- everything else
+     it needs is still the inlined JSON payload below. -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous">
 <!-- Before first paint, or the page flashes cream on the way to dark. The
      stored value IS the override; its absence means follow the system.
      localStorage throws in some privacy modes and on some file:// origins,
@@ -499,7 +507,9 @@ TEMPLATE = r"""<!doctype html>
   try { saved = localStorage.getItem('theme'); } catch (e) {}
   var dark = saved ? saved === 'dark'
                    : matchMedia('(prefers-color-scheme: dark)').matches;
-  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  var theme = dark ? 'dark' : 'light';
+  document.documentElement.dataset.theme = theme;
+  document.documentElement.dataset.bsTheme = theme;
 })();
 </script>
 <style>
@@ -515,6 +525,19 @@ TEMPLATE = r"""<!doctype html>
   --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   --radius:12px;
+  /* Bootstrap components read these, not the page's own --paper/--ink/etc,
+     so every --bs-* variable a component actually formulas from (navbar
+     colors, list-group hover/active, offcanvas chrome, form focus rings)
+     is repointed here rather than overriding each component's own variable
+     one by one. */
+  --bs-body-bg: var(--paper); --bs-body-bg-rgb: 250,247,241;
+  --bs-body-color: var(--ink); --bs-body-color-rgb: 51,47,41;
+  --bs-emphasis-color: var(--ink); --bs-emphasis-color-rgb: 51,47,41;
+  --bs-secondary-color: var(--soft); --bs-secondary-color-rgb: 111,103,92;
+  --bs-tertiary-bg: var(--card); --bs-tertiary-bg-rgb: 255,253,249;
+  --bs-border-color: var(--rule);
+  --bs-border-color-translucent: var(--rule);
+  --bs-primary: var(--accent); --bs-primary-rgb: 149,70,42;
 }
 /* Warm near-black, not a cold grey: the light theme is cream paper and burnt
    sienna, and a neutral dark would read as a different site. The accent
@@ -527,6 +550,14 @@ TEMPLATE = r"""<!doctype html>
   --rule:#3a332b; --accent:#e09468; --accent-soft:#3a2a20;
   --under:#d2a049; --over:#dd8585; --in:#8fbf7f;
   --on-accent:#1a1714; --shade:rgba(0,0,0,.5); --scrim:rgba(0,0,0,.55);
+  --bs-body-bg: var(--paper); --bs-body-bg-rgb: 26,23,20;
+  --bs-body-color: var(--ink); --bs-body-color-rgb: 236,229,218;
+  --bs-emphasis-color: var(--ink); --bs-emphasis-color-rgb: 236,229,218;
+  --bs-secondary-color: var(--soft); --bs-secondary-color-rgb: 164,154,139;
+  --bs-tertiary-bg: var(--card); --bs-tertiary-bg-rgb: 34,30,25;
+  --bs-border-color: var(--rule);
+  --bs-border-color-translucent: var(--rule);
+  --bs-primary: var(--accent); --bs-primary-rgb: 224,148,104;
 }
 *{box-sizing:border-box}
 /* Two roles: serif carries the identity -- the wordmark and a Recipe/Plan's
@@ -540,26 +571,23 @@ a{color:inherit;text-decoration:none}
 h1,h2,h3{font-weight:600;margin:0}
 .wrap{max-width:64rem;margin:0 auto;padding:0 clamp(1rem,4vw,2rem)}
 
-header{border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:20;
-  background:var(--paper)}
 .brand{display:flex;align-items:center;gap:.7rem;padding:1.15rem 0 .7rem}
 .brand h1{font-family:var(--serif);font-size:1.3rem;letter-spacing:-.01em}
 .brand span{font-size:.85rem;color:var(--soft)}
 /* Four tabs plus the pill overflow 360px. Scroll rather than wrap -- a wrapped
    nav pushes the list down the fold on the smallest phone. */
-nav{display:flex;align-items:center;gap:1.5rem;padding-bottom:.2rem;
-  overflow-x:auto;scrollbar-width:none}
-nav::-webkit-scrollbar{display:none}
-nav a{padding:.65rem 0 .75rem;font-size:1rem;color:var(--soft);
+#nav{gap:1.5rem;padding-bottom:.2rem;overflow-x:auto;scrollbar-width:none}
+#nav::-webkit-scrollbar{display:none}
+#nav a{padding:.65rem 0 .75rem;font-size:1rem;color:var(--soft);
   white-space:nowrap;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
-nav a.on{color:var(--ink);border-bottom-color:var(--accent)}
+#nav a.on{color:var(--ink);border-bottom-color:var(--accent)}
 /* Plan is a toggle, not a section -- a pill on the right, so it does not read
    as a fourth heading in a row of three. */
-nav a#plantoggle{margin-left:auto;padding:.45rem 1.1rem;border:1px solid var(--rule);
+#nav a#plantoggle{margin-left:auto;padding:.45rem 1.1rem;border:1px solid var(--rule);
   border-radius:999px;background:var(--card);font-size:.9rem;
   margin-bottom:.3rem;cursor:pointer}
-nav a#plantoggle:hover{border-color:var(--accent);color:var(--accent)}
-nav a#plantoggle.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+#nav a#plantoggle:hover{border-color:var(--accent);color:var(--accent)}
+#nav a#plantoggle.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 
 main{padding:clamp(1.4rem,2vw,2.2rem) 0 5rem}
 .lede{color:var(--soft);font-size:.95rem;line-height:1.6;margin:.1rem 0 1.5rem}
@@ -587,20 +615,15 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
   outline:2px solid var(--accent);outline-offset:1px}
 
 /* Theme is a page-level setting, so it sits in the brand row rather than
-   competing with four section tabs for 360px of nav. */
+   competing with four section tabs for 360px of nav. .btn already gives it a
+   border and hover state -- this rule only fixes the circle's size and
+   centers the icon inside it. */
 #theme{margin-left:auto;align-self:center;display:flex;align-items:center;
-  justify-content:center;width:2.5rem;height:2.5rem;padding:0;
-  border-radius:999px;color:var(--soft)}
+  justify-content:center;width:2.5rem;height:2.5rem;padding:0;color:var(--soft)}
 .badge{display:inline-block;min-width:1.15rem;margin-left:.35rem;padding:0 .3rem;
   background:var(--accent);color:var(--on-accent);border-radius:999px;font-size:.72rem;
   text-align:center}
 
-.sheet{position:fixed;inset:auto 0 0 0;z-index:30;background:var(--card);
-  border-top:1px solid var(--rule);max-height:78vh;overflow:auto;padding:1.3rem;
-  box-shadow:0 -8px 30px var(--shade)}
-.sheet[hidden]{display:none}
-.scrim{position:fixed;inset:0;z-index:29;background:var(--scrim)}
-.scrim[hidden]{display:none}
 .facet{margin-bottom:1.3rem}
 .facet[data-facet="slot"]{display:none}
 .facet h3{font-size:.85rem;font-weight:600;color:var(--soft);margin-bottom:.6rem}
@@ -618,18 +641,18 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
   border-bottom:1px solid var(--rule);padding-bottom:.5rem}
 .group h2{font-size:1.05rem;font-weight:600;color:var(--accent)}
 .group em{font-style:normal;font-size:.85rem;color:var(--soft)}
-ul.list{list-style:none;margin:0;padding:0}
-ul.list li{border-bottom:1px solid var(--rule)}
-/* A list row is title / macro / meta. On a phone the title takes the whole
-   width and the macro drops onto the meta line -- squeezing it into a right
-   column wrapped nearly every title onto two lines. Wide enough, and the macro
-   returns to its right-aligned column where a sorted list can be scanned. */
-ul.list a{display:flex;flex-wrap:wrap;align-items:baseline;gap:.2rem .6rem;
-  padding:.9rem .3rem;border-radius:9px;transition:background .15s}
-ul.list a:hover{background:var(--card)}
-ul.list a .t{flex:1 0 100%;font-size:1.05rem;font-weight:500}
-ul.list a .macro{order:2}
-ul.list a .meta{order:3;flex:1;margin-top:0}
+/* list-group-flush already gives every row its bottom border and strips the
+   outer box; this only adds back the row's internal flex layout, since a
+   title/macro/meta row isn't something Bootstrap's list-group has an
+   opinion about. On a phone the title takes the whole width and the macro
+   drops onto the meta line -- squeezing it into a right column wrapped
+   nearly every title onto two lines. Wide enough, and the macro returns to
+   its right-aligned column where a sorted list can be scanned. */
+.list-group-item{display:flex;flex-wrap:wrap;align-items:baseline;gap:.2rem .6rem;
+  padding:.9rem .3rem;background:transparent}
+.list-group-item .t{flex:1 0 100%;font-size:1.05rem;font-weight:500;color:var(--ink)}
+.list-group-item .macro{order:2}
+.list-group-item .meta{order:3;flex:1;margin-top:0}
 /* The macro is the payload -- the number a household actually scans for --
    so it reads in ink at full weight, not muted into the meta line beneath it. */
 .macro{white-space:nowrap;font-size:.92rem;font-weight:600;color:var(--ink);
@@ -695,18 +718,19 @@ ol.method li{margin-bottom:.85rem;line-height:1.6}
 .day dd a,.tagline a{color:var(--accent)}
 .day dd a{border-bottom:1px solid var(--accent-soft)}
 /* Plan mode. The drawer is its own thing, not a reused .sheet -- .sheet turns
-   into a sticky sidebar on wide screens and this must stay at the bottom. */
-.drawer{position:fixed;inset:auto 0 0 0;z-index:40;background:var(--card);
-  border-top:1px solid var(--rule);box-shadow:0 -2px 14px var(--shade);
-  padding:.85rem 0}
+   into a sticky sidebar on wide screens and this must stay at the bottom.
+   .fixed-bottom/.border-top/.shadow (on the element itself, in the HTML)
+   now do the positioning and chrome this rule used to; --bs-tertiary-bg and
+   --bs-border-color, from Task 2, keep the colors the same as before. */
+.drawer{background:var(--bs-tertiary-bg);padding:.85rem 0}
 .drawer .wrap{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
 .drawer .where{font-size:1rem}
 .drawer .where b{text-transform:capitalize}
 .drawer .rest{margin-left:auto;display:flex;gap:.6rem}
 body.plan-on{padding-bottom:6.5rem}
-body.plan-on .list a{cursor:pointer}
-body.plan-on .list a:hover{background:var(--accent-soft)}
-body.plan-on .list a:hover .t{color:var(--accent)}
+body.plan-on .list-group-item{cursor:pointer}
+body.plan-on .list-group-item:hover{background:var(--accent-soft)}
+body.plan-on .list-group-item:hover .t{color:var(--accent)}
 button[disabled]{opacity:.45;cursor:not-allowed}
 button[disabled]:hover{border-color:var(--rule)}
 textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -716,34 +740,39 @@ textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,m
 .subnav a{color:var(--soft);border-bottom:1px solid transparent;padding-bottom:.2rem}
 .subnav a.on{color:var(--accent);border-bottom-color:var(--accent)}
 
-@media(min-width:56rem){
+@media(max-width:991.98px){
+  #sheet{--bs-offcanvas-height:78vh}
+}
+@media(min-width:992px){
   body{font-size:17.5px}
   .layout{display:grid;grid-template-columns:15rem 1fr;gap:2.5rem;align-items:start}
-  .sheet{position:sticky;top:6.4rem;inset:auto;max-height:none;overflow:visible;
-    box-shadow:none;border:1px solid var(--rule);border-radius:var(--radius);padding:1.1rem}
-  .sheet[hidden]{display:block}
-  .scrim{display:none!important}
-  .sheet-foot .close{display:none}
+  /* .offcanvas-lg already goes static and undecorated at this width -- this
+     adds back the one thing it doesn't do on its own: staying in view while
+     the list scrolls past it. */
+  #sheet{position:sticky;top:6.4rem;border:1px solid var(--rule);
+    border-radius:var(--radius);padding:1.1rem}
+  #sheet .offcanvas-body{display:block}
   #filterbtn{display:none}
   .quickbar{display:none}
   .facet[data-facet="slot"]{display:block}
   .day dl{grid-template-columns:6.5rem 1fr}
-  ul.list a .t{flex:1 1 auto}
-  ul.list a .macro{margin-left:auto}
-  ul.list a .meta{flex:1 0 100%}
+  .list-group-item .t{flex:1 1 auto}
+  .list-group-item .macro{margin-left:auto}
+  .list-group-item .meta{flex:1 0 100%}
 }
 </style>
 
 </head>
 <body>
-<header><div class="wrap">
-  <div class="brand"><h1>Meal Planning</h1><span>plan the week, buy it once</span>
-    <button id="theme" type="button"></button></div>
-  <nav id="nav"></nav>
-</div></header>
+<nav class="navbar navbar-expand sticky-top border-bottom bg-body py-0">
+  <div class="wrap d-flex flex-wrap align-items-center w-100">
+    <div class="brand"><h1>Meal Planning</h1><span>plan the week, buy it once</span>
+      <button id="theme" type="button" class="btn btn-sm rounded-circle"></button></div>
+    <div id="nav" class="navbar-nav d-flex flex-row flex-wrap"></div>
+  </div>
+</nav>
 <main class="wrap"><div id="app"></div></main>
-<div class="scrim" id="scrim" hidden></div>
-<div class="drawer" id="drawer" hidden></div>
+<div class="drawer fixed-bottom border-top shadow" id="drawer" hidden></div>
 
 <script id="data" type="application/json">__PAYLOAD__</script>
 <script>
@@ -879,15 +908,20 @@ function facetPanel(){
       const on = (route.f[k]||[]).includes(v);
       return `<button class="chip ${on?'on':''}" data-facet="${k}" data-value="${v}">${nice(v)}</button>`;
     }).join('') + `</div></div>`).join('');
-  return `<div class="sheet" id="sheet" hidden>
+  return `<div class="offcanvas-bottom offcanvas-lg" data-bs-scroll="true" tabindex="-1" id="sheet">
+    <div class="offcanvas-header">
+      <h2 class="h6 mb-0">Filters</h2>
+      <button class="btn-close" id="done" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
     ${rows}
     <div class="facet"><h3>Protein floor</h3><div class="slider">
-      <input type="range" id="min" min="0" max="60" step="5" value="${route.min}">
+      <input type="range" class="form-range" id="min" min="0" max="60" step="5" value="${route.min}">
       <span class="macro" id="minlabel">${route.min ? g(route.min)+'+' : 'any'}</span>
     </div></div>
     <div class="sheet-foot">
-      <button id="clear">Clear all</button>
-      <button class="close" id="done">Done</button>
+      <button class="btn btn-outline-secondary" id="clear">Clear all</button>
+    </div>
     </div></div>`;
 }
 
@@ -907,26 +941,29 @@ function recipeList(){
                         .filter(([,rs]) => rs.length);
   const body = groups.length ? groups.map(([slot, rs]) => `
     <div class="group"><h2>${slot}</h2><em>${rs.length}</em></div>
-    <ul class="list">${rs.map(r => `<li><a href="#recipe/${r.slug}${qs()}">
+    <div class="list-group list-group-flush">${rs.map(r => `<a class="list-group-item list-group-item-action"
+      href="#recipe/${r.slug}${qs()}">
       <span class="t">${esc(r.title)}</span>
       <span class="macro">${scoreDot('protein',r)}${g(r.protein_g)} · ${kc(r.kcal)} kcal</span>
       <span class="meta">${[star(r.rating), nice(r.protein), r.effort ? r.effort+' effort' : '',
         (r.appliances||[]).map(nice).join(', ') || 'no appliance',
         (r.tags||[]).map(nice).join(', ')].filter(Boolean).join(' · ')}</span>
-    </a></li>`).join('')}</ul>`).join('')
+    </a>`).join('')}</div>`).join('')
     : `<p class="empty">No Recipe matches those filters.</p>`;
 
   const n = activeCount();
   return `<p class="lede">${D.recipes.length} Recipes. Showing ${hits.length}.</p>
     <div class="tools">
-      <input type="search" id="q" placeholder="Search recipes"
+      <input type="search" id="q" class="form-control" placeholder="Search recipes"
              title="Searches titles, ingredients, Pinned products and method"
              value="${esc(route.q)}">
-      <select id="sort" aria-label="Sort within each Slot">${
+      <select id="sort" class="form-select" aria-label="Sort within each Slot" style="flex:0 1 auto">${
         Object.entries(SORTS).map(([k,v]) =>
           `<option value="${k}"${k === route.sort ? ' selected' : ''}>${v.label}</option>`
         ).join('')}</select>
-      <button id="filterbtn">Filters${n ? `<span class="badge">${n}</span>` : ''}</button>
+      <button id="filterbtn" class="btn btn-outline-secondary" type="button"
+              data-bs-toggle="offcanvas" data-bs-target="#sheet" aria-controls="sheet">
+        Filters${n ? `<span class="badge">${n}</span>` : ''}</button>
     </div>
     ${quickbar()}
     <div class="layout">${facetPanel()}<div>${body}</div></div>`;
@@ -991,13 +1028,14 @@ function planList(){
   return `<p class="lede">${D.plans.length} planned week${D.plans.length>1?'s':''},
     latest first. A Plan is one real week — Recipes swapped, days away, Slots
     eaten out.</p>
-    <ul class="list">${D.plans.map(p=>`<li><a href="#plan/${p.slug}">
+    <div class="list-group list-group-flush">${D.plans.map(p=>`<a class="list-group-item list-group-item-action"
+      href="#plan/${p.slug}">
       <span class="t">${esc(p.title)}</span>
       <span class="macro">${p.cooked} / ${SLOT_COUNT} cooked</span>
       <span class="meta">${SLOT_COUNT - p.cooked
         ? (SLOT_COUNT - p.cooked) + ' Slot(s) eaten out'
         : 'every Slot cooked at home'}</span>
-    </a></li>`).join('')}</ul>`;
+    </a>`).join('')}</div>`;
 }
 
 /* One day of a Plan. Today is the same block lifted out and marked `.now`,
@@ -1144,10 +1182,10 @@ function renderDrawer(){
     <span class="where">${here}</span>
     <span class="macro">${done} / ${PLAN_SEQ.length}</span>
     <span class="rest">
-      <button id="planback"${cursor ? '' : ' disabled'}>← Back</button>
-      ${at ? `<button id="planskip">Skip</button>` : ''}
-      <button id="planout"${done < PLAN_SEQ.length ? ' disabled' : ''}>Checkout</button>
-      <button id="planexit">Exit</button>
+      <button id="planback" class="btn btn-outline-secondary btn-sm"${cursor ? '' : ' disabled'}>← Back</button>
+      ${at ? `<button id="planskip" class="btn btn-outline-secondary btn-sm">Skip</button>` : ''}
+      <button id="planout" class="btn btn-outline-primary btn-sm"${done < PLAN_SEQ.length ? ' disabled' : ''}>Checkout</button>
+      <button id="planexit" class="btn btn-outline-secondary btn-sm">Exit</button>
     </span></div>`;
 
   document.getElementById('planback').onclick = () => { cursor--; render(); };
@@ -1257,13 +1295,17 @@ function render(){
 
 function wireFilters(){
   const sheet = document.getElementById('sheet');
-  const scrim = document.getElementById('scrim');
-  const wide = () => matchMedia('(min-width:56rem)').matches;
-  const open = on => { sheet.hidden = !on; scrim.hidden = !on || wide(); };
+  const wide = () => matchMedia('(min-width:992px)').matches;
+  /* getOrCreateInstance, not `new` -- recipeList() rebuilds #sheet's markup
+     from scratch on every render(), so any instance tied to the previous
+     node is already gone with it. Bootstrap tracks the instance on the DOM
+     node itself, so asking for "the instance for this node, creating one if
+     there isn't one yet" is always correct, whether this is the first
+     render or the fiftieth. */
+  const offcanvas = () => bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('sheet'));
+  const isShown = () => sheet.classList.contains('show');
 
-  document.getElementById('filterbtn').onclick = () => open(sheet.hidden);
-  document.getElementById('done').onclick = () => open(false);
-  scrim.onclick = () => open(false);
+  document.getElementById('done').onclick = () => offcanvas().hide();
 
   const q = document.getElementById('q');
   let timer;
@@ -1282,18 +1324,16 @@ function wireFilters(){
     cur.has(value) ? cur.delete(value) : cur.add(value);
     route.f[facet] = [...cur];
     if (!route.f[facet].length) delete route.f[facet];
-    writeHash(route, true); const wasOpen = !sheet.hidden;
-    render(); if (wasOpen && !wide()) { document.getElementById('sheet').hidden = false;
-      document.getElementById('scrim').hidden = false; }
+    writeHash(route, true); const wasOpen = isShown();
+    render(); if (wasOpen && !wide()) offcanvas().show();
   });
 
   const min = document.getElementById('min');
   min.oninput = () => { document.getElementById('minlabel').textContent =
     +min.value ? '~' + min.value + 'g+' : 'any'; };
   min.onchange = () => { route.min = +min.value; writeHash(route, true);
-    const wasOpen = !sheet.hidden; render();
-    if (wasOpen && !wide()) { document.getElementById('sheet').hidden = false;
-      document.getElementById('scrim').hidden = false; } };
+    const wasOpen = isShown(); render();
+    if (wasOpen && !wide()) offcanvas().show(); };
 
   document.getElementById('clear').onclick = () => {
     route.f = {}; route.q = ''; route.min = 0; writeHash(route, true); render(); };
@@ -1315,6 +1355,14 @@ const ICON = {
       + 'M18.3 18.3l1.5 1.5M2.6 12h2.1M19.3 12h2.1M4.2 19.8l1.5-1.5M18.3 5.7l1.5-1.5"/></svg>',
 };
 
+/* Both attributes always move together -- data-theme drives the page's own
+   13 variables, data-bs-theme drives Bootstrap's. One setter, so nothing can
+   set one and forget the other. */
+function setTheme(value){
+  document.documentElement.dataset.theme = value;
+  document.documentElement.dataset.bsTheme = value;
+}
+
 function paintTheme(){
   const dark = document.documentElement.dataset.theme === 'dark';
   const btn = document.getElementById('theme');
@@ -1326,7 +1374,7 @@ function paintTheme(){
 
 document.getElementById('theme').onclick = () => {
   const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-  document.documentElement.dataset.theme = next;
+  setTheme(next);
   try { localStorage.setItem('theme', next); } catch (e) {}
   paintTheme();
 };
@@ -1337,7 +1385,7 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
   let saved = null;
   try { saved = localStorage.getItem('theme'); } catch (e) {}
   if (saved) return;
-  document.documentElement.dataset.theme = event.matches ? 'dark' : 'light';
+  setTheme(event.matches ? 'dark' : 'light');
   paintTheme();
 });
 
@@ -1346,6 +1394,9 @@ addEventListener('hashchange', () => { route = readHash(); render(); });
 route = readHash();
 render();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
 </body>
 </html>
 """

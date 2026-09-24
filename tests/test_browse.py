@@ -391,9 +391,19 @@ class GeneratedPage(unittest.TestCase):
         cls.data = browse.load_all(ROOT)
         cls.html = browse.render(cls.data)
 
-    def test_the_page_is_self_contained(self):
-        self.assertNotIn("<script src=", self.html)
-        self.assertNotIn("<link rel=\"stylesheet\"", self.html)
+    def test_the_page_only_fetches_its_pinned_ui_library(self):
+        """Ticket 24's amendment allows exactly one runtime fetch: the pinned
+        Bootstrap build, by exact URL. Anything else external creeping in --
+        an accidental second CDN dependency, a typo'd version -- is what
+        this test exists to catch, same as the old absolute-zero version did
+        before there was a reason to allow one."""
+        bootstrap_css = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        bootstrap_js = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        scripts = re.findall(r'<script src="([^"]+)"', self.html)
+        links = re.findall(r'<link[^>]*rel="stylesheet"[^>]*>', self.html)
+        self.assertEqual(scripts, [bootstrap_js])
+        self.assertEqual(len(links), 1)
+        self.assertIn(bootstrap_css, links[0])
 
     def test_the_page_carries_no_redacted_string(self):
         browse.assert_no_pii(self.html, self.data["raw_orders"])
@@ -445,6 +455,7 @@ BOOT = re.compile(r"\(function\(\)\{\s*var saved = null;.*?\}\)\(\);", re.S)
 
 HARNESS = """
 const results = {};
+const bsResults = {};
 for (const [saved, sysDark] of CASES) {
   globalThis.document = {documentElement: {dataset: {}}};
   globalThis.localStorage = {getItem() {
@@ -454,8 +465,9 @@ for (const [saved, sysDark] of CASES) {
   globalThis.matchMedia = () => ({matches: sysDark});
   BOOT
   results[saved + '|' + sysDark] = document.documentElement.dataset.theme;
+  bsResults[saved + '|' + sysDark] = document.documentElement.dataset.bsTheme;
 }
-console.log(JSON.stringify(results));
+console.log(JSON.stringify({theme: results, bsTheme: bsResults}));
 """
 
 CASES = [
@@ -493,7 +505,9 @@ class ThemeBootScript(unittest.TestCase):
                                  capture_output=True, text=True).stdout
         finally:
             os.unlink(path)
-        cls.themes = json.loads(out)
+        data = json.loads(out)
+        cls.themes = data["theme"]
+        cls.bs_themes = data["bsTheme"]
 
     def test_a_stored_dark_beats_a_light_system(self):
         self.assertEqual(self.themes["dark|false"], "dark")
@@ -517,6 +531,11 @@ class ThemeBootScript(unittest.TestCase):
         """Privacy modes and some file:// origins throw. A theme preference
         must never be able to stop the page rendering."""
         self.assertEqual(self.themes["THROW|true"], "dark")
+
+    def test_bs_theme_mirrors_theme(self):
+        """Bootstrap's own color-mode CSS reads data-bs-theme, not data-theme
+        -- the two must never disagree, in every one of the seven cases."""
+        self.assertEqual(self.bs_themes, self.themes)
 
 
 if __name__ == "__main__":
