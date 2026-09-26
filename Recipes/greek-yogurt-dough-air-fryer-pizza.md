@@ -5,7 +5,7 @@ protein: dairy
 effort: low
 tags: [fakeaway]
 appliances: [air-fryer]
-macros: { protein_g: 19, kcal: 410 }
+macros: { protein_g: 32, kcal: 500 }
 ingredients:
   - { ingredient: self-raising-flour, qty: 150, unit: g, note: plus a little for dusting }
   - { ingredient: greek-yogurt, qty: 150, unit: g, note: 5% fat }
@@ -19,5 +19,5 @@ ingredients:
 1. Mix the self-raising flour, Greek yogurt, oregano, salt, pepper and half the cheddar into a soft dough. Knead briefly on a floured surface, then split it in two.
 2. Press or roll each half into a thin round that fits the air-fryer basket, and lay it on a sheet of baking paper.
 3. Air-fry each base at 200°C for 4–5 minutes until set, then flip it.
-4. Spread the passata over the base, add the toppings of the day, and scatter over the rest of the cheddar. Air-fry for another 4–5 minutes until the cheese is melted and golden.
+4. Spread the passata over the base, add the toppings of the day (the macros allow ~50g of chicken or ham plus veg per pizza), and scatter over the rest of the cheddar. Air-fry for another 4–5 minutes until the cheese is melted and golden.
 5. **To Serve:** Slice and serve straight from the basket, one pizza each.

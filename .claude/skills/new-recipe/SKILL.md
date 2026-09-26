@@ -95,7 +95,7 @@ Bands.
    path = sys.argv[1]; slug = os.path.basename(path)[:-3]
    front = sl.load_frontmatter(path)
    V = {'slot': ['breakfast','lunch','dinner','pudding'],
-        'protein': ['sausage','egg','tofu','quorn','chicken','white-fish','oily-fish','beef'],
+        'protein': ['sausage','egg','tofu','quorn','chicken','white-fish','oily-fish','beef','dairy','protein-powder'],
         'effort': ['low','medium','high'],
         'appliances': ['skillet','air-fryer','ninja-sizzle','rice-cooker','pot','toaster','poacher'],
         'tags': ['fakeaway','bulk-cook','eat-cold']}
