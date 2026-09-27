@@ -1,9 +1,12 @@
 # Waitrose Order History
 
-Pulled from Waitrose "My Orders" on 16 September 2026.
+Pulled from Waitrose "My Orders" on 16 September 2026. The 17 September order was
+added on 27 September 2026 from its order page, pasted by hand; orders after it
+have not been checked.
 
 | Date | Status | Total | Captured |
 |---|---|---|---|
+| Thursday 17 September | Completed | £107.34 | Yes — `17-september.md` |
 | Tuesday 8 September | Completed | £96.32 | Yes — `08-september.md` |
 | Monday 31 August | Completed | £144.55 | Yes — `31-august.md` |
 | Tuesday 25 August | Completed | £131.15 | Yes — `25-august.md` |
