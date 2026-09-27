@@ -3,9 +3,8 @@
 
 Run: .venv/bin/python tests/test_browse.py
 
-These exist for one reason above all others: `Orders/*.md` hold real personal
-data and `index.html` is committed and published. A redaction that silently
-stops redacting is the failure this file is here to catch.
+The pure functions are tested on fixtures; the AgainstTheRealRepo and
+GeneratedPage classes read what is actually here.
 """
 
 import importlib.util
@@ -29,102 +28,6 @@ def _load(name, filename):
 
 
 browse = _load("browse", "browse.py")
-
-
-ORDER = """# Waitrose Order — 11 August 2026
-
-Order number 1000000001. Collected Tuesday 11 August, 10:00am-11:00am, from Riverside, AB1 2CD.
-
-### Bakery
-
-| Line | Item | Size | Qty | Cost |
-|---|---|---|---|---|
-| 841175 | Light Rye Boule | each | 1 | £2.50 |
-
-### Household
-
-| Line | Item | Size | Qty | Cost |
-|---|---|---|---|---|
-| 733624 | Ecover Non Bio Washing Liquid 40w | 1.43litre | 1 | £10.50 |
-
-### Toiletries, Health & Beauty
-
-| Line | Item | Size | Qty | Cost |
-|---|---|---|---|---|
-| 990001 | Example Deodorant Refill | 40g | 1 | £6.00 |
-
-### Cost breakdown
-
-- Item total: £123.29
-- Savings: −£0.70
-- **Total: £122.59**
-"""
-
-
-class ParseOrder(unittest.TestCase):
-    def setUp(self):
-        self.order = browse.parse_order(ORDER, "11-august.md")
-
-    def test_reads_the_order_date_from_the_heading(self):
-        self.assertEqual(self.order["date"], "11 August 2026")
-
-    def test_reads_an_item_row_into_its_fields(self):
-        bakery = [c for c in self.order["categories"] if c["name"] == "Bakery"][0]
-        self.assertEqual(
-            bakery["items"],
-            [{"line": "841175", "item": "Light Rye Boule", "size": "each",
-              "qty": 1, "cost": "£2.50"}],
-        )
-
-    def test_reads_the_order_total(self):
-        self.assertEqual(self.order["total"], "£122.59")
-
-
-class Redaction(unittest.TestCase):
-    def setUp(self):
-        self.order = browse.parse_order(ORDER, "11-august.md")
-        self.text = browse.json_dump(self.order)
-
-    def test_omits_the_order_number(self):
-        self.assertNotIn("1000000001", self.text)
-
-    def test_omits_the_collection_branch_and_postcode(self):
-        self.assertNotIn("Riverside", self.text)
-        self.assertNotIn("AB1 2CD", self.text)
-
-    def test_omits_the_collection_time_window(self):
-        self.assertNotIn("10:00am", self.text)
-
-    def test_omits_the_toiletries_category_entirely(self):
-        names = [c["name"] for c in self.order["categories"]]
-        self.assertNotIn("Toiletries, Health & Beauty", names)
-        self.assertNotIn("Deodorant", self.text)
-        self.assertNotIn("990001", self.text)
-
-    def test_keeps_the_household_category(self):
-        names = [c["name"] for c in self.order["categories"]]
-        self.assertIn("Household", names)
-        self.assertIn("Ecover Non Bio Washing Liquid 40w", self.text)
-
-
-class PiiGuard(unittest.TestCase):
-    """browse.py must refuse to emit a page that carries a redacted string."""
-
-    def test_accepts_a_page_with_no_redacted_string(self):
-        browse.assert_no_pii("<p>Light Rye Boule</p>", [ORDER])
-
-    def test_rejects_a_page_carrying_an_order_number(self):
-        with self.assertRaises(browse.Failure) as caught:
-            browse.assert_no_pii("<p>order 1000000001</p>", [ORDER])
-        self.assertIn("1000000001", str(caught.exception))
-
-    def test_rejects_a_page_carrying_the_postcode(self):
-        with self.assertRaises(browse.Failure):
-            browse.assert_no_pii("<p>AB1 2CD</p>", [ORDER])
-
-    def test_rejects_a_page_carrying_a_toiletries_item(self):
-        with self.assertRaises(browse.Failure):
-            browse.assert_no_pii("<p>Example Deodorant Refill</p>", [ORDER])
 
 
 GOALS = """## Macro Bands
@@ -252,46 +155,11 @@ class DayTotals(unittest.TestCase):
         )
 
 
-class OrderAggregate(unittest.TestCase):
-    def setUp(self):
-        self.orders = [
-            {"date": "11 August 2026", "categories": [
-                {"name": "Bakery", "items": [
-                    {"line": "841175", "item": "Light Rye Boule", "size": "each",
-                     "qty": 1, "cost": "£2.50"}]}]},
-            {"date": "25 August 2026", "categories": [
-                {"name": "Bakery", "items": [
-                    {"line": "841175", "item": "Light Rye Boule", "size": "each",
-                     "qty": 2, "cost": "£5.00"}]},
-                {"name": "Fresh & Chilled", "items": [
-                    {"line": "603600", "item": "Fage Total 2% Fat Natural Greek Yogurt Large",
-                     "size": "950g", "qty": 3, "cost": "£18.00"}]}]},
-        ]
-        self.rows = {r["line"]: r for r in browse.order_aggregate(self.orders, PINS)}
-
-    def test_counts_how_many_orders_an_item_appears_in(self):
-        self.assertEqual(self.rows["841175"]["orders"], 2)
-
-    def test_sums_the_quantity_bought_across_orders(self):
-        self.assertEqual(self.rows["841175"]["qty"], 3)
-
-    def test_records_the_dates_it_was_bought(self):
-        self.assertEqual(self.rows["841175"]["dates"],
-                         ["11 August 2026", "25 August 2026"])
-
-    def test_joins_a_bought_line_to_the_pin_that_cites_it(self):
-        self.assertEqual(self.rows["603600"]["pinned_as"], "greek-yogurt")
-
-    def test_leaves_an_unpinned_line_as_the_pinning_worklist(self):
-        self.assertIsNone(self.rows["841175"]["pinned_as"])
-
-
-
 def plan_payload(plans):
     """build_payload over fixture Plans, with everything else stubbed empty."""
     return browse.build_payload({
         "recipes": RECIPES, "plans": plans, "pins": {},
-        "bands": {}, "goals": browse.DEFAULT_GOALS, "orders": [], "history": [],
+        "bands": {}, "goals": browse.DEFAULT_GOALS,
     })["plans"]
 
 
@@ -370,7 +238,6 @@ class LastEaten(unittest.TestCase):
             "recipes": RECIPES,
             "plans": [self.plan("2026-09-14", {"monday": {"dinner": "steak"}})],
             "pins": {}, "bands": {}, "goals": browse.DEFAULT_GOALS,
-            "orders": [], "history": [],
         })["recipes"]}
         self.assertEqual(rows["steak"]["last_eaten"], "2026-09-14")
         self.assertIsNone(rows["bream"]["last_eaten"])
@@ -423,15 +290,6 @@ class AgainstTheRealRepo(unittest.TestCase):
                              if s != browse.EATEN_OUT and s not in self.data["recipes"]})
         self.assertEqual(unresolved, [])
 
-    def test_reads_every_captured_order(self):
-        self.assertEqual(len(self.data["orders"]), 4)
-
-    def test_no_captured_order_carries_a_redacted_category(self):
-        for order in self.data["orders"]:
-            for category in order["categories"]:
-                self.assertNotIn(category["name"], browse.REDACTED_CATEGORIES)
-
-
 class GeneratedPage(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -452,8 +310,10 @@ class GeneratedPage(unittest.TestCase):
         self.assertEqual(len(links), 1)
         self.assertIn(bootstrap_css, links[0])
 
-    def test_the_page_carries_no_redacted_string(self):
-        browse.assert_no_pii(self.html, self.data["raw_orders"])
+    def test_the_page_carries_no_orders_view(self):
+        # Orders are harvested into Pins and discarded; the page never shows one.
+        self.assertNotIn("ordersView", self.html)
+        self.assertNotIn("['orders','Orders']", self.html)
 
     def test_the_page_inlines_every_recipe_title(self):
         for recipe in self.data["recipes"].values():
@@ -462,11 +322,6 @@ class GeneratedPage(unittest.TestCase):
     def test_the_page_inlines_every_planned_week(self):
         for plan in self.data["plans"]:
             self.assertIn(plan["slug"], self.html)
-
-    def test_the_page_inlines_every_order_date(self):
-        for order in self.data["orders"]:
-            self.assertIn(order["date"], self.html)
-
 
 class Search(unittest.TestCase):
     """Both vocabularies are searchable, which is the whole point of PINS.md:

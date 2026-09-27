@@ -30,31 +30,28 @@ Named, because the list is the rule:
 
 - **`bin/shopping-list.py`** aggregates a Plan into its shopping section. Ruled
   in [What The Four Skills Are](.scratch/meal-planning-system/issues/08-what-the-four-skills-are.md).
-- **`bin/browse.py`** generates `index.html`, the browse interface over Recipes,
-  Plans and Orders. Ruled in
+- **`bin/browse.py`** generates `index.html`, the browse interface over Recipes
+  and Plans. Ruled in
   [Browse The Pool](.scratch/meal-planning-system/issues/24-browse-the-pool.md).
 
 A **third** `bin/` entry is a decision, not a convenience — raise it as a
 ticket. Everything else is prose, because everything else is judgement.
 
 `index.html` is generated and committed, and regenerating it is manual:
-re-run `bin/browse.py` whenever a Recipe, Plan, Pin or Order changes.
+re-run `bin/browse.py` whenever a Recipe, Plan or Pin changes.
 `bin/browse.py --check` says whether the committed page has gone stale.
 
 **Parity between the Recipes, `index.html` and GitHub Pages is vital.** The
 page is served from the branch root at `mikebyte00.github.io/recipes`, so the
 committed `index.html` *is* what the household reads on a phone in the kitchen.
-A markdown change that stops there is invisible. Every edit to a Recipe, Plan,
-Pin or Order therefore finishes the same way, and the change is not done
+A markdown change that stops there is invisible. Every edit to a Recipe, Plan
+or Pin therefore finishes the same way, and the change is not done
 until it has:
 
 1. `.venv/bin/python bin/browse.py` — regenerate the page.
-2. `.venv/bin/python tests/test_browse.py` — 94 tests, including the redaction
-   ones. Thirty-five shell out to `node` — to run the page's theme boot script,
+2. `.venv/bin/python tests/test_browse.py` — 74 tests. Thirty-five shell out to `node` — to run the page's theme boot script,
    its eaten-days count, its picked-days badge, Checkout's week and meal swap,
-   and the filter reset Plan mode makes on every move — and skip cleanly when it is absent. `test_reads_every_captured_order` fails on a
-   checkout with no harvested `Orders/*.md`, which are gitignored — that is the
-   environment, not the code.
+   and the filter reset Plan mode makes on every move — and skip cleanly when it is absent.
 3. `git commit` the source change **and** `index.html` in the same commit.
 4. `git push` — Pages serves the pushed commit, so an unpushed commit is a
    stale page.
@@ -72,10 +69,10 @@ Committing a Recipe without its regenerated page is the failure mode this
 guards against: `--check` then reports stale on someone else's unrelated run,
 and the live page quietly disagrees with the repo.
 
-**The page publishes a redacted view of `Orders/`**, which hold real personal
-data. Read [Browse The Pool](.scratch/meal-planning-system/issues/24-browse-the-pool.md)
-before touching that redaction, and run `.venv/bin/python tests/test_browse.py`
-afterwards — those tests exist to catch a redaction that stops redacting.
+**Orders are not kept.** A harvest reads an order, writes the Pins it
+justifies, logs the date in `Orders/history.md`, and discards the order — it
+carries personal data and this repo is public. Never write an order into the
+repo. Ruled in [Browse The Pool](.scratch/meal-planning-system/issues/24-browse-the-pool.md).
 
 
 ## The bar for a Recipe
@@ -129,7 +126,8 @@ Search stays off the table on relevance grounds regardless: it resolved
 1 ingredient in 7. Multi-search deep links are a normal navigation the user
 clicks, which is why they are fine.
 
-**Harvesting orders is the one exception**, and it is read-only: capturing a
-completed order's items and line numbers from the user's own signed-in session
-follows [Orders/HARVEST.md](Orders/HARVEST.md). Read it before driving a
+**Harvesting orders is the one exception**, and it is read-only: reading a
+completed order's items and line numbers — from a saved order page or the
+user's own signed-in session — into Pins follows
+[Orders/HARVEST.md](Orders/HARVEST.md). Read it before driving a
 browser against Waitrose for any reason.

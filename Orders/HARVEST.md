@@ -2,9 +2,16 @@
 
 **ALWAYS** prefer to use Claude Chrome extention to control a real browser. Avoid using in-built browser
 
-How to capture a completed Waitrose order into this repo, with **line numbers**.
-Reusable: run it whenever new orders have landed. It skips what is already
-captured, so re-running is cheap and safe.
+How to turn a completed Waitrose order into **Pins**, with line numbers, and log
+that it was done. Reusable: run it whenever new orders have landed.
+
+**The order itself is not kept.** A harvest reads it, writes the Pins it
+justifies, adds a row to `Orders/history.md`, and discards it. Waitrose's own
+*My Orders* page is the record of what was bought; this repo keeps only the
+decisions an order led to. Ruled on 27 September 2026 in
+[Browse The Pool](../.scratch/meal-planning-system/issues/24-browse-the-pool.md):
+stored orders held personal data in a public repo, and the page view built from
+them went unused.
 
 Written for a browser-driving agent (Claude Cowork) working in the user's own
 signed-in session. A human can follow it too; the console snippets are the only
@@ -33,7 +40,8 @@ line number is a **Pin** that never has to be guessed again.
 ## Boundaries
 
 This harvest **reads**. It navigates to order pages in a session the user has
-already signed in to, reads what is on screen, and writes files in this repo.
+already signed in to, reads what is on screen, and writes `PINS.md` and
+`Orders/history.md` — nothing else, and never the order itself.
 
 Three hard guardrails, because the surrounding surfaces are live commerce:
 
@@ -65,97 +73,75 @@ have no items. Ignore anything earlier; it predates the two-week corpus.
 
 ### 1. Find what is missing
 
-Read `Orders/history.md` for what is already captured, then open **My Orders**
-and read the order list. An order needs harvesting when it is completed, dated
-1 August 2026 or later, and has no file in `Orders/`.
+Read `Orders/history.md`: an order with no harvest date still needs one. Then
+check **My Orders** for anything newer than its last row. An order needs
+harvesting when it is completed, dated 1 August 2026 or later, and has no
+harvest date.
 
-Name files `<DD>-<month>.md`, lowercase — `11-august.md`.
+### 2. Read the order
 
-### 2. Capture each missing order
+Any of these carries what a harvest needs — every product's name, pack size and
+**line number**:
 
-Open the order's detail page and **scroll to the bottom before extracting** —
-the item list lazy-loads, and un-scrolled products are silently absent.
+- **A saved copy of the order page** (Chrome's *Save page as*, an `.mhtml`
+  file). The product links hold the line numbers; parse the HTML part and read
+  every `a[href*="/ecom/products/"]`.
+- **The live order page**, in the user's signed-in browser. **Scroll to the
+  bottom first** — the item list lazy-loads, and un-scrolled products are
+  silently absent — then run:
 
-Read the item rows for name, pack size, quantity and price. Then run this to
-get the line numbers:
+  ```js
+  copy([...new Set(
+    [...document.querySelectorAll('a[href*="/ecom/products/"]')]
+      .map(a => {
+        const m = a.href.match(/\/ecom\/products\/[^/]+\/(\d+)/);
+        if (!m) return null;
+        const name = (a.innerText || a.getAttribute('aria-label') || '')
+          .trim().split('\n')[0];
+        return m[1] + '\t' + name;
+      })
+      .filter(Boolean)
+  )].join('\n'));
+  ```
 
-```js
-copy([...new Set(
-  [...document.querySelectorAll('a[href*="/ecom/products/"]')]
-    .map(a => {
-      const m = a.href.match(/\/ecom\/products\/[^/]+\/(\d+)/);
-      if (!m) return null;
-      const name = (a.innerText || a.getAttribute('aria-label') || '')
-        .trim().split('\n')[0];
-      return m[1] + '\t' + name;
-    })
-    .filter(Boolean)
-)].join('\n'));
-```
+**Pasted page text is not enough on its own**: it has names and sizes but no
+line numbers. A line number that cannot be read from the order is left out of
+the Pin, never guessed — a plausible-looking wrong number is the one failure
+this design is built to avoid.
 
-Join the two on product name. The snippet encodes an assumption about markup
-that Waitrose may change — if it returns nothing, or the wrong text, adapt the
-selector. **The completion criterion below is what matters, not this snippet.**
+Keep the order in the session's scratch space only. **Never write it into the
+repo**: order numbers, the collection branch and postcode, collection windows
+and a personal-care category all ride along with the items.
 
-### 3. Write the order file
+### 3. Mint Pins
 
-One file per order, following `Orders/11-august.md`. Keep Waitrose's own
-section headings (Food Cupboard, Fresh & Chilled, Frozen, Bakery, Household,
-Toiletries) — they are the closest thing to a free product taxonomy.
+Steps 6–9 below. The order is the evidence; read it with product names exactly
+as Waitrose writes them, because a tidied name destroys the naming evidence the
+harvest exists to collect.
 
-```markdown
-# Waitrose Order — 11 August 2026
+### 4. Log it and discard the order
 
-Order number 1000000001. Collected Tuesday 11 August, 10:00am–11:00am, from Riverside, AB1 2CD.
-
-### Food Cupboard
-
-| Line | Item | Size | Qty | Cost |
-|---|---|---|---|---|
-| 584333 | Epicure Organic Cannellini Beans | 400g | 1 | £1.20 |
-| — | Some Product With No Resolvable Link | 250g | 1 | £2.00 |
-
-### Cost breakdown
-
-- Item total: £123.29
-- Savings: −£0.70
-- **Total: £122.59**
-```
-
-Two rules that make the file usable later:
-
-- **Record product names exactly as Waitrose writes them.** A tidied name breaks
-  the join and destroys the naming evidence the harvest exists to collect.
-- **Write `—` in the Line column when no number resolves.** An unresolved
-  product is *Unpinned*: flagged for a human, never guessed. A plausible-looking
-  wrong number is the one failure this whole design is built to avoid.
-
-### 4. Update the index
-
-`Orders/history.md` holds the order list — date, status, total, and whether it
-has been captured. Add a row per order seen, including cancelled ones, so a
-later run knows they were considered and skipped rather than missed.
+Add or update the order's row in `Orders/history.md` with today's date in the
+*Harvested* column — cancelled orders too, with the reason in place of a date,
+so a later run knows they were considered. Then delete the scratch copy.
 
 ### 5. Verify before reporting done
 
-Spot-check **five** line numbers per order by opening
-`/ecom/products/x/<number>` and confirming the product name and pack size match
-what was recorded. This is an allowed path and the only check that catches a
-mis-joined row.
+When the live site is reachable, spot-check **five** of the line numbers you
+wrote by opening `/ecom/products/x/<number>` and confirming the product name and
+pack size. A line number read from a saved page's own link needs no second
+check — the link *is* the product.
 
 ## Completion criterion
 
-Every completed order dated 1 August 2026 or later has a file in `Orders/`;
-every item in every new file carries either a line number or `—`; every new
-order appears in `Orders/history.md`; and five numbers per new order have been
-verified against their product page.
-
-Report the count of items harvested and the count left `—`.
+Every completed order dated 1 August 2026 or later has a harvest date in
+`Orders/history.md`, every Pin the order justified is written or explicitly
+declined, and no order file exists in the repo.
 
 ## Minting Pins from a harvest
 
 A harvest **proposes**; a human **confirms**. Nothing is minted silently. This
-half runs after the order files are written, and it writes `PINS.md`.
+half runs on the order read in step 2, and it writes `PINS.md`.
 
 ### 6. Walk the slugs, not the products
 
@@ -183,9 +169,10 @@ conflict and each judgement call on its own, with a recommendation.
 
 Two rules settle most conflicts:
 
-- **Recency wins.** Orders are dated, so two products for one slug is usually a
-  switch you already made with your own money. The newest order is the decision;
-  the loser becomes an `alternate`.
+- **Recency wins.** A product in this order that differs from an existing Pin
+  is usually a switch you already made with your own money. The order in hand is
+  the newest evidence, so it is the proposal; the existing product becomes an
+  `alternate`. Two products for one slug in the same order are a conflict.
 - **Explicit recipe text overrides recency.** A Recipe reading *"pre-cooked
   green or Puy"* at 250g names Merchant Gourmet's exact product, and that beats a
   more recent tin of something else.
@@ -198,7 +185,7 @@ Pin; never overwrite one.** A Pin already `confirmed: true` is a decision, and a
 fresh harvest is evidence, not authority.
 
 A Pin needs no product. The counter proteins have no line number and never will;
-a **Staple** may have none yet because you last bought it before the captured
+a **Staple** may have none yet because you last bought it before the harvested
 window. Both are still Pins, because "store-cupboard, do not shop for it" is a
 decision worth storing. **Unpinned** stays the absence of a row.
 
@@ -229,7 +216,7 @@ absences recorded, products that matched nothing.
 
 ## Known repo state
 
-`Orders/history.md` is the index; the three August orders carry Line columns.
-`PINS.md` holds 94 Pins, written 07 September 2026 — 62 with harvested line
-numbers, 7 counter proteins, 25 Staples awaiting a product. 18 ingredients are
-recorded there as absences, and the next harvest should close some of them.
+`Orders/history.md` is the harvest log. No order is stored in the repo: the four
+orders harvested through 16 September were captured as files before this
+procedure changed, and those files lived only on one machine. `PINS.md` is the
+only thing a harvest leaves behind.

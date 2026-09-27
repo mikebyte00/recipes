@@ -12,9 +12,12 @@ Read `VOCABULARY.md` — *The Plan grid* — and `GOALS.md` before editing a gri
 
 ## Steps
 
-1. **Offer the harvest.** The order that just landed is *last* week's, so its new
-   Pins serve *this* week. It is a browser session in the user's own signed-in
-   account, following `Orders/HARVEST.md` — ask before opening one.
+1. **Offer the harvest.** Read `Orders/history.md` and say when the last harvest
+   was and which order it covered — *"last harvested: the 17 September order,
+   on 27 September"* — so a missed week is visible. The order that just landed
+   is *last* week's, so its new Pins serve *this* week. Harvesting follows
+   `Orders/HARVEST.md`: a saved order page from the user, or a browser session
+   in their own signed-in account — ask before opening one.
 
    A week that skips it still shops: this week's new ingredients come out
    **Unpinned**, which is the designed path, and the next harvest Pins them.

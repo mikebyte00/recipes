@@ -15,7 +15,7 @@ ingredients:
   - { ingredient: cauliflower-rice, qty: 200, unit: g }
   - { ingredient: red-pepper, qty: 1, unit: each, prep: chunked }
   - { ingredient: tenderstem-broccoli, qty: 200, unit: g }
-  - { ingredient: pineapple, qty: 200, unit: g, note: "tinned chunks, drained — keep the juice" }
+  - { ingredient: pineapple, qty: 227, unit: g, note: "1 tin, drained and cut into chunks — keep the juice" }
   - { ingredient: soy-sauce, qty: 20, unit: g, note: light }
   - { ingredient: honey, qty: 10, unit: g }
   - { ingredient: sesame-seeds, qty: 1, unit: tbsp }

@@ -1,16 +1,23 @@
 # Waitrose Order History
 
-Pulled from Waitrose "My Orders" on 16 September 2026.
+The harvest log: one row per Waitrose order, and the date it was harvested for
+Pins. **An order with no harvest date still needs harvesting.** Orders are not
+kept — a harvest reads one, writes its Pins, and discards it — so this is the only
+trace an order leaves. Waitrose's own *My Orders* page has the details.
 
-| Date | Status | Total | Captured |
-|---|---|---|---|
-| Tuesday 8 September | Completed | £96.32 | Yes — `08-september.md` |
-| Monday 31 August | Completed | £144.55 | Yes — `31-august.md` |
-| Tuesday 25 August | Completed | £131.15 | Yes — `25-august.md` |
-| Tuesday 11 August | Completed | £122.59 | Yes — `11-august.md` |
-| Tuesday 30 June | Cancelled | £40.00 | No — cancelled, no items |
-| Wednesday 17 June | Completed | £173.04 | No — predates 1 August scope |
-| Tuesday 16 June | Cancelled | £45.00 | No — cancelled, no items |
-| Sunday 7 June | Completed | £80.99 | No — predates 1 August scope |
-| Monday 1 June | Completed | £121.61 | No — predates 1 August scope |
-| Sunday 25 January | Completed | £82.78 | No — predates 1 August scope |
+Last checked against *My Orders* on 16 September 2026; the 17 September order was
+added on 27 September. Orders after 17 September have not been checked.
+
+| Order date | Status | Harvested |
+|---|---|---|
+| Thursday 17 September 2026 | Completed | 27 September 2026 |
+| Tuesday 8 September 2026 | Completed | 16 September 2026 |
+| Monday 31 August 2026 | Completed | 07 September 2026 |
+| Tuesday 25 August 2026 | Completed | 07 September 2026 |
+| Tuesday 11 August 2026 | Completed | 07 September 2026 |
+| Tuesday 30 June 2026 | Cancelled | — cancelled, no items |
+| Wednesday 17 June 2026 | Completed | — predates 1 August scope |
+| Tuesday 16 June 2026 | Cancelled | — cancelled, no items |
+| Sunday 7 June 2026 | Completed | — predates 1 August scope |
+| Monday 1 June 2026 | Completed | — predates 1 August scope |
+| Sunday 25 January 2026 | Completed | — predates 1 August scope |

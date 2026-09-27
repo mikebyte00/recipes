@@ -4,14 +4,10 @@
 The second and last piece of code this project authorises, ruled in
 .scratch/meal-planning-system/issues/24-browse-the-pool.md.
 
-Reads Recipes/, Plans/, PINS.md, GOALS.md and Orders/, and writes one
+Reads Recipes/, Plans/, PINS.md and GOALS.md, and writes one
 self-contained index.html at the repo root with every datum inlined as JSON.
 No server, no build step, no runtime fetches -- it opens over file:// and it
 is served by GitHub Pages from the branch root.
-
-Orders/ holds real personal data. Everything this file emits from them is
-redacted, and assert_no_pii() refuses to write a page that carries a redacted
-string. Run tests/test_browse.py after touching any of it.
 
 Usage: bin/browse.py [--check]
 """
@@ -25,111 +21,12 @@ import sys
 
 import yaml
 
-# Categories dropped from the published page in their entirety.
-REDACTED_CATEGORIES = {"Toiletries, Health & Beauty"}
-
-# Not an item category: the order's own footer.
-COST_BREAKDOWN = "Cost breakdown"
-
-ORDER_DATE = re.compile(r"^#\s+Waitrose Order\s+[-—]\s+(.+?)\s*$", re.M)
-ORDER_PREAMBLE = re.compile(
-    r"Order number\s+(\d+)\.\s+Collected\s+[^,]+,\s*([^,]+),\s*from\s+(.+?)\.\s*$",
-    re.M,
-)
-ORDER_HEADING = re.compile(r"^###\s+(.+?)\s*$", re.M)
-ORDER_ROW = re.compile(
-    r"^\|\s*(\d{6})\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|\s*(\d+)\s*\|\s*(.+?)\s*\|\s*$", re.M
-)
-ORDER_TOTAL = re.compile(r"^-\s+\*\*Total:\s*(.+?)\*\*\s*$", re.M)
-
-
 class Failure(Exception):
     """A violation that makes the page wrong or unsafe. Stop; do not write it."""
 
 
 def json_dump(value):
     return json.dumps(value, ensure_ascii=False, sort_keys=True)
-
-
-def parse_order(text, filename):
-    """Parse one Orders/*.md into the redacted shape the page may show.
-
-    The preamble line -- order number, collection window, branch, postcode --
-    is never read into the result, and REDACTED_CATEGORIES never becomes a
-    category. Redaction is by omission at parse time, so no later stage can
-    reintroduce what was dropped.
-    """
-    date = ORDER_DATE.search(text)
-    if not date:
-        raise Failure(f"{filename} has no `# Waitrose Order -- <date>` heading")
-
-    sections = []
-    for heading in ORDER_HEADING.finditer(text):
-        sections.append((heading.group(1), heading.end()))
-
-    categories = []
-    for index, (name, start) in enumerate(sections):
-        end = sections[index + 1][1] if index + 1 < len(sections) else len(text)
-        if name == COST_BREAKDOWN or name in REDACTED_CATEGORIES:
-            continue
-        items = [
-            {
-                "line": row.group(1),
-                "item": row.group(2),
-                "size": row.group(3),
-                "qty": int(row.group(4)),
-                "cost": row.group(5),
-            }
-            for row in ORDER_ROW.finditer(text[start:end])
-        ]
-        if items:
-            categories.append({"name": name, "items": items})
-
-    total = ORDER_TOTAL.search(text)
-    return {
-        "file": filename,
-        "date": date.group(1),
-        "categories": categories,
-        "total": total.group(1) if total else None,
-        "redacted": sorted(REDACTED_CATEGORIES),
-    }
-
-
-def pii_strings(text):
-    """Every string from one raw order that must not reach the page."""
-    forbidden = set()
-
-    preamble = ORDER_PREAMBLE.search(text)
-    if preamble:
-        forbidden.add(preamble.group(1))          # order number
-        window = preamble.group(2)                # 10:00am-11:00am
-        forbidden.add(window)
-        forbidden.update(part for part in re.split(r"[-—–]", window) if part.strip())
-        for part in preamble.group(3).split(","):  # branch, postcode
-            if part.strip():
-                forbidden.add(part.strip())
-
-    for name in REDACTED_CATEGORIES:
-        match = re.search(
-            r"^###\s+" + re.escape(name) + r"\s*$(.*?)(?=^###\s|\Z)", text, re.M | re.S
-        )
-        if match:
-            for row in ORDER_ROW.finditer(match.group(1)):
-                forbidden.add(row.group(1))
-                forbidden.add(row.group(2))
-
-    return {value.strip() for value in forbidden if value.strip()}
-
-
-def assert_no_pii(html, raw_orders):
-    """Refuse a page carrying anything the redaction was supposed to remove."""
-    leaked = sorted(
-        {value for text in raw_orders for value in pii_strings(text) if value in html}
-    )
-    if leaked:
-        raise Failure(
-            "redaction leaked into the page -- not written:\n  " + "\n  ".join(leaked)
-        )
 
 
 # Mirrors GOALS.md's Nutrient Goals. Duplicated deliberately so the pure
@@ -256,32 +153,8 @@ def goal_flags(totals, goals=None):
     return flags
 
 
-def order_aggregate(orders, pins):
-    """Every distinct line bought, how often, when, and whether it is Pinned."""
-    by_line = {pin.get("line_number"): key for key, pin in pins.items()
-               if pin.get("line_number")}
-    rows = {}
-    for order in orders:
-        for category in order["categories"]:
-            for item in category["items"]:
-                row = rows.setdefault(item["line"], {
-                    "line": item["line"], "item": item["item"],
-                    "category": category["name"], "orders": 0, "qty": 0, "dates": [],
-                    "pinned_as": by_line.get(item["line"]),
-                })
-                row["orders"] += 1
-                row["qty"] += item["qty"]
-                row["dates"].append(order["date"])
-                row["item"] = item["item"]
-    return sorted(rows.values(), key=lambda r: (-r["orders"], r["item"].lower()))
-
-
 FRONTMATTER = re.compile(r"\A---\n(.*?)\n---\n(.*)\Z", re.S)
 METHOD_STEP = re.compile(r"^\s*\d+\.\s+(.*?)\s*$", re.M)
-HISTORY_ROW = re.compile(
-    r"^\|\s*([^|]+?)\s*\|\s*(Completed|Cancelled)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|$",
-    re.M,
-)
 
 
 def read(path):
@@ -334,68 +207,20 @@ def load_plans(root):
     return plans
 
 
-def load_orders(root):
-    """Every captured order, parsed and redacted, oldest first."""
-    parsed, raw = [], []
-    for path in sorted(glob.glob(os.path.join(root, "Orders", "*.md"))):
-        name = os.path.basename(path)
-        if name in ("HARVEST.md", "BASKET.md", "history.md"):
-            continue
-        text = read(path)
-        raw.append(text)
-        parsed.append(parse_order(text, name))
-    parsed.sort(key=lambda o: _order_key(o["date"]))
-    return parsed, raw
-
-
-MONTHS = ["january", "february", "march", "april", "may", "june", "july",
-          "august", "september", "october", "november", "december"]
-
-
-def _order_key(date):
-    parts = date.replace(",", " ").split()
-    day = month = year = 0
-    for part in parts:
-        if part.isdigit() and len(part) == 4:
-            year = int(part)
-        elif part.isdigit():
-            day = int(part)
-        elif part.lower() in MONTHS:
-            month = MONTHS.index(part.lower()) + 1
-    return (year, month, day)
-
-
-def load_history(root):
-    """Orders/history.md: the index of what exists, captured or not."""
-    path = os.path.join(root, "Orders", "history.md")
-    if not os.path.isfile(path):
-        return []
-    return [
-        {"date": row.group(1), "status": row.group(2),
-         "total": row.group(3), "captured": row.group(4)}
-        for row in HISTORY_ROW.finditer(read(path))
-    ]
-
-
 def load_all(root):
     goals_text = read(os.path.join(root, "GOALS.md"))
-    orders, raw_orders = load_orders(root)
     return {
         "recipes": load_recipes(root),
         "plans": load_plans(root),
         "pins": load_pins(root),
         "bands": parse_bands(goals_text),
         "goals": parse_nutrient_goals(goals_text),
-        "orders": orders,
-        "raw_orders": raw_orders,
-        "history": load_history(root),
     }
 
 
 def build_payload(data):
     """Everything the page shows, resolved once here so the browser only renders."""
     recipes, pins, bands = data["recipes"], data["pins"], data["bands"]
-    orders = data["orders"]
 
     eaten = last_eaten(data["plans"])
     recipe_rows = []
@@ -465,24 +290,6 @@ def build_payload(data):
             "cooked": cooked,
         })
 
-    aggregate = order_aggregate(orders, pins)
-    bought = {row["line"]: row for row in aggregate}
-    pin_rows = []
-    for key in sorted(pins):
-        pin = pins[key]
-        line = pin.get("line_number")
-        row = bought.get(line) if line else None
-        pin_rows.append({
-            "key": key,
-            "display": pin.get("display") or humanise(key),
-            "store": pin.get("store"),
-            "line": line,
-            "staple": bool(pin.get("staple")),
-            "product": pin.get("search_term"),
-            "orders": row["orders"] if row else 0,
-            "last_bought": row["dates"][-1] if row else None,
-        })
-
     facets = {field: sorted({v for r in recipe_rows for v in
                              (r[field] if isinstance(r[field], list) else [r[field]])
                              if v})
@@ -491,16 +298,11 @@ def build_payload(data):
     return {
         "recipes": recipe_rows,
         "plans": plan_rows,
-        "orders": orders,
-        "aggregate": aggregate,
-        "pins": pin_rows,
-        "history": data["history"],
         "bands": bands,
         "goals": data["goals"],
         "facets": facets,
         "days": DAYS,
         "slots": SLOTS,
-        "redacted": sorted(REDACTED_CATEGORIES),
     }
 
 
@@ -773,7 +575,6 @@ button[disabled]:hover{border-color:var(--rule)}
 textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
   font-size:.85rem;line-height:1.6;color:inherit;background:var(--card);
   border:1px solid var(--rule);border-radius:9px;padding:.85rem}
-.subnav{display:flex;gap:1.2rem;margin-bottom:1.3rem;font-size:.9rem}
 .subnav a{color:var(--soft);border-bottom:1px solid transparent;padding-bottom:.2rem}
 .subnav a.on{color:var(--accent);border-bottom-color:var(--accent)}
 
@@ -850,15 +651,14 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c =>
 const g = n => n == null ? '—' : '~' + (+n) + 'g';
 const kc = n => n == null ? '—' : '~' + Math.round(n);
 
-let route = {view:'today', slug:null, sub:null, f:{}, q:'', min:0, sort:'title'};
+let route = {view:'today', slug:null, f:{}, q:'', min:0, sort:'title'};
 
 function readHash(){
   const raw = location.hash.replace(/^#/,'');
   const [path, query] = raw.split('?');
   const parts = (path || 'today').split('/');
-  const r = {view: parts[0] || 'today', slug: parts[1] || null, sub: null,
+  const r = {view: parts[0] || 'today', slug: parts[1] || null,
              f:{}, q:'', min:0, sort:'title'};
-  if (r.view === 'orders') { r.sub = parts[1] || 'orders'; r.slug = null; }
   const p = new URLSearchParams(query || '');
   r.q = p.get('q') || '';
   r.min = +(p.get('min') || 0);
@@ -875,7 +675,6 @@ function writeHash(r, replace){
   FACETS.forEach(k => { if ((r.f[k]||[]).length) p.set(k, r.f[k].join(',')); });
   let path = r.view;
   if (r.view === 'recipe' || r.view === 'plan') path += '/' + r.slug;
-  if (r.view === 'orders' && r.sub && r.sub !== 'orders') path += '/' + r.sub;
   const s = p.toString();
   const hash = '#' + path + (s ? '?' + s : '');
   if (replace) history.replaceState(null,'',hash); else location.hash = hash;
@@ -927,7 +726,7 @@ function scoreDot(kind, r){
 function renderNav(){
   /* `planmode` is the wizard toggle, not a view -- `plan` is a Plan's own page. */
   const tabs = [['today','Today'],['recipes','Recipes'],['plans','Plans'],
-                ['orders','Orders'],['planmode','Plan']];
+                ['planmode','Plan']];
   const here = route.view === 'recipe' ? 'recipes'
              : route.view === 'plan' ? 'plans' : route.view;
   document.getElementById('nav').innerHTML = tabs.map(([v,label]) =>
@@ -1068,8 +867,8 @@ function recipeDetail(slug){
     <section><h3>Ingredients — ${r.ingredients.length}</h3>
       ${r.unpinned.length ? `<div class="warn"><strong>${r.unpinned.length} Unpinned:</strong>
         ${r.unpinned.map(nice).join(', ')}. No Pin exists, so the shopping list flags
-        these to add by hand — and buying one puts it in the order history where
-        the next harvest Pins it.</div>` : ''}
+        these to add by hand — and the next harvest of an order that bought one
+        Pins it.</div>` : ''}
       <div class="scroller"><table><thead><tr><th>Ingredient</th><th class="num">Qty</th>
         <th>Store</th><th>Pinned product</th></tr></thead><tbody>${ing}</tbody></table></div>
     </section>
@@ -1364,66 +1163,6 @@ function wireCheckout(){
   });
 }
 
-function ordersView(){
-  const sub = route.sub || 'orders';
-  const tabs = [['orders','By order'],['items','Every item'],['pins','Pins']];
-  const head = `<div class="subnav">${tabs.map(([v,l])=>
-    `<a class="${v===sub?'on':''}" href="#orders${v==='orders'?'':'/'+v}">${l}</a>`).join('')}</div>`;
-
-  if (sub === 'items'){
-    const rows = D.aggregate.map(r=>`<tr>
-      <td>${esc(r.item)}<div class="note">${esc(r.category)} · ${r.dates.map(esc).join(', ')}</div></td>
-      <td class="num">${r.orders}</td><td class="num">${r.qty}</td>
-      <td>${r.pinned_as ? `<span class="note">${nice(r.pinned_as)}</span>`
-            : '<span class="pill un">not pinned</span>'}</td></tr>`).join('');
-    const todo = D.aggregate.filter(r=>!r.pinned_as && r.orders>1).length;
-    return head + `<p class="lede">${D.aggregate.length} distinct items across
-      ${D.orders.length} orders. ${D.aggregate.filter(r=>!r.pinned_as).length} are not
-      Pinned${todo ? `, and ${todo} of those were bought more than once — that is the
-      pinning worklist` : ''}.</p>
-      <div class="scroller"><table><thead><tr><th>Item</th><th class="num">Orders</th>
-        <th class="num">Qty</th><th>Pin</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-  }
-
-  if (sub === 'pins'){
-    const rows = D.pins.map(p=>`<tr>
-      <td>${esc(p.display)}<div class="note">${esc(p.key)}${p.staple?' · staple':''}</div></td>
-      <td>${esc(p.store==='dorset-meats'?'Dorset Meats':p.store==='soutars'?'Soutars':cap(p.store||'—'))}</td>
-      <td class="num">${p.line ? esc(p.line) : '—'}</td>
-      <td>${p.orders ? `${p.orders}× <div class="note">last ${esc(p.last_bought)}</div>`
-            : '<span class="note">not in a captured order</span>'}</td></tr>`).join('');
-    return head + `<p class="lede">${D.pins.length} Pins, joined back to the orders by
-      line number. A Pin with no order behind it is a hand-written decision — the
-      counter proteins and the store-cupboard Staples are vetted that way.</p>
-      <div class="scroller"><table><thead><tr><th>Pin</th><th>Store</th>
-        <th class="num">Line</th><th>Bought</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-  }
-
-  const cards = D.orders.slice().reverse().map(o => `
-    <section><h3>${esc(o.date)} — ${esc(o.total||'')}</h3>
-      ${o.categories.map(c=>`<h4 class="note" style="margin:.9rem 0 .2rem">${esc(c.name)}</h4>
-        <div class="scroller"><table><thead><tr><th>Item</th><th>Size</th>
-          <th class="num">Qty</th><th class="num">Cost</th></tr></thead>
-          <tbody>${c.items.map(i=>`<tr><td>${esc(i.item)}
-            <div class="note">${esc(i.line)}</div></td><td>${esc(i.size)}</td>
-            <td class="num">${i.qty}</td><td class="num">${esc(i.cost)}</td></tr>`).join('')}
-          </tbody></table></div>`).join('')}
-    </section>`).join('');
-
-  const hist = D.history.map(h=>`<tr><td>${esc(h.date)}</td><td>${esc(h.status)}</td>
-    <td class="num">${esc(h.total)}</td><td class="note">${esc(h.captured)}</td></tr>`).join('');
-
-  return head + `<p class="lede">${D.orders.length} captured orders.</p>
-    <div class="warn">Order numbers, the collection branch, postcode and time window,
-      and the ${D.redacted.join(' and ')} category are omitted from this page.
-      They are in the repository's order files, not here.</div>
-    ${cards}
-    <section><h3>Order history</h3>
-      <div class="scroller"><table><thead><tr><th>Date</th><th>Status</th>
-        <th class="num">Total</th><th>Captured</th></tr></thead><tbody>${hist}</tbody></table></div>
-    </section>`;
-}
-
 function render(){
   renderNav();
   const app = document.getElementById('app');
@@ -1435,7 +1174,6 @@ function render(){
     : v === 'recipe' ? recipeDetail(route.slug)
     : v === 'plans'  ? planList()
     : v === 'plan'   ? planDetail(route.slug)
-    : v === 'orders' ? ordersView()
     : recipeList();
   renderDrawer();
   if (checkedOut) wireCheckout();
@@ -1564,7 +1302,6 @@ def main(argv):
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     data = load_all(root)
     html = render(data)
-    assert_no_pii(html, data["raw_orders"])
 
     out = os.path.join(root, "index.html")
     if "--check" in argv:
@@ -1579,8 +1316,7 @@ def main(argv):
     payload = build_payload(data)
     print(
         f"index.html written: {len(payload['recipes'])} Recipes, "
-        f"{len(payload['plans'])} Plans, {len(payload['orders'])} orders, "
-        f"{len(payload['aggregate'])} distinct items, {len(html)} bytes."
+        f"{len(payload['plans'])} Plans, {len(html)} bytes."
     )
     return 0
 

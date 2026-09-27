@@ -407,6 +407,14 @@ naming a cause, especially when the pattern is your own.
   addressable by SHA afterwards. The cost accepted is that a redaction failure
   is now internet-facing, and a fresh clone cannot regenerate the page.
 
+- [Browse The Pool](issues/24-browse-the-pool.md), amended 27 September 2026:
+  **orders are harvested into Pins and discarded.** Stored order files existed
+  only on one machine, so every cloud rebuild published an empty Orders view.
+  Asked what a stored order was for, the answer was Pins plus the date of the
+  last harvest. `Orders/history.md` became the harvest log; the Orders view,
+  its Pins tab and all the redaction code left `bin/browse.py`; the personal-data
+  risk is closed by absence rather than redaction.
+
 - [Retire Menus](issues/25-retire-menus.md), settled 19 September 2026: **Plan
   mode fully replaced Menus, so Menus, `new-menu` and the Weekly Layout are
   gone.** The first architectural *reversal* on this map: it deletes a skill the
