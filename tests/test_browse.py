@@ -652,5 +652,71 @@ console.log(JSON.stringify(out));
         self.assertEqual(self.ago["across_bst_end"], 7)
 
 
+PICKED_DAYS = re.compile(r"function pickedDays\(plan, slug, current, week\)\{.*?\n\}", re.S)
+
+MON_FIRST = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+
+# [plan, slug, current Slot key] -- `plan` is Plan mode's own session state.
+PICKED_CASES = {
+    "none": [{}, "chilli", "monday.dinner"],
+    "one": [{"monday.dinner": "chilli"}, "chilli", "tuesday.dinner"],
+    # Filled out of order (a Back, then a re-pick), still read Monday first.
+    "several": [{"wednesday.dinner": "chilli", "monday.dinner": "chilli",
+                 "tuesday.dinner": "curry"}, "chilli", "thursday.dinner"],
+    "current": [{"monday.dinner": "chilli", "tuesday.dinner": "chilli"},
+                "chilli", "tuesday.dinner"],
+    "eaten_out": [{"monday.dinner": "eaten-out"}, "eaten-out", "tuesday.dinner"],
+    "same_day_twice": [{"monday.lunch": "wrap", "monday.dinner": "wrap"},
+                       "wrap", "tuesday.lunch"],
+}
+
+
+@unittest.skipUnless(shutil.which("node"), "node is not installed")
+class PickedDays(unittest.TestCase):
+    """Plan mode's other badge: the days a Recipe already holds in the week
+    being picked, so a repeat is a choice rather than an accident. Lifted
+    out of TEMPLATE, so the test runs what ships."""
+
+    @classmethod
+    def setUpClass(cls):
+        fn = PICKED_DAYS.search(browse.TEMPLATE)
+        assert fn, "pickedDays is no longer in TEMPLATE"
+        script = fn.group(0) + """
+const week = %s, out = {};
+for (const [k, [plan, slug, current]] of Object.entries(%s))
+  out[k] = pickedDays(plan, slug, current, week);
+console.log(JSON.stringify(out));
+""" % (json.dumps(MON_FIRST), json.dumps(PICKED_CASES))
+        with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as handle:
+            handle.write(script)
+            path = handle.name
+        try:
+            out = subprocess.run([shutil.which("node"), path], check=True,
+                                 capture_output=True, text=True).stdout
+        finally:
+            os.unlink(path)
+        cls.picked = json.loads(out)
+
+    def test_a_recipe_not_yet_picked_has_no_days(self):
+        self.assertEqual(self.picked["none"], [])
+
+    def test_names_the_day_it_was_picked(self):
+        self.assertEqual(self.picked["one"], ["Mon"])
+
+    def test_days_read_monday_first_whatever_order_they_were_picked(self):
+        self.assertEqual(self.picked["several"], ["Mon", "Wed"])
+
+    def test_the_slot_being_picked_does_not_count(self):
+        """Going back to a Slot, its own Recipe is not 'already picked' --
+        the drawer already says what the Slot holds."""
+        self.assertEqual(self.picked["current"], ["Mon"])
+
+    def test_eaten_out_is_never_a_pick(self):
+        self.assertEqual(self.picked["eaten_out"], [])
+
+    def test_a_day_is_named_once(self):
+        self.assertEqual(self.picked["same_day_twice"], ["Mon"])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
