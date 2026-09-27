@@ -829,5 +829,51 @@ console.log(JSON.stringify(out));
         self.assertEqual(self.swapped["untouched"], SWAP_PLAN)
 
 
+CLEAR_FILTERS = re.compile(r"function clearFilters\(route\)\{.*?\n\}", re.S)
+
+FILTERED_ROUTE = {"view": "recipes", "slug": None, "sub": None,
+                  "f": {"slot": ["dinner"], "protein": ["chicken"]},
+                  "q": "rice", "min": 30, "sort": "protein"}
+
+
+@unittest.skipUnless(shutil.which("node"), "node is not installed")
+class ClearFilters(unittest.TestCase):
+    """What Plan mode resets on every move to a new Slot, and what Clear
+    resets: filters chosen for one Slot must not empty the list for the
+    next. Lifted out of TEMPLATE, so the test runs what ships."""
+
+    @classmethod
+    def setUpClass(cls):
+        fn = CLEAR_FILTERS.search(browse.TEMPLATE)
+        assert fn, "clearFilters is no longer in TEMPLATE"
+        script = fn.group(0) + """
+const route = %s;
+const out = clearFilters(route);
+console.log(JSON.stringify({out, route}));
+""" % json.dumps(FILTERED_ROUTE)
+        with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as handle:
+            handle.write(script)
+            path = handle.name
+        try:
+            out = subprocess.run([shutil.which("node"), path], check=True,
+                                 capture_output=True, text=True).stdout
+        finally:
+            os.unlink(path)
+        cls.result = json.loads(out)
+
+    def test_facets_search_and_protein_floor_are_cleared(self):
+        out = self.result["out"]
+        self.assertEqual((out["f"], out["q"], out["min"]), ({}, "", 0))
+
+    def test_sort_is_an_ordering_not_a_filter_and_stays(self):
+        self.assertEqual(self.result["out"]["sort"], "protein")
+
+    def test_the_view_stays(self):
+        self.assertEqual(self.result["out"]["view"], "recipes")
+
+    def test_the_route_handed_in_is_left_alone(self):
+        self.assertEqual(self.result["route"], FILTERED_ROUTE)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

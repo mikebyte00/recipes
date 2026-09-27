@@ -389,6 +389,12 @@ function qs(){
 }
 const listHash = () => '#recipes' + qs();
 
+/* The route with every filter off -- facets, search and protein floor. Sort
+   stays: it orders the list, it never empties it. */
+function clearFilters(route){
+  return {...route, f: {}, q: '', min: 0};
+}
+
 const activeCount = () =>
   FACETS.reduce((n,k) => n + (route.f[k]||[]).length, 0) + (route.min ? 1 : 0);
 
@@ -719,9 +725,16 @@ function planSet(value){
   planNext();
 }
 
+/* Every move of the cursor comes through here. Filters chosen for one Slot
+   would narrow -- often empty -- the list for the next, so each move clears them. */
+function planMove(to){
+  cursor = to;
+  route = clearFilters(route); writeHash(route, true);
+}
+
 /* Move on a Slot -- or, editing a day, back to Checkout once it is done. */
 function planNext(){
-  cursor++;
+  planMove(cursor + 1);
   if (editDay && (PLAN_SEQ[cursor] || [])[0] !== editDay){
     editDay = null; checkedOut = true;
   }
@@ -797,7 +810,7 @@ function renderDrawer(){
       <button id="planexit" class="btn btn-outline-secondary btn-sm">Exit</button>
     </span></div>`;
 
-  document.getElementById('planback').onclick = () => { cursor--; render(); };
+  document.getElementById('planback').onclick = () => { planMove(cursor - 1); render(); };
   if (editDay) document.getElementById('plankeep').onclick = planNext;
   if (at) document.getElementById('planskip').onclick = () => planSet('eaten-out');
   document.getElementById('planout').onclick = () => { editDay = null; checkedOut = true; render(); };
@@ -822,7 +835,7 @@ function wireCheckout(){
   out.focus({preventScroll: true}); out.select();
   document.getElementById('edit').onclick = () => { swapFrom = null; checkedOut = false; render(); };
   document.getElementById('startover').onclick = () => {
-    plan = {}; cursor = 0; checkedOut = false; render(); };
+    plan = {}; planMove(0); checkedOut = false; render(); };
   /* Swapping: a first tap picks a meal up, a tap on the same meal of another
      day swaps the two, and any other tap puts it back down. */
   document.getElementById('app').onclick = event => {
@@ -840,7 +853,7 @@ function wireCheckout(){
   document.querySelectorAll('.day .edit').forEach(b => b.onclick = () => {
     swapFrom = null;
     editDay = b.dataset.day;
-    cursor = PLAN_SEQ.findIndex(([day]) => day === editDay);
+    planMove(PLAN_SEQ.findIndex(([day]) => day === editDay));
     checkedOut = false; render(); window.scrollTo(0, 0);
   });
 }
@@ -967,7 +980,7 @@ function wireFilters(){
     if (wasOpen && !wide()) offcanvas().show(); };
 
   document.getElementById('clear').onclick = () => {
-    route.f = {}; route.q = ''; route.min = 0; writeHash(route, true); render(); };
+    route = clearFilters(route); writeHash(route, true); render(); };
 }
 
 /* Theme toggle. Two states, not three: the stored value IS the override and

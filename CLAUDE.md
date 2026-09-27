@@ -49,10 +49,10 @@ Pin or Order therefore finishes the same way, and the change is not done
 until it has:
 
 1. `.venv/bin/python bin/browse.py` — regenerate the page.
-2. `.venv/bin/python tests/test_browse.py` — 90 tests, including the redaction
-   ones. Thirty-one shell out to `node` — to run the page's theme boot script,
-   its eaten-days count, its picked-days badge, and Checkout's week and meal
-   swap — and skip cleanly when it is absent. `test_reads_every_captured_order` fails on a
+2. `.venv/bin/python tests/test_browse.py` — 94 tests, including the redaction
+   ones. Thirty-five shell out to `node` — to run the page's theme boot script,
+   its eaten-days count, its picked-days badge, Checkout's week and meal swap,
+   and the filter reset Plan mode makes on every move — and skip cleanly when it is absent. `test_reads_every_captured_order` fails on a
    checkout with no harvested `Orders/*.md`, which are gitignored — that is the
    environment, not the code.
 3. `git commit` the source change **and** `index.html` in the same commit.
