@@ -313,6 +313,34 @@ retrievable on their servers. Rewriting before the first push is the only
 version of this that fully works. Anyone repeating it elsewhere should check
 `git ls-remote` is empty before trusting it.
 
+### Amended 27 September 2026: orders are harvested and discarded
+
+**Supersedes the settlement above for everything about order files.** Keeping
+order files off the public repo meant any machine without them — every cloud
+session — rebuilt the page with an empty Orders view and pushed it; the committed
+page lost its orders from 26 September. Redacting the files at source so they
+could be committed was built and then dropped, because the user asked the
+prior question: **what is a stored order for?**
+
+The answer was: two things only. Pins, which a harvest writes to `PINS.md`; and
+knowing whether a harvest was missed, which needs a date, not an order. The
+Orders view had never been used, and Waitrose's own *My Orders* page holds the
+detail. So:
+
+- **A harvest reads an order, writes its Pins, logs the date, and discards the
+  order.** No order file is written. `Orders/HARVEST.md` holds the procedure.
+- **`Orders/history.md` becomes the harvest log**: order date, status, and the
+  date it was harvested. A blank harvest date is a missed harvest.
+- **The Orders view is gone from the page**, its *Pins* tab with it — `PINS.md`
+  is the record, and the shopping list and basket read it directly. The
+  redaction machinery (`parse_order`, `pii_strings`, `assert_no_pii`) and its
+  tests went with it: with no order data on the page there is nothing to redact.
+- `.gitignore` no longer mentions `Orders/`.
+
+The risk this ticket spent most of its length on — personal data in a public
+repo — is now closed by absence rather than by redaction. The standing rule is
+in `CLAUDE.md`: never write an order into the repo.
+
 ### What this costs, from here
 
 - **A redaction failure is now an internet-facing failure.** It used to leak to

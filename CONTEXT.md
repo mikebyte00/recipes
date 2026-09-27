@@ -66,8 +66,7 @@ hand.
 Pins are **stored in this repo**, not re-derived each week: a Pin is a decision,
 and decisions belong somewhere you can see and correct them. [Orders](#order)
 are how Pins get created, not where they live. A Pin holds only what was decided;
-anything countable — how often something was bought, and when — stays countable
-from the orders themselves.
+how often something was bought, and when, is Waitrose's to remember.
 
 A Pin also **declares the one unit its ingredient must be written in**, and
 Recipes comply. That turns shopping-list aggregation into plain addition, and
@@ -85,13 +84,14 @@ An ingredient a [Recipe](#recipe) needs that has no [Pin](#pin) yet. Unpinned
 ingredients are **flagged, never guessed** — they are skipped by basket
 automation and listed for you to add by hand.
 
-Adding one by hand puts it in your order history, where the next harvest turns
-it into a Pin. The manual work feeds the system rather than repeating.
+Adding one by hand puts it in your next order, where the harvest turns it into
+a Pin. The manual work feeds the system rather than repeating.
 
 ## Order
 
-A completed Waitrose shop, captured from the household's own account and kept.
-An Order records what was actually bought: the products, their sizes and
+A completed Waitrose shop, read from the household's own account at harvest
+and then **discarded** — the repo keeps only the Pins it justified and the date
+it was harvested, in `Orders/history.md`. An Order records what was actually bought: the products, their sizes and
 quantities, what they cost, and the six-digit line number that names each one on
 the shelf.
 
@@ -102,8 +102,8 @@ between them, and it is why an Order is never edited to reflect a change of mind
 
 Orders are also the only place the **shop's own vocabulary** is written down. A
 [Recipe](#recipe) says parmesan and pine nuts; the Order says Parmigiano
-Reggiano and Pine Kernels. Those two vocabularies disagree, and an Order is the
-only record of how.
+Reggiano and Pine Kernels. Those two vocabularies disagree; a Pin's
+`search_term` is where the shop's word is kept once an Order has shown it.
 
 An Order carries facts about the household as well as about its food — where and
 when the shop was collected, and whatever non-food went into the same basket.
