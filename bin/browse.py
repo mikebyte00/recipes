@@ -747,6 +747,11 @@ ol.method li{margin-bottom:.85rem;line-height:1.6}
 /* A meal in the day grid is the way into its Recipe, so it has to read as a
    link -- the global bare `a` would leave it looking like plain text. */
 .day h4 .edit{margin-left:auto}
+/* Checkout's meals are buttons, for swapping, but read as the text they were. */
+.day dd .swap{font:inherit;color:inherit;text-align:left;background:none;border:0;
+  border-radius:6px;padding:.1rem .35rem;margin:-.1rem -.35rem;cursor:pointer}
+.day dd .swap.sel{background:var(--accent);color:var(--on-accent)}
+.day dd .swap.target{outline:1px dashed var(--accent);outline-offset:-1px}
 .day dd a,.tagline a{color:var(--accent)}
 .day dd a{border-bottom:1px solid var(--accent-soft)}
 /* Plan mode. The drawer is its own thing, not a reused .sheet -- .sheet turns
@@ -1198,6 +1203,8 @@ let checkedOut = false;
 /* The one day being re-picked from Checkout, or null. Its last Slot returns
    to Checkout instead of walking on into the next day. */
 let editDay = null;
+/* The Slot key a Checkout swap started from, or null. */
+let swapFrom = null;
 
 const planKey = ([day, slot]) => day + '.' + slot;
 const planSlot = () => (PLAN_SEQ[cursor] || [])[1];
@@ -1228,7 +1235,7 @@ function planNext(){
 }
 
 function planExit(){
-  planOn = false; checkedOut = false; editDay = null; render();
+  planOn = false; checkedOut = false; editDay = null; swapFrom = null; render();
 }
 
 /* Checkout's readable week: every day Monday first, every Slot in order, as
@@ -1241,16 +1248,28 @@ function weekRows(plan, week, slots, titles){
   })}));
 }
 
+/* Two Slots trade what they hold. A new grid, so a swap is one assignment. */
+function planSwap(plan, a, b){
+  return {...plan, [a]: plan[b], [b]: plan[a]};
+}
+
 function checkoutView(){
   const titles = Object.fromEntries(D.recipes.map(r => [r.slug, r.title]));
   const days = weekRows(plan, WEEK, D.slots, titles).map(({day, slots}) => `
     <div class="day"><h4><span>${cap(day)}</span>
       <button class="edit btn btn-outline-secondary btn-sm" data-day="${day}">Edit</button></h4>
-      <dl>${slots.map(([s, t]) => `<dt>${s}</dt><dd>${esc(t)}</dd>`).join('')}</dl></div>`).join('');
+      <dl>${slots.map(([s, t]) => {
+        const key = day + '.' + s;
+        const state = key === swapFrom ? ' sel'
+          : swapFrom && swapFrom.split('.')[1] === s ? ' target' : '';
+        return `<dt>${s}</dt><dd><button class="swap${state}" data-key="${key}"
+          aria-pressed="${key === swapFrom}">${esc(t)}</button></dd>`;
+      }).join('')}</dl></div>`).join('');
   return `<p class="lede">28 Slots, Monday first. A skipped Slot reads
       <code>eaten-out</code> — the grid's one reserved value, and the only thing
       besides a Recipe slug the shopping list accepts. It buys nothing. Paste this
-      into <code>plan-the-week</code> at step 2, where a Plan's grid starts.</p>
+      into <code>plan-the-week</code> at step 2, where a Plan's grid starts.
+      Tap a meal, then the same meal on another day, to swap them.</p>
     <div class="tools"><button id="edit">← Back to the week</button>
       <button id="startover">Start over</button></div>
     <section>${days}</section>
@@ -1307,10 +1326,25 @@ function wireCheckout(){
   const out = document.getElementById('out');
   // Selected for copying, but not scrolled to: the week reads first.
   out.focus({preventScroll: true}); out.select();
-  document.getElementById('edit').onclick = () => { checkedOut = false; render(); };
+  document.getElementById('edit').onclick = () => { swapFrom = null; checkedOut = false; render(); };
   document.getElementById('startover').onclick = () => {
     plan = {}; cursor = 0; checkedOut = false; render(); };
+  /* Swapping: a first tap picks a meal up, a tap on the same meal of another
+     day swaps the two, and any other tap puts it back down. */
+  document.getElementById('app').onclick = event => {
+    const b = event.target.closest('.swap');
+    const key = b && b.dataset.key;
+    if (!swapFrom && !key) return;
+    if (!swapFrom) swapFrom = key;
+    else {
+      if (key && key !== swapFrom && key.split('.')[1] === swapFrom.split('.')[1])
+        plan = planSwap(plan, swapFrom, key);
+      swapFrom = null;
+    }
+    render();
+  };
   document.querySelectorAll('.day .edit').forEach(b => b.onclick = () => {
+    swapFrom = null;
     editDay = b.dataset.day;
     cursor = PLAN_SEQ.findIndex(([day]) => day === editDay);
     checkedOut = false; render(); window.scrollTo(0, 0);

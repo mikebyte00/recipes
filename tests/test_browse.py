@@ -771,5 +771,63 @@ console.log(JSON.stringify(weekRows(%s, %s, %s, %s)));
         self.assertEqual(self.rows[1]["slots"][1], ["lunch", "\u2014"])
 
 
+PLAN_SWAP = re.compile(r"function planSwap\(plan, a, b\)\{.*?\n\}", re.S)
+
+SWAP_PLAN = {"monday.dinner": "salmon", "thursday.dinner": "chilli",
+             "friday.dinner": "eaten-out", "monday.lunch": "wrap"}
+SWAP_CASES = {
+    "two_recipes": ["monday.dinner", "thursday.dinner"],
+    "with_skipped": ["thursday.dinner", "friday.dinner"],
+    "itself": ["monday.dinner", "monday.dinner"],
+}
+
+
+@unittest.skipUnless(shutil.which("node"), "node is not installed")
+class PlanSwap(unittest.TestCase):
+    """Checkout's meal swap: two Slots trade what they hold, nothing else
+    moves, and the grid handed in is left alone. Lifted out of TEMPLATE, so
+    the test runs what ships."""
+
+    @classmethod
+    def setUpClass(cls):
+        fn = PLAN_SWAP.search(browse.TEMPLATE)
+        assert fn, "planSwap is no longer in TEMPLATE"
+        script = fn.group(0) + """
+const plan = %s, out = {};
+for (const [k, [a, b]] of Object.entries(%s)) out[k] = planSwap(plan, a, b);
+out.untouched = plan;
+console.log(JSON.stringify(out));
+""" % (json.dumps(SWAP_PLAN), json.dumps(SWAP_CASES))
+        with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as handle:
+            handle.write(script)
+            path = handle.name
+        try:
+            out = subprocess.run([shutil.which("node"), path], check=True,
+                                 capture_output=True, text=True).stdout
+        finally:
+            os.unlink(path)
+        cls.swapped = json.loads(out)
+
+    def test_two_recipes_trade_places(self):
+        got = self.swapped["two_recipes"]
+        self.assertEqual(got["monday.dinner"], "chilli")
+        self.assertEqual(got["thursday.dinner"], "salmon")
+
+    def test_nothing_else_moves(self):
+        self.assertEqual(self.swapped["two_recipes"]["monday.lunch"], "wrap")
+        self.assertEqual(self.swapped["two_recipes"]["friday.dinner"], "eaten-out")
+
+    def test_a_skipped_slot_swaps_like_any_other(self):
+        got = self.swapped["with_skipped"]
+        self.assertEqual(got["thursday.dinner"], "eaten-out")
+        self.assertEqual(got["friday.dinner"], "chilli")
+
+    def test_a_slot_swapped_with_itself_is_unchanged(self):
+        self.assertEqual(self.swapped["itself"], SWAP_PLAN)
+
+    def test_the_grid_handed_in_is_left_alone(self):
+        self.assertEqual(self.swapped["untouched"], SWAP_PLAN)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
