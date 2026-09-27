@@ -23,7 +23,7 @@ taking the catalogue to 88. The 08 September harvest minted six more —
 `quorn-pieces` — and added a line number to the existing `tarragon` staple,
 taking the catalogue to 94. The 17 September harvest, read from a saved order
 page on 27 September 2026, minted nine more — `blueberries`, `cinnamon`
-(staple), `flaked-almonds`, `garlic` (staple), `halloumi`, `peas`, `pineapple`,
+(staple), `flaked-almonds`, `garlic`, `halloumi`, `peas`, `pineapple`,
 `red-onion`, `waffle-fries` — taking the catalogue to 103. That harvest was the
 first under the discard rule: the order itself was not kept, so from here on
 the counts in this file are the only record of what a harvest found.
@@ -394,10 +394,10 @@ garlic:
   display: Garlic
   store: waitrose
   unit: clove
-  pack: { qty: 3, unit: each }
+  pack: { qty: 30, unit: clove }
   search_term: Duchy Organic Garlic
   line_number: "085305"
-  staple: true
+  staple: false
   confirmed: true
 
 garlic-mayonnaise:
@@ -1067,9 +1067,10 @@ confirmed, so they sit here until a harvest and a human say otherwise.
 - `ginger` · `black-olives` — cupboard-adjacent but genuinely perishable, so
   they belong on a shopping list. No product harvested yet.
 
-`garlic` sat here until 27 September 2026, when it was Pinned as a **Staple**
-on the user's decision: Recipes use it a clove at a time, and a bulb outlasts
-a week.
+`garlic` sat here until 27 September 2026, when the 17 September harvest
+Pinned it — **still not a Staple**, on the user's decision, so it stays on the
+weekly list. Recipes count cloves, so the pack is written as
+three bulbs' worth of cloves, ~30 — any week's garlic comes to one pack.
 
 `blueberries`, harvested on 31 August but never minted, was minted by the 17
 September harvest.
