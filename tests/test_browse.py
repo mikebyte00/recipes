@@ -718,5 +718,58 @@ console.log(JSON.stringify(out));
         self.assertEqual(self.picked["same_day_twice"], ["Mon"])
 
 
+WEEK_ROWS = re.compile(r"function weekRows\(plan, week, slots, titles\)\{.*?\n\}", re.S)
+
+ROW_SLOTS = ["breakfast", "lunch", "dinner", "pudding"]
+ROW_TITLES = {"oats": "Overnight Oats", "chilli": "Beef Chilli"}
+ROW_PLAN = {"tuesday.breakfast": "oats", "monday.breakfast": "oats",
+            "monday.lunch": "eaten-out", "monday.dinner": "chilli",
+            "monday.pudding": "gone-from-the-pool"}
+
+
+@unittest.skipUnless(shutil.which("node"), "node is not installed")
+class WeekRows(unittest.TestCase):
+    """Checkout's readable week, the list each day's Edit hangs off. Lifted
+    out of TEMPLATE, so the test runs what ships."""
+
+    @classmethod
+    def setUpClass(cls):
+        fn = WEEK_ROWS.search(browse.TEMPLATE)
+        assert fn, "weekRows is no longer in TEMPLATE"
+        script = fn.group(0) + """
+console.log(JSON.stringify(weekRows(%s, %s, %s, %s)));
+""" % (json.dumps(ROW_PLAN), json.dumps(MON_FIRST), json.dumps(ROW_SLOTS),
+       json.dumps(ROW_TITLES))
+        with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as handle:
+            handle.write(script)
+            path = handle.name
+        try:
+            out = subprocess.run([shutil.which("node"), path], check=True,
+                                 capture_output=True, text=True).stdout
+        finally:
+            os.unlink(path)
+        cls.rows = json.loads(out)
+
+    def test_seven_days_monday_first(self):
+        self.assertEqual([r["day"] for r in self.rows], MON_FIRST)
+
+    def test_every_day_lists_every_slot_in_order(self):
+        for row in self.rows:
+            self.assertEqual([s for s, _ in row["slots"]], ROW_SLOTS)
+
+    def test_a_recipe_reads_as_its_title(self):
+        self.assertEqual(self.rows[0]["slots"][2], ["dinner", "Beef Chilli"])
+
+    def test_eaten_out_reads_as_skipped(self):
+        self.assertEqual(self.rows[0]["slots"][1], ["lunch", "skipped"])
+
+    def test_an_unknown_slug_reads_as_itself(self):
+        """Never a blank where the grid holds something."""
+        self.assertEqual(self.rows[0]["slots"][3], ["pudding", "gone-from-the-pool"])
+
+    def test_an_empty_slot_reads_as_a_dash(self):
+        self.assertEqual(self.rows[1]["slots"][1], ["lunch", "\u2014"])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

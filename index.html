@@ -240,6 +240,7 @@ ol.method li{margin-bottom:.85rem;line-height:1.6}
 .stat.flag b{color:var(--over)}
 /* A meal in the day grid is the way into its Recipe, so it has to read as a
    link -- the global bare `a` would leave it looking like plain text. */
+.day h4 .edit{margin-left:auto}
 .day dd a,.tagline a{color:var(--accent)}
 .day dd a{border-bottom:1px solid var(--accent-soft)}
 /* Plan mode. The drawer is its own thing, not a reused .sheet -- .sheet turns
@@ -688,6 +689,9 @@ let plan = {};
 let planOn = false;
 let cursor = 0;
 let checkedOut = false;
+/* The one day being re-picked from Checkout, or null. Its last Slot returns
+   to Checkout instead of walking on into the next day. */
+let editDay = null;
 
 const planKey = ([day, slot]) => day + '.' + slot;
 const planSlot = () => (PLAN_SEQ[cursor] || [])[1];
@@ -705,21 +709,45 @@ function planYaml(){
 function planSet(value){
   if (cursor >= PLAN_SEQ.length) return;
   plan[planKey(PLAN_SEQ[cursor])] = value;
+  planNext();
+}
+
+/* Move on a Slot -- or, editing a day, back to Checkout once it is done. */
+function planNext(){
   cursor++;
+  if (editDay && (PLAN_SEQ[cursor] || [])[0] !== editDay){
+    editDay = null; checkedOut = true;
+  }
   render();
 }
 
 function planExit(){
-  planOn = false; checkedOut = false; render();
+  planOn = false; checkedOut = false; editDay = null; render();
+}
+
+/* Checkout's readable week: every day Monday first, every Slot in order, as
+   [slot, what it reads as]. A slug the pool no longer knows reads as itself,
+   so the list never shows a blank where the grid holds something. */
+function weekRows(plan, week, slots, titles){
+  return week.map(day => ({day, slots: slots.map(slot => {
+    const v = plan[day + '.' + slot];
+    return [slot, !v ? '\u2014' : v === 'eaten-out' ? 'skipped' : titles[v] || v];
+  })}));
 }
 
 function checkoutView(){
+  const titles = Object.fromEntries(D.recipes.map(r => [r.slug, r.title]));
+  const days = weekRows(plan, WEEK, D.slots, titles).map(({day, slots}) => `
+    <div class="day"><h4><span>${cap(day)}</span>
+      <button class="edit btn btn-outline-secondary btn-sm" data-day="${day}">Edit</button></h4>
+      <dl>${slots.map(([s, t]) => `<dt>${s}</dt><dd>${esc(t)}</dd>`).join('')}</dl></div>`).join('');
   return `<p class="lede">28 Slots, Monday first. A skipped Slot reads
       <code>eaten-out</code> — the grid's one reserved value, and the only thing
       besides a Recipe slug the shopping list accepts. It buys nothing. Paste this
       into <code>plan-the-week</code> at step 2, where a Plan's grid starts.</p>
     <div class="tools"><button id="edit">← Back to the week</button>
       <button id="startover">Start over</button></div>
+    <section>${days}</section>
     <textarea id="out" rows="32" readonly>${esc(planYaml())}</textarea>`;
 }
 
@@ -732,7 +760,7 @@ function renderDrawer(){
   const done = planDone();
   const at = PLAN_SEQ[cursor];
   const here = at
-    ? `Pick <b>${cap(at[0])} ${at[1]}</b>${
+    ? `${editDay ? 'Editing' : 'Pick'} <b>${cap(at[0])} ${at[1]}</b>${
         plan[planKey(at)] ? ` <span class="note">— holds ${
           plan[planKey(at)] === 'eaten-out' ? 'skipped'
           : esc((byslug[plan[planKey(at)]] || {}).title || '')}</span>` : ''}`
@@ -742,15 +770,18 @@ function renderDrawer(){
     <span class="where">${here}</span>
     <span class="macro">${done} / ${PLAN_SEQ.length}</span>
     <span class="rest">
-      <button id="planback" class="btn btn-outline-secondary btn-sm"${cursor ? '' : ' disabled'}>← Back</button>
+      <button id="planback" class="btn btn-outline-secondary btn-sm"${
+        cursor && (!editDay || PLAN_SEQ[cursor - 1][0] === editDay) ? '' : ' disabled'}>← Back</button>
+      ${editDay ? `<button id="plankeep" class="btn btn-outline-secondary btn-sm">Keep</button>` : ''}
       ${at ? `<button id="planskip" class="btn btn-outline-secondary btn-sm">Skip</button>` : ''}
       <button id="planout" class="btn btn-outline-primary btn-sm"${done < PLAN_SEQ.length ? ' disabled' : ''}>Checkout</button>
       <button id="planexit" class="btn btn-outline-secondary btn-sm">Exit</button>
     </span></div>`;
 
   document.getElementById('planback').onclick = () => { cursor--; render(); };
+  if (editDay) document.getElementById('plankeep').onclick = planNext;
   if (at) document.getElementById('planskip').onclick = () => planSet('eaten-out');
-  document.getElementById('planout').onclick = () => { checkedOut = true; render(); };
+  document.getElementById('planout').onclick = () => { editDay = null; checkedOut = true; render(); };
   document.getElementById('planexit').onclick = planExit;
 }
 
@@ -768,10 +799,16 @@ function wirePlanClicks(){
 
 function wireCheckout(){
   const out = document.getElementById('out');
-  out.focus(); out.select();
+  // Selected for copying, but not scrolled to: the week reads first.
+  out.focus({preventScroll: true}); out.select();
   document.getElementById('edit').onclick = () => { checkedOut = false; render(); };
   document.getElementById('startover').onclick = () => {
     plan = {}; cursor = 0; checkedOut = false; render(); };
+  document.querySelectorAll('.day .edit').forEach(b => b.onclick = () => {
+    editDay = b.dataset.day;
+    cursor = PLAN_SEQ.findIndex(([day]) => day === editDay);
+    checkedOut = false; render(); window.scrollTo(0, 0);
+  });
 }
 
 function ordersView(){
