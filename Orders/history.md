@@ -10,7 +10,7 @@ added on 27 September. Orders after 17 September have not been checked.
 
 | Order date | Status | Harvested |
 |---|---|---|
-| Thursday 17 September 2026 | Completed | |
+| Thursday 17 September 2026 | Completed | 27 September 2026 |
 | Tuesday 8 September 2026 | Completed | 16 September 2026 |
 | Monday 31 August 2026 | Completed | 07 September 2026 |
 | Tuesday 25 August 2026 | Completed | 07 September 2026 |

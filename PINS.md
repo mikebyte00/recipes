@@ -21,7 +21,12 @@ pool on 09 September 2026, after five Recipes landed and took the corpus to 42.
 taking the catalogue to 88. The 08 September harvest minted six more —
 `banana`, `blue-cheese`, `chestnut-mushrooms`, `green-beans`, `milk-chocolate`,
 `quorn-pieces` — and added a line number to the existing `tarragon` staple,
-taking the catalogue to 94.
+taking the catalogue to 94. The 17 September harvest, read from a saved order
+page on 27 September 2026, minted nine more — `blueberries`, `cinnamon`
+(staple), `flaked-almonds`, `garlic` (staple), `halloumi`, `peas`, `pineapple`,
+`red-onion`, `waffle-fries` — taking the catalogue to 103. That harvest was the
+first under the discard rule: the order itself was not kept, so from here on
+the counts in this file are the only record of what a harvest found.
 
 ## Reading a Pin
 
@@ -143,6 +148,16 @@ blue-cheese:
   pack: { qty: 150, unit: g }
   search_term: Saint Agur Blue Cheese
   line_number: "062460"
+  staple: false
+  confirmed: true
+
+blueberries:
+  display: Blueberries
+  store: waitrose
+  unit: g
+  pack: { qty: 125, unit: g }
+  search_term: Duchy Organic Blueberries
+  line_number: "088973"
   staple: false
   confirmed: true
 
@@ -274,6 +289,16 @@ chili-powder:
   staple: true
   confirmed: true
 
+cinnamon:
+  display: Cinnamon
+  store: waitrose
+  unit: pinch
+  pack: { qty: 32, unit: g }
+  search_term: Cooks' Ingredients Cinnamon
+  line_number: "528453"
+  staple: true
+  confirmed: true
+
 cottage-cheese:
   display: Cottage cheese
   store: waitrose
@@ -355,6 +380,26 @@ feta:
   staple: false
   confirmed: true
 
+flaked-almonds:
+  display: Flaked almonds
+  store: waitrose
+  unit: g
+  pack: { qty: 100, unit: g }
+  search_term: Waitrose Toasted Flaked Almonds
+  line_number: "018106"
+  staple: false
+  confirmed: true
+
+garlic:
+  display: Garlic
+  store: waitrose
+  unit: clove
+  pack: { qty: 3, unit: each }
+  search_term: Duchy Organic Garlic
+  line_number: "085305"
+  staple: true
+  confirmed: true
+
 garlic-mayonnaise:
   display: Garlic mayonnaise
   store: waitrose
@@ -412,6 +457,16 @@ green-pesto:
   pack: { qty: 190, unit: g }
   search_term: No.1 Italian Pesto Alla Genovese
   line_number: "090431"
+  staple: false
+  confirmed: true
+
+halloumi:
+  display: Halloumi
+  store: waitrose
+  unit: g
+  pack: { qty: 250, unit: g }
+  search_term: Duchy Organic Cypriot Halloumi
+  line_number: "919567"
   staple: false
   confirmed: true
 
@@ -588,6 +643,16 @@ pearl-barley:
   staple: false
   confirmed: true
 
+peas:
+  display: Frozen peas
+  store: waitrose
+  unit: g
+  pack: { qty: 500, unit: g }
+  search_term: Duchy Organic Frozen Garden Peas
+  line_number: "006659"
+  staple: false
+  confirmed: true
+
 peri-peri-mayonnaise:
   display: Peri peri mayonnaise
   store: waitrose
@@ -612,6 +677,16 @@ pine-nuts:
   pack: { qty: 100, unit: g }
   search_term: Waitrose Duchy Organic Pine Kernels
   line_number: "520168"
+  staple: false
+  confirmed: true
+
+pineapple:
+  display: Tinned pineapple
+  store: waitrose
+  unit: g
+  pack: { qty: 227, unit: g }
+  search_term: Dole Tropical Gold Pineapple Slices in Juice
+  line_number: "447811"
   staple: false
   confirmed: true
 
@@ -663,6 +738,16 @@ raspberries:
   pack: { qty: 125, unit: g }
   search_term: Duchy Organic Raspberries
   line_number: "096831"
+  staple: false
+  confirmed: true
+
+red-onion:
+  display: Red onions
+  store: waitrose
+  unit: each
+  pack: { qty: 500, unit: g }
+  search_term: Duchy Organic Red Onions
+  line_number: "085112"
   staple: false
   confirmed: true
 
@@ -881,6 +966,16 @@ vegetarian-sausage:
   staple: false
   confirmed: true
 
+waffle-fries:
+  display: Waffle fries
+  store: waitrose
+  unit: g
+  pack: { qty: 300, unit: g }
+  search_term: Waitrose Waffle Fries
+  line_number: "972626"
+  staple: false
+  confirmed: true
+
 white-chocolate:
   display: White chocolate
   store: waitrose
@@ -940,8 +1035,8 @@ worcestershire-sauce:
 
 The 24 ingredients with no Pin, and why. Recorded here so the catalogue's
 coverage is checkable rather than assumed. **This list is the Unpinned flag**:
-an ingredient here is added to the order by hand, and buying it once puts it in
-the order history where the next harvest turns it into a Pin.
+an ingredient here is added to the order by hand, and buying it once means the
+next harvest turns it into a Pin.
 
 `pancetta` was pinned directly on 16 September 2026 — Soutars, not Waitrose, so
 it would never have surfaced through a harvest. Recorded here rather than in
@@ -953,33 +1048,37 @@ The 08 September harvest resolved six of these: `banana`, `blue-cheese`,
 product and are now Pins; `quorn-pieces` arrived with three new Recipes and
 matched Quorn Vegetarian Pieces (441467) in the same order.
 
-**Never harvested (20)** — real shopping items absent from the four captured
-orders. Each will Pin itself on the next harvest after you buy it.
+**Never harvested (13)** — real shopping items absent from the orders harvested
+so far. Each will Pin itself on the next harvest after you buy it. The 17
+September harvest resolved seven more of the original twenty: `flaked-almonds`,
+`halloumi`, `pineapple`, `red-onion`, `waffle-fries`, `cinnamon` and `peas`.
 
-- `burger-buns` · `flaked-almonds` · `halloumi` · `lettuce` · `parsley` ·
-  `pineapple` · `red-onion` · `strawberries` · `waffle-fries` ·
-  `wholewheat-linguine` · `chilli-oil` · `cinnamon` · `coconut-milk` ·
+- `burger-buns` · `lettuce` · `parsley` · `strawberries` ·
+  `wholewheat-linguine` · `chilli-oil` · `coconut-milk` ·
   `jerk-seasoning` · `kidney-beans` · `marmalade` · `rice-vinegar` ·
-  `spring-onion` · `sweetheart-cabbage` · `peas`
+  `spring-onion` · `sweetheart-cabbage`
 
-Four of those — `chilli-oil`, `cinnamon`, `jerk-seasoning`, `rice-vinegar` —
+Three of those — `chilli-oil`, `jerk-seasoning`, `rice-vinegar` —
 read like store cupboard, and would likely mint as staples. Likely is not
 confirmed, so they sit here until a harvest and a human say otherwise.
 
-**Fresh, and deliberately not stapled (3)**
+**Fresh, and deliberately not stapled (2)**
 
-- `garlic` · `ginger` · `black-olives` — cupboard-adjacent but genuinely
-  perishable, so they belong on a shopping list. No product harvested yet.
+- `ginger` · `black-olives` — cupboard-adjacent but genuinely perishable, so
+  they belong on a shopping list. No product harvested yet.
 
-**Harvested, not yet minted (1)**
+`garlic` sat here until 27 September 2026, when it was Pinned as a **Staple**
+on the user's decision: Recipes use it a clove at a time, and a bulb outlasts
+a week.
 
-- `blueberries` (Duchy Organic Blueberries, 088973, 31 August)
+`blueberries`, harvested on 31 August but never minted, was minted by the 17
+September harvest.
 
-The ordinary case running backwards: the product was already in the order
-history, and the ingredient arrived afterwards with the yogurt pots. A harvest
-proposes; a human confirms. Until someone works
-[Orders/HARVEST.md](Orders/HARVEST.md) steps 6-9 over it, it has no row, so it
-stays on the Unpinned flag and gets added by hand.
+**Not yet audited.** Recipes added since 16 September use ingredients this
+section does not list yet — among them `basmati-rice`, `cauliflower-rice`,
+`cheddar`, `cornflour`, `egg-whites`, `red-pepper`, `self-raising-flour`,
+`sesame-seeds` and `tenderstem-broccoli`. They are Unpinned all the same; the
+count above is of the ones this section has reasoned about.
 
 ## Bought, matched nothing
 
@@ -988,9 +1087,12 @@ candidates — matching is slug-driven, so these were never proposed.
 
 Household and personal (9): three cleaning and laundry lines, four paper/bin
 lines from the 08 September order, one personal-care refill, one supplement.
-Not named here — this file is public, and the page redacts the whole
-personal-care category, so listing the products in prose would undo that. The
-order files on disk have them.
+Not named here — this file is public, and orders are not kept, so naming them
+would publish the one thing the harvest deliberately throws away.
+
+The 17 September order added twelve more: five household lines and one
+personal-care line (counted, not named, as above), and ciabatta rolls · two
+alcohol-free beers · kiwi · ice · two squashes.
 
 Groceries outside the recipe corpus (15): grapes · kiwi · carrots · peppers ·
 cucumber · radish · watercress · pumpkin seeds · plum tomatoes · blackeye
@@ -1002,9 +1104,10 @@ in the order history are dark, milk (now Pinned) and white — this one may well
 be what the strawberry pots actually use, but swapping a stated ingredient for
 a different one on a hunch is exactly what `confirmed` exists to prevent.
 
-Candidates, not evidence (1): blueberries — answers a corpus ingredient and is
-listed under [Absences](#absences) awaiting a minted Pin.
+Candidates, not evidence (1): blueberries — answered a corpus ingredient, and
+was minted by the 17 September harvest.
 
-**Tenderstem broccoli** is worth a second look — 200g, bought twice, and no
-Recipe in the corpus uses it. That reads like a dinner side you cook regularly
-and never wrote down.
+**Tenderstem broccoli** was worth a second look — 200g, bought twice, and no
+Recipe used it. The sweet & sour chicken now does (27 September 2026), so it
+is a Pin candidate the next time an order carries it; its line number went
+with the orders that were not kept.
