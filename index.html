@@ -774,7 +774,8 @@ function checkoutView(){
       besides a Recipe slug the shopping list accepts. It buys nothing. Paste this
       into <code>plan-the-week</code> at step 2, where a Plan's grid starts.
       Tap a meal, then the same meal on another day, to swap them.</p>
-    <div class="tools"><button id="edit">← Back to the week</button>
+    <div class="tools"><button id="copy" class="btn btn-primary btn-sm">Copy to clipboard</button>
+      <button id="edit">← Back to the week</button>
       <button id="startover">Start over</button></div>
     <section>${days}</section>
     <textarea id="out" rows="32" readonly>${esc(planYaml())}</textarea>`;
@@ -830,6 +831,15 @@ function wireCheckout(){
   const out = document.getElementById('out');
   // Selected for copying, but not scrolled to: the week reads first.
   out.focus({preventScroll: true}); out.select();
+  /* The clipboard API needs a secure context; Pages is https, and the old
+     selection copy covers a page opened from disk. */
+  document.getElementById('copy').onclick = event => {
+    const b = event.currentTarget;
+    const done = () => { b.textContent = 'Copied'; };
+    out.select();
+    (navigator.clipboard ? navigator.clipboard.writeText(out.value)
+      : Promise.reject()).then(done, () => document.execCommand('copy') && done());
+  };
   document.getElementById('edit').onclick = () => { swapFrom = null; checkedOut = false; render(); };
   document.getElementById('startover').onclick = () => {
     plan = {}; planMove(0); checkedOut = false; render(); };
