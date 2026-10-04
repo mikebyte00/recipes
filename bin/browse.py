@@ -107,6 +107,21 @@ def annotate_ingredient(line, pins):
     return out
 
 
+def plan_staples(days, recipes, pins):
+    """The Staples a week's Recipes use, as [display, meals]: nothing to buy,
+    but each one to check is in the cupboard. A Recipe cooked twice counts
+    twice, so the busiest Staples read as the ones likeliest to run out."""
+    meals = {}
+    for slots in days.values():
+        for slug in slots.values():
+            for line in (recipes.get(slug) or {}).get("ingredients") or []:
+                pin = pins.get(line["ingredient"]) or {}
+                if pin.get("staple"):
+                    name = pin.get("display") or humanise(line["ingredient"])
+                    meals[name] = meals.get(name, 0) + 1
+    return sorted([name, n] for name, n in meals.items())
+
+
 def day_totals(slots, recipes):
     """Sum a day from its Recipes -- never from a grid's hand-written table."""
     protein = kcal = 0.0
@@ -331,6 +346,7 @@ def build_payload(data):
             "days": plan["days"],
             "totals": totals,
             "cooked": cooked,
+            "staples": plan_staples(plan["days"], recipes, data["pins"]),
             "basket": plan.get("basket", []),
             "counter": plan.get("counter", []),
             "multi_search": plan.get("multi_search", ""),
@@ -1050,6 +1066,10 @@ function planDetail(slug){
       <p class="note">Soutars and Dorset Meats, to take into the shop.</p>
       <div class="tools"><button class="copy btn btn-primary btn-sm" data-text="${esc(counterText(p.counter))}">Copy to clipboard</button></div>
       ${shopTable(p.slug, 'counter', ['Store', 'Item', 'Qty'], p.counter)}</section>` : ''}
+    ${p.staples.length ? `<section><h3>Staples to check</h3>
+      <p class="note">Not on the shopping list — these are assumed to be in the cupboard.
+        Check each has enough for the week; buy any that is running low.</p>
+      ${shopTable(p.slug, 'staples', ['Staple', 'Meals'], p.staples)}</section>` : ''}
   </article>`;
 }
 

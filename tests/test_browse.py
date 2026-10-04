@@ -236,6 +236,27 @@ class ShoppingBlocks(unittest.TestCase):
                          {"basket": [], "counter": [], "multi_search": ""})
 
 
+class PlanStaples(unittest.TestCase):
+    PINS = {"salt": {"display": "Salt", "staple": True},
+            "soy-sauce": {"display": "Soy sauce", "staple": True},
+            "tofu": {"display": "Tofu", "staple": False}}
+    RECIPES = {
+        "a": {"ingredients": [{"ingredient": "salt"}, {"ingredient": "tofu", "qty": 1}]},
+        "b": {"ingredients": [{"ingredient": "salt"}, {"ingredient": "soy-sauce"},
+                              {"ingredient": "pepper"}]},
+    }
+
+    def test_lists_each_staple_the_week_uses_with_its_meal_count(self):
+        days = {"monday": {"lunch": "a", "dinner": "b"},
+                "tuesday": {"lunch": "a", "dinner": browse.EATEN_OUT}}
+        self.assertEqual(browse.plan_staples(days, self.RECIPES, self.PINS),
+                         [["Salt", 3], ["Soy sauce", 1]])
+
+    def test_a_week_eaten_out_checks_nothing(self):
+        self.assertEqual(browse.plan_staples(
+            {"monday": {"lunch": browse.EATEN_OUT}}, self.RECIPES, self.PINS), [])
+
+
 class LastEaten(unittest.TestCase):
     """Variety is measured against weeks actually eaten, so each Recipe carries
     the last day a Plan put it on the table. Plan mode compares that with the
