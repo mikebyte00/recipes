@@ -156,9 +156,8 @@ def goal_flags(totals, goals=None):
 FRONTMATTER = re.compile(r"\A---\n(.*?)\n---\n(.*)\Z", re.S)
 METHOD_STEP = re.compile(r"^\s*\d+\.\s+(.*?)\s*$", re.M)
 MULTI_SEARCH = re.compile(r"\*\*Paste into Multi-search:\*\*\s*```\n(.*?)\n```", re.S)
-COUNTS = re.compile(r"^\*\*Multi-search adds 1 of each\.\*\*.*?\n\n(.*?)\n\n", re.S | re.M)
-COUNT_ROW = re.compile(r"^\| (.+?) \| \*\*(\d+)\*\* \| (.+?) \|$", re.M)
-BY_HAND = re.compile(r"^### Add by hand.*?\n(.*?)(?=^#|\Z)", re.S | re.M)
+TABLE = re.compile(r"^(?:\|.*\|\n?)+", re.M)
+PACKS = re.compile(r"^(\d+) ×")
 
 
 def read(path):
@@ -193,21 +192,43 @@ def load_recipes(root):
     return recipes
 
 
+def first_table(text):
+    """The body rows of the first markdown table in text, as lists of cells."""
+    table = TABLE.search(text)
+    rows = [[cell.strip() for cell in line.strip().strip("|").split("|")]
+            for line in table.group(0).splitlines()] if table else []
+    return [row for row in rows[1:] if not set("".join(row)) <= set("-: ")]
+
+
 def shopping_blocks(body):
-    """The two things a Plan's shopping section hands over for pasting: the
-    Multi-search block and the Unpinned items, each as plain lines. Read from
-    bin/shopping-list.py's output as written, so the page copies what the Plan
-    says rather than a second computation of it. Empty when there is no list."""
-    multi = MULTI_SEARCH.search(body)
-    counts = COUNTS.search(body)
-    hand = BY_HAND.search(body)
-    return {
-        "multi_search": multi.group(1).strip() if multi else "",
-        # The lines Multi-search's 1-of-each gets wrong: [item, count, line].
-        "counts": [list(row) for row in COUNT_ROW.findall(counts.group(1))] if counts else [],
-        "by_hand": "\n".join(line[2:].strip() for line in hand.group(1).splitlines()
-                              if line.startswith("- ")) if hand else "",
-    }
+    """A Plan's shopping section, shaped for the Plan page's two shop tables.
+    Read from bin/shopping-list.py's output as written, so the page shows what
+    the Plan says rather than a second computation of it.
+
+    basket  -- [type, item, packs, line]: every Waitrose line under its full
+               product name, then each Unpinned item to search for by hand.
+    counter -- [store, item, need] for the stores shopped at a counter.
+    multi_search -- the basket's items as Multi-search lines, one paste.
+    """
+    shop = body.split("\n## Shopping\n", 1)[1] if "\n## Shopping\n" in body else ""
+    basket, counter = [], []
+    for section in re.split(r"^### ", shop, flags=re.M)[1:]:
+        store = section.split(" — ")[0].strip()
+        if store == "Waitrose":
+            multi = MULTI_SEARCH.search(section)
+            names = multi.group(1).splitlines() if multi else []
+            for i, (item, _, buy, line) in enumerate(first_table(section)):
+                packs = PACKS.match(buy)
+                basket.append(["Waitrose", names[i] if i < len(names) else item,
+                               int(packs.group(1)) if packs else 1,
+                               "" if line == "—" else line])
+        elif store.startswith("Add by hand"):
+            basket += [["By hand", line[2:].strip(), None, ""]
+                       for line in section.splitlines() if line.startswith("- ")]
+        else:
+            counter += [[store, item, need] for item, need in first_table(section)]
+    return {"basket": basket, "counter": counter,
+            "multi_search": "\n".join(row[1] for row in basket)}
 
 
 def load_plans(root):
@@ -310,9 +331,9 @@ def build_payload(data):
             "days": plan["days"],
             "totals": totals,
             "cooked": cooked,
+            "basket": plan.get("basket", []),
+            "counter": plan.get("counter", []),
             "multi_search": plan.get("multi_search", ""),
-            "by_hand": plan.get("by_hand", ""),
-            "counts": plan.get("counts", []),
         })
 
     facets = {field: sorted({v for r in recipe_rows for v in
@@ -597,7 +618,7 @@ body.plan-on .list-group-item:hover{background:var(--accent-soft)}
 body.plan-on .list-group-item:hover .t{color:var(--accent)}
 button[disabled]{opacity:.45;cursor:not-allowed}
 button[disabled]:hover{border-color:var(--rule)}
-/* A counts row ticked off once its quantity is set in the trolley. */
+/* A shop table row ticked off once it is in the basket. */
 tr.done td{text-decoration:line-through;opacity:.5}
 textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
   font-size:.85rem;line-height:1.6;color:inherit;background:var(--card);
@@ -1020,61 +1041,73 @@ function planDetail(slug){
         a real week deviates on purpose. Floor ${g(D.goals.protein_floor)}/day,
         ceiling ${kc(D.goals.kcal_ceiling)} kcal/day.</p>
       ${days}</section>
-    ${copyBox('Multi-search', 'Paste into Waitrose Multi-search. It adds 1 of each.', p.multi_search)}
-    ${p.counts.length ? `<section><h3>Then set these counts</h3>
-      <p class="note">Every other line is right at 1. Tick each one as you set it.</p>
-      <table class="table table-sm" id="counts" data-plan="${esc(p.slug)}"><thead><tr><th>Item</th><th>Count</th><th></th><th>Line</th></tr></thead>
-      <tbody>${p.counts.map(([item, n, line]) => {
-        const done = countsTicked(p.slug).includes(line);
-        return `<tr${done ? ' class="done"' : ''}><td>${esc(item)}</td><td><b>${n}</b></td>
-          <td><input type="checkbox" class="form-check-input" data-line="${esc(line)}"
-            aria-label="${esc(item)} set to ${n}"${done ? ' checked' : ''}></td><td>${esc(line)}</td></tr>`;
-      }).join('')}</tbody></table>
-      </section>` : ''}
-    ${copyBox('Add by hand', 'No Pin exists for these, so search for them yourself.', p.by_hand)}
+    ${p.basket.length ? `<section><h3>Waitrose</h3>
+      <p class="note">Paste into Multi-search, then set each line's quantity as it
+        goes in the basket and tick it off. By-hand items have no Pin, so pick the product.</p>
+      <div class="tools"><button class="copy btn btn-primary btn-sm" data-text="${esc(p.multi_search)}">Copy Multi-search</button></div>
+      ${shopTable(p.slug, 'basket', ['Type', 'Item', 'Qty', 'Line'], p.basket)}</section>` : ''}
+    ${p.counter.length ? `<section><h3>Counters</h3>
+      <p class="note">Soutars and Dorset Meats, to take into the shop.</p>
+      <div class="tools"><button class="copy btn btn-primary btn-sm" data-text="${esc(counterText(p.counter))}">Copy to clipboard</button></div>
+      ${shopTable(p.slug, 'counter', ['Store', 'Item', 'Qty'], p.counter)}</section>` : ''}
   </article>`;
 }
 
-/* A section whose text is there to be pasted somewhere else, with its button.
-   Nothing to paste, no section. */
-function copyBox(title, note, text){
-  if (!text) return '';
-  return `<section><h3>${title}</h3><p class="note">${note}</p>
-    <div class="tools"><button class="copy btn btn-primary btn-sm">Copy to clipboard</button></div>
-    <textarea rows="${Math.min(text.split('\n').length, 16)}" readonly>${esc(text)}</textarea></section>`;
+/* The counter list as plain text, grouped by store, for a phone's notes. */
+function counterText(rows){
+  const stores = [...new Set(rows.map(([store]) => store))];
+  return stores.map(store => store + '\n' + rows.filter(r => r[0] === store)
+    .map(([, item, need]) => `- ${item}: ${need}`).join('\n')).join('\n\n');
 }
 
-/* Copy the textarea that follows a .copy button's toolbar. The clipboard API
-   needs a secure context; Pages is https, and the old selection copy covers a
-   page opened from disk. */
-function copyFrom(button, out){
-  const done = () => { button.textContent = 'Copied'; };
-  out.select();
-  (navigator.clipboard ? navigator.clipboard.writeText(out.value)
-    : Promise.reject()).then(done, () => document.execCommand('copy') && done());
+/* A shop table with a tick per row; a ticked row strikes through. A Qty over
+   1 is bold: Multi-search adds 1 of each, so those are the lines to change. */
+function shopTable(slug, name, heads, rows){
+  const ticked = shopTicked(slug, name);
+  return `<table class="table table-sm shop" data-key="${esc(name + ':' + slug)}">
+    <thead><tr><th></th>${heads.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map(cells => {
+      const id = cells.slice(0, 2).join(' / ');
+      const done = ticked.includes(id);
+      return `<tr${done ? ' class="done"' : ''}><td><input type="checkbox" class="form-check-input"
+        data-id="${esc(id)}" aria-label="${esc(cells[1])}"${done ? ' checked' : ''}></td>${
+        cells.map((c, i) => `<td>${heads[i] === 'Qty' && c > 1 ? `<b>${c}</b>` : esc(c == null ? '' : String(c))}</td>`).join('')}</tr>`;
+    }).join('')}</tbody></table>`;
 }
 
-/* Which counts rows are ticked, by line number, per Plan. A per-viewer
-   convenience in this browser only, so a blocked storage just forgets. */
-function countsTicked(slug){
-  try { return JSON.parse(localStorage.getItem('counts:' + slug)) || []; }
+/* Which rows of a shop table are ticked, per Plan. A per-viewer convenience
+   in this browser only, so a blocked storage just forgets. */
+function shopTicked(slug, name){
+  try { return JSON.parse(localStorage.getItem(name + ':' + slug)) || []; }
   catch (e) { return []; }
 }
 
-function wireCounts(){
-  const table = document.getElementById('counts');
-  if (!table) return;
-  table.onchange = event => {
-    const box = event.target;
-    box.closest('tr').classList.toggle('done', box.checked);
-    const ticked = [...table.querySelectorAll('input:checked')].map(b => b.dataset.line);
-    try { localStorage.setItem('counts:' + table.dataset.plan, JSON.stringify(ticked)); } catch (e) {}
+function wireShopTables(){
+  document.querySelectorAll('table.shop').forEach(table => table.onchange = event => {
+    event.target.closest('tr').classList.toggle('done', event.target.checked);
+    const ticked = [...table.querySelectorAll('input:checked')].map(b => b.dataset.id);
+    try { localStorage.setItem(table.dataset.key, JSON.stringify(ticked)); } catch (e) {}
+  });
+}
+
+/* Put text on the clipboard. The clipboard API needs a secure context; Pages
+   is https, and a selection copy from a throwaway textarea covers a page
+   opened from disk. */
+function copyText(button, text){
+  const done = () => { button.textContent = 'Copied'; };
+  const fallback = () => {
+    const t = document.createElement('textarea');
+    t.value = text; document.body.appendChild(t); t.select();
+    const ok = document.execCommand('copy'); t.remove();
+    if (ok) done();
   };
+  (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
+    .then(done, fallback);
 }
 
 function wireCopies(){
   document.querySelectorAll('button.copy').forEach(b =>
-    b.onclick = () => copyFrom(b, b.parentElement.nextElementSibling));
+    b.onclick = () => copyText(b, b.dataset.text));
 }
 
 /* Plan mode. The pool stays on screen and the wizard walks: the drawer names
@@ -1220,7 +1253,7 @@ function wireCheckout(){
   const out = document.getElementById('out');
   // Selected for copying, but not scrolled to: the week reads first.
   out.focus({preventScroll: true}); out.select();
-  document.getElementById('copy').onclick = event => copyFrom(event.currentTarget, out);
+  document.getElementById('copy').onclick = event => copyText(event.currentTarget, out.value);
   document.getElementById('edit').onclick = () => { swapFrom = null; checkedOut = false; render(); };
   document.getElementById('startover').onclick = () => {
     plan = {}; planMove(0); checkedOut = false; render(); };
@@ -1261,7 +1294,7 @@ function render(){
   renderDrawer();
   if (checkedOut) wireCheckout();
   else if (v === 'recipes' || v === undefined) { wireFilters(); wirePlanClicks(); }
-  wireCopies(); wireCounts();
+  wireCopies(); wireShopTables();
   window.scrollTo(0, 0);
 }
 

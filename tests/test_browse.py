@@ -198,23 +198,42 @@ class Plans(unittest.TestCase):
 
 
 class ShoppingBlocks(unittest.TestCase):
-    """The Plan page's two copy boxes, read from the Plan's shopping section."""
+    """The Plan page's two shop tables, read from the Plan's shopping section."""
 
-    def test_reads_the_multi_search_block_and_the_unpinned_items(self):
-        body = ("Notes.\n\n## Shopping\n\n**Paste into Multi-search:**\n\n"
-                "```\nDuchy Organic Spinach\nQuorn Vegetarian Pieces\n```\n\n"
-                "**Multi-search adds 1 of each.** 1 of 2 lines are right at 1; set these 1:\n\n"
-                "| Item | Count | Line |\n|---|---|---|\n| Quorn pieces | **3** | 441467 |\n\n"
-                "### Soutars\n\n| Eggs | 12 each |\n\n"
-                "### Add by hand — 2 Unpinned\n\nNo Pin exists.\n\n- Ginger\n- Spring onion\n")
-        self.assertEqual(browse.shopping_blocks(body), {
-            "multi_search": "Duchy Organic Spinach\nQuorn Vegetarian Pieces",
-            "counts": [["Quorn pieces", "3", "441467"]],
-            "by_hand": "Ginger\nSpring onion"})
+    BODY = ("Notes.\n\n## Shopping\n\nGenerated.\n\n### Waitrose — 2 lines\n\n"
+            "| Item | Need | Buy | Line |\n|---|---|---|---|\n"
+            "| Spinach | 200 g | 1 × 200 g | 022524 |\n"
+            "| Quorn pieces | 900 g | 3 × 300 g | 441467 |\n"
+            "| White miso paste | 20 g | buy 1 ⚠ pack unknown | — |\n\n"
+            "**Paste into Multi-search:**\n\n"
+            "```\nDuchy Organic Spinach\nQuorn Vegetarian Pieces\nWhite miso paste\n```\n\n"
+            "**Multi-search adds 1 of each.** set these 1:\n\n"
+            "| Item | Count | Line |\n|---|---|---|\n| Quorn pieces | **3** | 441467 |\n\n"
+            "### Soutars — 1 lines\n\n| Item | Need |\n|---|---|\n| Eggs | 12 each |\n\n"
+            "### Dorset Meats — 1 lines\n\n| Item | Need |\n|---|---|\n| White fish fillets | 4 fillets |\n\n"
+            "### Add by hand — 2 Unpinned\n\nNo Pin exists.\n\n- Ginger\n- Spring onion\n")
 
-    def test_a_plan_with_no_shopping_section_has_nothing_to_copy(self):
+    def test_the_basket_is_every_waitrose_line_by_product_name_then_the_unpinned(self):
+        self.assertEqual(browse.shopping_blocks(self.BODY)["basket"], [
+            ["Waitrose", "Duchy Organic Spinach", 1, "022524"],
+            ["Waitrose", "Quorn Vegetarian Pieces", 3, "441467"],
+            ["Waitrose", "White miso paste", 1, ""],
+            ["By hand", "Ginger", None, ""],
+            ["By hand", "Spring onion", None, ""]])
+
+    def test_one_multi_search_paste_carries_the_unpinned_too(self):
+        self.assertEqual(browse.shopping_blocks(self.BODY)["multi_search"].splitlines(),
+                         ["Duchy Organic Spinach", "Quorn Vegetarian Pieces",
+                          "White miso paste", "Ginger", "Spring onion"])
+
+    def test_the_counter_stores_get_their_own_list(self):
+        self.assertEqual(browse.shopping_blocks(self.BODY)["counter"], [
+            ["Soutars", "Eggs", "12 each"],
+            ["Dorset Meats", "White fish fillets", "4 fillets"]])
+
+    def test_a_plan_with_no_shopping_section_has_nothing_to_shop(self):
         self.assertEqual(browse.shopping_blocks("Just notes.\n"),
-                         {"multi_search": "", "counts": [], "by_hand": ""})
+                         {"basket": [], "counter": [], "multi_search": ""})
 
 
 class LastEaten(unittest.TestCase):
