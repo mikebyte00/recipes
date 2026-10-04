@@ -265,6 +265,16 @@ def load_plans(root):
     return plans
 
 
+def load_household(root):
+    """HOUSEHOLD.md's reminders: every `- ` line, in the file's order. The
+    list is optional, so a missing file is an empty one."""
+    path = os.path.join(root, "HOUSEHOLD.md")
+    if not os.path.exists(path):
+        return []
+    return [line[2:].strip() for line in read(path).splitlines()
+            if line.startswith("- ") and line[2:].strip()]
+
+
 def load_all(root):
     goals_text = read(os.path.join(root, "GOALS.md"))
     return {
@@ -273,6 +283,7 @@ def load_all(root):
         "pins": load_pins(root),
         "bands": parse_bands(goals_text),
         "goals": parse_nutrient_goals(goals_text),
+        "household": load_household(root),
     }
 
 
@@ -360,6 +371,7 @@ def build_payload(data):
     return {
         "recipes": recipe_rows,
         "plans": plan_rows,
+        "household": data.get("household", []),
         "bands": bands,
         "goals": data["goals"],
         "facets": facets,
@@ -1070,6 +1082,9 @@ function planDetail(slug){
       <p class="note">Not on the shopping list — these are assumed to be in the cupboard.
         Check each has enough for the week; buy any that is running low.</p>
       ${shopTable(p.slug, 'staples', ['Staple', 'Meals'], p.staples)}</section>` : ''}
+    ${D.household.length ? `<section><h3>Household reminders</h3>
+      <p class="note">Around the house, food or not. Check each is stocked; the list lives in <code>HOUSEHOLD.md</code>.</p>
+      ${shopTable(p.slug, 'household', ['Item'], D.household.map(item => [item]))}</section>` : ''}
   </article>`;
 }
 
@@ -1090,7 +1105,7 @@ function shopTable(slug, name, heads, rows){
       const id = cells.slice(0, 2).join(' / ');
       const done = ticked.includes(id);
       return `<tr${done ? ' class="done"' : ''}><td><input type="checkbox" class="form-check-input"
-        data-id="${esc(id)}" aria-label="${esc(cells[1])}"${done ? ' checked' : ''}></td>${
+        data-id="${esc(id)}" aria-label="${esc(id)}"${done ? ' checked' : ''}></td>${
         cells.map((c, i) => `<td>${heads[i] === 'Qty' && c > 1 ? `<b>${c}</b>` : esc(c == null ? '' : String(c))}</td>`).join('')}</tr>`;
     }).join('')}</tbody></table>`;
 }

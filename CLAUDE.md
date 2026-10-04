@@ -38,18 +38,18 @@ A **third** `bin/` entry is a decision, not a convenience — raise it as a
 ticket. Everything else is prose, because everything else is judgement.
 
 `index.html` is generated and committed, and regenerating it is manual:
-re-run `bin/browse.py` whenever a Recipe, Plan or Pin changes.
+re-run `bin/browse.py` whenever a Recipe, Plan, Pin or `HOUSEHOLD.md` changes.
 `bin/browse.py --check` says whether the committed page has gone stale.
 
 **Parity between the Recipes, `index.html` and GitHub Pages is vital.** The
 page is served from the branch root at `mikebyte00.github.io/recipes`, so the
 committed `index.html` *is* what the household reads on a phone in the kitchen.
-A markdown change that stops there is invisible. Every edit to a Recipe, Plan
-or Pin therefore finishes the same way, and the change is not done
+A markdown change that stops there is invisible. Every edit to a Recipe, Plan,
+Pin or `HOUSEHOLD.md` therefore finishes the same way, and the change is not done
 until it has:
 
 1. `.venv/bin/python bin/browse.py` — regenerate the page.
-2. `.venv/bin/python tests/test_browse.py` — 74 tests. Thirty-five shell out to `node` — to run the page's theme boot script,
+2. `.venv/bin/python tests/test_browse.py` — 82 tests. Thirty-five shell out to `node` — to run the page's theme boot script,
    its eaten-days count, its picked-days badge, Checkout's week and meal swap,
    and the filter reset Plan mode makes on every move — and skip cleanly when it is absent.
 3. `git commit` the source change **and** `index.html` in the same commit.

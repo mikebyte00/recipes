@@ -257,6 +257,18 @@ class PlanStaples(unittest.TestCase):
             {"monday": {"lunch": browse.EATEN_OUT}}, self.RECIPES, self.PINS), [])
 
 
+class Household(unittest.TestCase):
+    def test_reads_each_bullet_in_order_and_ignores_the_prose(self):
+        with tempfile.TemporaryDirectory() as root:
+            with open(os.path.join(root, "HOUSEHOLD.md"), "w") as handle:
+                handle.write("# Household\n\nCheck these.\n\n- Hand soap\n- Squash\n-\n")
+            self.assertEqual(browse.load_household(root), ["Hand soap", "Squash"])
+
+    def test_no_file_is_an_empty_list(self):
+        with tempfile.TemporaryDirectory() as root:
+            self.assertEqual(browse.load_household(root), [])
+
+
 class LastEaten(unittest.TestCase):
     """Variety is measured against weeks actually eaten, so each Recipe carries
     the last day a Plan put it on the table. Plan mode compares that with the
