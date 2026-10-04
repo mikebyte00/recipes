@@ -264,6 +264,8 @@ body.plan-on .list-group-item:hover{background:var(--accent-soft)}
 body.plan-on .list-group-item:hover .t{color:var(--accent)}
 button[disabled]{opacity:.45;cursor:not-allowed}
 button[disabled]:hover{border-color:var(--rule)}
+/* A counts row ticked off once its quantity is set in the trolley. */
+tr.done td{text-decoration:line-through;opacity:.5}
 textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
   font-size:.85rem;line-height:1.6;color:inherit;background:var(--card);
   border:1px solid var(--rule);border-radius:9px;padding:.85rem}
@@ -687,10 +689,14 @@ function planDetail(slug){
       ${days}</section>
     ${copyBox('Multi-search', 'Paste into Waitrose Multi-search. It adds 1 of each.', p.multi_search)}
     ${p.counts.length ? `<section><h3>Then set these counts</h3>
-      <p class="note">Every other line is right at 1.</p>
-      <table class="table table-sm"><thead><tr><th>Item</th><th>Count</th><th>Line</th></tr></thead>
-      <tbody>${p.counts.map(([item, n, line]) =>
-        `<tr><td>${esc(item)}</td><td><b>${n}</b></td><td>${esc(line)}</td></tr>`).join('')}</tbody></table>
+      <p class="note">Every other line is right at 1. Tick each one as you set it.</p>
+      <table class="table table-sm" id="counts" data-plan="${esc(p.slug)}"><thead><tr><th>Item</th><th>Count</th><th></th><th>Line</th></tr></thead>
+      <tbody>${p.counts.map(([item, n, line]) => {
+        const done = countsTicked(p.slug).includes(line);
+        return `<tr${done ? ' class="done"' : ''}><td>${esc(item)}</td><td><b>${n}</b></td>
+          <td><input type="checkbox" class="form-check-input" data-line="${esc(line)}"
+            aria-label="${esc(item)} set to ${n}"${done ? ' checked' : ''}></td><td>${esc(line)}</td></tr>`;
+      }).join('')}</tbody></table>
       </section>` : ''}
     ${copyBox('Add by hand', 'No Pin exists for these, so search for them yourself.', p.by_hand)}
   </article>`;
@@ -713,6 +719,24 @@ function copyFrom(button, out){
   out.select();
   (navigator.clipboard ? navigator.clipboard.writeText(out.value)
     : Promise.reject()).then(done, () => document.execCommand('copy') && done());
+}
+
+/* Which counts rows are ticked, by line number, per Plan. A per-viewer
+   convenience in this browser only, so a blocked storage just forgets. */
+function countsTicked(slug){
+  try { return JSON.parse(localStorage.getItem('counts:' + slug)) || []; }
+  catch (e) { return []; }
+}
+
+function wireCounts(){
+  const table = document.getElementById('counts');
+  if (!table) return;
+  table.onchange = event => {
+    const box = event.target;
+    box.closest('tr').classList.toggle('done', box.checked);
+    const ticked = [...table.querySelectorAll('input:checked')].map(b => b.dataset.line);
+    try { localStorage.setItem('counts:' + table.dataset.plan, JSON.stringify(ticked)); } catch (e) {}
+  };
 }
 
 function wireCopies(){
@@ -904,7 +928,7 @@ function render(){
   renderDrawer();
   if (checkedOut) wireCheckout();
   else if (v === 'recipes' || v === undefined) { wireFilters(); wirePlanClicks(); }
-  wireCopies();
+  wireCopies(); wireCounts();
   window.scrollTo(0, 0);
 }
 
