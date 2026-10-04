@@ -1000,7 +1000,7 @@ white-miso-paste:
   display: White miso paste
   store: waitrose
   unit: g
-  staple: true
+  staple: false
   confirmed: true
 
 wholewheat-penne:
