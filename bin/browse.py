@@ -156,6 +156,8 @@ def goal_flags(totals, goals=None):
 FRONTMATTER = re.compile(r"\A---\n(.*?)\n---\n(.*)\Z", re.S)
 METHOD_STEP = re.compile(r"^\s*\d+\.\s+(.*?)\s*$", re.M)
 MULTI_SEARCH = re.compile(r"\*\*Paste into Multi-search:\*\*\s*```\n(.*?)\n```", re.S)
+COUNTS = re.compile(r"^\*\*Multi-search adds 1 of each\.\*\*.*?\n\n(.*?)\n\n", re.S | re.M)
+COUNT_ROW = re.compile(r"^\| (.+?) \| \*\*(\d+)\*\* \| (.+?) \|$", re.M)
 BY_HAND = re.compile(r"^### Add by hand.*?\n(.*?)(?=^#|\Z)", re.S | re.M)
 
 
@@ -197,9 +199,12 @@ def shopping_blocks(body):
     bin/shopping-list.py's output as written, so the page copies what the Plan
     says rather than a second computation of it. Empty when there is no list."""
     multi = MULTI_SEARCH.search(body)
+    counts = COUNTS.search(body)
     hand = BY_HAND.search(body)
     return {
         "multi_search": multi.group(1).strip() if multi else "",
+        # The lines Multi-search's 1-of-each gets wrong: [item, count, line].
+        "counts": [list(row) for row in COUNT_ROW.findall(counts.group(1))] if counts else [],
         "by_hand": "\n".join(line[2:].strip() for line in hand.group(1).splitlines()
                               if line.startswith("- ")) if hand else "",
     }
@@ -307,6 +312,7 @@ def build_payload(data):
             "cooked": cooked,
             "multi_search": plan.get("multi_search", ""),
             "by_hand": plan.get("by_hand", ""),
+            "counts": plan.get("counts", []),
         })
 
     facets = {field: sorted({v for r in recipe_rows for v in
@@ -1012,7 +1018,13 @@ function planDetail(slug){
         a real week deviates on purpose. Floor ${g(D.goals.protein_floor)}/day,
         ceiling ${kc(D.goals.kcal_ceiling)} kcal/day.</p>
       ${days}</section>
-    ${copyBox('Multi-search', 'Paste into Waitrose Multi-search. It adds 1 of each; the Plan file says which lines need more.', p.multi_search)}
+    ${copyBox('Multi-search', 'Paste into Waitrose Multi-search. It adds 1 of each.', p.multi_search)}
+    ${p.counts.length ? `<section><h3>Then set these counts</h3>
+      <p class="note">Every other line is right at 1.</p>
+      <table class="table table-sm"><thead><tr><th>Item</th><th>Count</th><th>Line</th></tr></thead>
+      <tbody>${p.counts.map(([item, n, line]) =>
+        `<tr><td>${esc(item)}</td><td><b>${n}</b></td><td>${esc(line)}</td></tr>`).join('')}</tbody></table>
+      </section>` : ''}
     ${copyBox('Add by hand', 'No Pin exists for these, so search for them yourself.', p.by_hand)}
   </article>`;
 }

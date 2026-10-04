@@ -203,15 +203,18 @@ class ShoppingBlocks(unittest.TestCase):
     def test_reads_the_multi_search_block_and_the_unpinned_items(self):
         body = ("Notes.\n\n## Shopping\n\n**Paste into Multi-search:**\n\n"
                 "```\nDuchy Organic Spinach\nQuorn Vegetarian Pieces\n```\n\n"
+                "**Multi-search adds 1 of each.** 1 of 2 lines are right at 1; set these 1:\n\n"
+                "| Item | Count | Line |\n|---|---|---|\n| Quorn pieces | **3** | 441467 |\n\n"
                 "### Soutars\n\n| Eggs | 12 each |\n\n"
                 "### Add by hand — 2 Unpinned\n\nNo Pin exists.\n\n- Ginger\n- Spring onion\n")
         self.assertEqual(browse.shopping_blocks(body), {
             "multi_search": "Duchy Organic Spinach\nQuorn Vegetarian Pieces",
+            "counts": [["Quorn pieces", "3", "441467"]],
             "by_hand": "Ginger\nSpring onion"})
 
     def test_a_plan_with_no_shopping_section_has_nothing_to_copy(self):
         self.assertEqual(browse.shopping_blocks("Just notes.\n"),
-                         {"multi_search": "", "by_hand": ""})
+                         {"multi_search": "", "counts": [], "by_hand": ""})
 
 
 class LastEaten(unittest.TestCase):
