@@ -155,6 +155,8 @@ def goal_flags(totals, goals=None):
 
 FRONTMATTER = re.compile(r"\A---\n(.*?)\n---\n(.*)\Z", re.S)
 METHOD_STEP = re.compile(r"^\s*\d+\.\s+(.*?)\s*$", re.M)
+MULTI_SEARCH = re.compile(r"\*\*Paste into Multi-search:\*\*\s*```\n(.*?)\n```", re.S)
+BY_HAND = re.compile(r"^### Add by hand.*?\n(.*?)(?=^#|\Z)", re.S | re.M)
 
 
 def read(path):
@@ -189,6 +191,20 @@ def load_recipes(root):
     return recipes
 
 
+def shopping_blocks(body):
+    """The two things a Plan's shopping section hands over for pasting: the
+    Multi-search block and the Unpinned items, each as plain lines. Read from
+    bin/shopping-list.py's output as written, so the page copies what the Plan
+    says rather than a second computation of it. Empty when there is no list."""
+    multi = MULTI_SEARCH.search(body)
+    hand = BY_HAND.search(body)
+    return {
+        "multi_search": multi.group(1).strip() if multi else "",
+        "by_hand": "\n".join(line[2:].strip() for line in hand.group(1).splitlines()
+                              if line.startswith("- ")) if hand else "",
+    }
+
+
 def load_plans(root):
     """Every week actually planned, latest first.
 
@@ -197,12 +213,13 @@ def load_plans(root):
     """
     plans = []
     for path in sorted(glob.glob(os.path.join(root, "Plans", "*.md")), reverse=True):
-        front, _ = split_document(path)
+        front, body = split_document(path)
         slug = os.path.basename(path)[:-3]
         plans.append({
             "slug": slug,
             "title": front.get("title") or humanise(slug),
             "days": {day: dict(front.get("days", {}).get(day) or {}) for day in DAYS},
+            **shopping_blocks(body),
         })
     return plans
 
@@ -288,6 +305,8 @@ def build_payload(data):
             "days": plan["days"],
             "totals": totals,
             "cooked": cooked,
+            "multi_search": plan.get("multi_search", ""),
+            "by_hand": plan.get("by_hand", ""),
         })
 
     facets = {field: sorted({v for r in recipe_rows for v in
@@ -993,7 +1012,33 @@ function planDetail(slug){
         a real week deviates on purpose. Floor ${g(D.goals.protein_floor)}/day,
         ceiling ${kc(D.goals.kcal_ceiling)} kcal/day.</p>
       ${days}</section>
+    ${copyBox('Multi-search', 'Paste into Waitrose Multi-search. It adds 1 of each; the Plan file says which lines need more.', p.multi_search)}
+    ${copyBox('Add by hand', 'No Pin exists for these, so search for them yourself.', p.by_hand)}
   </article>`;
+}
+
+/* A section whose text is there to be pasted somewhere else, with its button.
+   Nothing to paste, no section. */
+function copyBox(title, note, text){
+  if (!text) return '';
+  return `<section><h3>${title}</h3><p class="note">${note}</p>
+    <div class="tools"><button class="copy btn btn-primary btn-sm">Copy to clipboard</button></div>
+    <textarea rows="${Math.min(text.split('\n').length, 16)}" readonly>${esc(text)}</textarea></section>`;
+}
+
+/* Copy the textarea that follows a .copy button's toolbar. The clipboard API
+   needs a secure context; Pages is https, and the old selection copy covers a
+   page opened from disk. */
+function copyFrom(button, out){
+  const done = () => { button.textContent = 'Copied'; };
+  out.select();
+  (navigator.clipboard ? navigator.clipboard.writeText(out.value)
+    : Promise.reject()).then(done, () => document.execCommand('copy') && done());
+}
+
+function wireCopies(){
+  document.querySelectorAll('button.copy').forEach(b =>
+    b.onclick = () => copyFrom(b, b.parentElement.nextElementSibling));
 }
 
 /* Plan mode. The pool stays on screen and the wizard walks: the drawer names
@@ -1139,15 +1184,7 @@ function wireCheckout(){
   const out = document.getElementById('out');
   // Selected for copying, but not scrolled to: the week reads first.
   out.focus({preventScroll: true}); out.select();
-  /* The clipboard API needs a secure context; Pages is https, and the old
-     selection copy covers a page opened from disk. */
-  document.getElementById('copy').onclick = event => {
-    const b = event.currentTarget;
-    const done = () => { b.textContent = 'Copied'; };
-    out.select();
-    (navigator.clipboard ? navigator.clipboard.writeText(out.value)
-      : Promise.reject()).then(done, () => document.execCommand('copy') && done());
-  };
+  document.getElementById('copy').onclick = event => copyFrom(event.currentTarget, out);
   document.getElementById('edit').onclick = () => { swapFrom = null; checkedOut = false; render(); };
   document.getElementById('startover').onclick = () => {
     plan = {}; planMove(0); checkedOut = false; render(); };
@@ -1188,6 +1225,7 @@ function render(){
   renderDrawer();
   if (checkedOut) wireCheckout();
   else if (v === 'recipes' || v === undefined) { wireFilters(); wirePlanClicks(); }
+  wireCopies();
   window.scrollTo(0, 0);
 }
 

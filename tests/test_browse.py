@@ -197,6 +197,23 @@ class Plans(unittest.TestCase):
         self.assertNotIn("violations", plan_payload([self.plan])[0])
 
 
+class ShoppingBlocks(unittest.TestCase):
+    """The Plan page's two copy boxes, read from the Plan's shopping section."""
+
+    def test_reads_the_multi_search_block_and_the_unpinned_items(self):
+        body = ("Notes.\n\n## Shopping\n\n**Paste into Multi-search:**\n\n"
+                "```\nDuchy Organic Spinach\nQuorn Vegetarian Pieces\n```\n\n"
+                "### Soutars\n\n| Eggs | 12 each |\n\n"
+                "### Add by hand — 2 Unpinned\n\nNo Pin exists.\n\n- Ginger\n- Spring onion\n")
+        self.assertEqual(browse.shopping_blocks(body), {
+            "multi_search": "Duchy Organic Spinach\nQuorn Vegetarian Pieces",
+            "by_hand": "Ginger\nSpring onion"})
+
+    def test_a_plan_with_no_shopping_section_has_nothing_to_copy(self):
+        self.assertEqual(browse.shopping_blocks("Just notes.\n"),
+                         {"multi_search": "", "by_hand": ""})
+
+
 class LastEaten(unittest.TestCase):
     """Variety is measured against weeks actually eaten, so each Recipe carries
     the last day a Plan put it on the table. Plan mode compares that with the
