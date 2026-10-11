@@ -680,6 +680,14 @@ button[disabled]{opacity:.45;cursor:not-allowed}
 button[disabled]:hover{border-color:var(--rule)}
 /* A shop table row ticked off once it is in the basket. */
 tr.done td{text-decoration:line-through;opacity:.5}
+/* The whole row is the tick target, 44px at least. */
+table.shop tbody tr{cursor:pointer}
+table.shop tbody td{height:2.75rem;vertical-align:middle}
+table.shop td em{color:var(--soft)}
+.jump{position:sticky;top:var(--nav-h,3.6rem);z-index:5;display:flex;gap:.4rem;overflow-x:auto;
+  margin:0 -1rem 1rem;padding:.5rem 1rem;background:var(--bs-body-bg);border-bottom:1px solid var(--rule)}
+.jump .btn{flex:none}
+[id^=sec-]{scroll-margin-top:calc(var(--nav-h,3.6rem) + 3.5rem)}
 textarea{width:100%;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
   font-size:.85rem;line-height:1.6;color:inherit;background:var(--card);
   border:1px solid var(--rule);border-radius:9px;padding:.85rem}
@@ -1113,28 +1121,31 @@ function planDetail(slug){
   return `<a class="back" href="#plans">← Plans</a>
   <article><h2>${esc(p.title)}</h2>
     <p class="tagline">${p.cooked} of ${SLOT_COUNT} Slots cooked at home</p>
+    ${jumpRow([['week', 'Week', true], ['waitrose', 'Waitrose', p.basket.length],
+               ['counters', 'Counters', p.counter.length], ['staples', 'Staples', p.staples.length],
+               ['household', 'Household', D.household.length]])}
 
-    <section><h3>The week</h3>
+    <section id="sec-week"><h3>The week</h3>
       <p class="note">Tap a meal to open its Recipe. Day totals are summed from the
         Recipes each Slot names; a day with nothing cooked at home is not measured
         against the goals, and a Plan is never checked against a layout —
         a real week deviates on purpose. Floor ${g(D.goals.protein_floor)}/day,
         ceiling ${kc(D.goals.kcal_ceiling)} kcal/day.</p>
       ${days}</section>
-    ${p.basket.length ? `<section><h3>Waitrose</h3>
+    ${p.basket.length ? `<section id="sec-waitrose"><h3>Waitrose</h3>
       <p class="note">Paste into Multi-search, then set each line's quantity as it
         goes in the basket and tick it off. By-hand items have no Pin, so pick the product.</p>
       <div class="tools"><button class="copy btn btn-primary btn-sm" data-text="${esc(p.multi_search)}">Copy Multi-search</button></div>
-      ${shopTable(p.slug, 'basket', ['Type', 'Item', 'Qty', 'Line'], p.basket)}</section>` : ''}
-    ${p.counter.length ? `<section><h3>Counters</h3>
+      ${shopTable(p.slug, 'basket', ['Item', 'Qty', 'Line'], p.basket, 1)}</section>` : ''}
+    ${p.counter.length ? `<section id="sec-counters"><h3>Counters</h3>
       <p class="note">Soutars and Dorset Meats, to take into the shop.</p>
       <div class="tools"><button class="copy btn btn-primary btn-sm" data-text="${esc(counterText(p.counter))}">Copy to clipboard</button></div>
       ${shopTable(p.slug, 'counter', ['Store', 'Item', 'Qty'], p.counter)}</section>` : ''}
-    ${p.staples.length ? `<section><h3>Staples to check</h3>
+    ${p.staples.length ? `<section id="sec-staples"><h3>Staples to check</h3>
       <p class="note">Not on the shopping list — these are assumed to be in the cupboard.
         Check each has enough for the week; buy any that is running low.</p>
       ${shopTable(p.slug, 'staples', ['Staple', 'Meals'], p.staples)}</section>` : ''}
-    ${D.household.length ? `<section><h3>Household reminders</h3>
+    ${D.household.length ? `<section id="sec-household"><h3>Household reminders</h3>
       <p class="note">Around the house, food or not. Check each is stocked; the list lives in <code>HOUSEHOLD.md</code>.</p>
       ${shopTable(p.slug, 'household', ['Item'], D.household.map(item => [item]))}</section>` : ''}
   </article>`;
@@ -1147,9 +1158,17 @@ function counterText(rows){
     .map(([, item, need]) => `- ${item}: ${need}`).join('\n')).join('\n\n');
 }
 
+/* The Plan page's sticky jump row. Buttons, not links: the hash is the router. */
+function jumpRow(items){
+  return `<nav class="jump">${items.filter(i => i[2]).map(([k, label]) =>
+    `<button type="button" class="btn btn-sm btn-outline-secondary" data-jump="sec-${k}">${label}</button>`).join('')}</nav>`;
+}
+
 /* A shop table with a tick per row; a ticked row strikes through. A Qty over
-   1 is bold: Multi-search adds 1 of each, so those are the lines to change. */
-function shopTable(slug, name, heads, rows){
+   1 is bold: Multi-search adds 1 of each, so those are the lines to change.
+   skip drops leading cells from view but keeps them in the tick id, so ticks
+   saved before the Type column went still match. */
+function shopTable(slug, name, heads, rows, skip = 0){
   const ticked = shopTicked(slug, name);
   return `<table class="table table-sm shop" data-key="${esc(name + ':' + slug)}">
     <thead><tr><th></th>${heads.map(h => `<th>${h}</th>`).join('')}</tr></thead>
@@ -1158,7 +1177,8 @@ function shopTable(slug, name, heads, rows){
       const done = ticked.includes(id);
       return `<tr${done ? ' class="done"' : ''}><td><input type="checkbox" class="form-check-input"
         data-id="${esc(id)}" aria-label="${esc(id)}"${done ? ' checked' : ''}></td>${
-        cells.map((c, i) => `<td>${heads[i] === 'Qty' && c > 1 ? `<b>${c}</b>` : esc(c == null ? '' : String(c))}</td>`).join('')}</tr>`;
+        cells.slice(skip).map((c, i) => `<td>${heads[i] === 'Qty' && c > 1 ? `<b>${c}</b>`
+          : heads[i] === 'Line' && !c ? '<em>by hand</em>' : esc(c == null ? '' : String(c))}</td>`).join('')}</tr>`;
     }).join('')}</tbody></table>`;
 }
 
@@ -1170,6 +1190,16 @@ function shopTicked(slug, name){
 }
 
 function wireShopTables(){
+  // The navbar's height varies with the wordmark's wrap, so measure it.
+  document.body.style.setProperty('--nav-h', document.querySelector('.navbar').offsetHeight + 'px');
+  document.querySelectorAll('[data-jump]').forEach(b => b.onclick = () =>
+    document.getElementById(b.dataset.jump).scrollIntoView({behavior: 'smooth'}));
+  document.querySelectorAll('table.shop').forEach(table => table.onclick = event => {
+    const box = event.target.closest('tr')?.querySelector('input');
+    if (!box || event.target === box) return;
+    box.checked = !box.checked;
+    box.dispatchEvent(new Event('change', {bubbles: true}));
+  });
   document.querySelectorAll('table.shop').forEach(table => table.onchange = event => {
     event.target.closest('tr').classList.toggle('done', event.target.checked);
     const ticked = [...table.querySelectorAll('input:checked')].map(b => b.dataset.id);
