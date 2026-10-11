@@ -433,6 +433,12 @@ naming a cause, especially when the pattern is your own.
   left open: `new-recipe` now takes gaps from `plan-the-week` alone, so the pool
   grows only when a real week has a hole in it.
 
+- [The Snack Slot](issues/26-the-snack-slot.md), settled 11 October 2026: **a
+  fifth, optional Slot for batch bakes**, bought once on its bake day and
+  spread over the next seven days' totals. `day_macros` in
+  `bin/shopping-list.py` becomes the single day-sum both the skill and the page
+  use.
+
 
 ## Not yet specified
 

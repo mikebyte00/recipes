@@ -49,9 +49,11 @@ Pin or `HOUSEHOLD.md` therefore finishes the same way, and the change is not don
 until it has:
 
 1. `.venv/bin/python bin/browse.py` — regenerate the page.
-2. `.venv/bin/python tests/test_browse.py` — 82 tests. Thirty-five shell out to `node` — to run the page's theme boot script,
-   its eaten-days count, its picked-days badge, Checkout's week and meal swap,
+2. `.venv/bin/python tests/test_browse.py` — 95 tests. Forty-one shell out to `node` — to run the page's theme boot script,
+   its eaten-days count, its picked-days badge, Checkout's week, `days:` block and meal swap,
    and the filter reset Plan mode makes on every move — and skip cleanly when it is absent.
+   Then `.venv/bin/python tests/test_shopping_list.py` — 18 tests of the grid,
+   `makes:` and day-total rules.
 3. `git commit` the source change **and** `index.html` in the same commit.
 4. `git push` — Pages serves the pushed commit, so an unpushed commit is a
    stale page.
@@ -96,7 +98,9 @@ recipes fail this project even when they hit the macros.
 These are settled. Treat a request that contradicts one as a question worth
 raising rather than a spec to follow.
 
-- **Serves 2**, always, project-wide. Recipes carry no serving count.
+- **Serves 2**, always, project-wide. Recipes carry no serving count. The one
+  exception is a **snack**: a batch Recipe carries `makes:`, whole-batch
+  quantities and per-serving macros.
 - **Protein and kcal only.** Carbohydrates and fat are deliberately untracked.
 - **Macros are approximations.** Store them as bare numbers, so a Plan can sum
   them. Write `~` on every macro figure shown to the user — the numbers are

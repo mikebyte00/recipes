@@ -9,11 +9,12 @@ which holds the reasoning. This file is the operative list.
 
 | Field | Cardinality | Values |
 |---|---|---|
-| `slot` | one | `breakfast` `lunch` `dinner` `pudding` |
-| `protein` | one, or absent on a pudding | `sausage` `egg` `tofu` `quorn` `chicken` `white-fish` `oily-fish` `beef` `dairy` `protein-powder` |
+| `slot` | one | `breakfast` `lunch` `dinner` `pudding` `snack` |
+| `protein` | one, or absent on a pudding or snack | `sausage` `egg` `tofu` `quorn` `chicken` `white-fish` `oily-fish` `beef` `dairy` `protein-powder` |
 | `effort` | one | `low` `medium` `high` |
 | `rating` | one, or absent | `1` `2` `3` `4` `5` |
 | `retired` | `true`, or absent | `true` |
+| `makes` | a positive integer, required on a `snack`, absent otherwise | servings per batch |
 | `appliances` | list | `skillet` `air-fryer` `ninja-sizzle` `rice-cooker` `pot` `toaster` `poacher` |
 | `tags` | list | `fakeaway` `bulk-cook` `eat-cold` |
 
@@ -54,6 +55,12 @@ Keeping the Slot present is what lets the 28-Slot completeness check stay
 meaningful: an empty value or a missing key reads as an incomplete grid, which
 `bin/shopping-list.py` treats as fatal. Decided in
 [The Shopping List Script](.scratch/meal-planning-system/issues/17-the-shopping-list-script.md).
+
+**`snack` is the one optional Slot.** A day may also hold `snack: <slug>` — a
+batch baked that day, bought once, and counted in day totals as an even share
+over the seven days from it. A day with no snack omits the key; `snack:
+eaten-out` is rejected. So a grid is 28 meal Slots plus up to seven snacks.
+Decided in [The Snack Slot](.scratch/meal-planning-system/issues/26-the-snack-slot.md).
 
 **A Plan's body ends with its `## Shopping` section.** Regenerating the list
 replaces everything from that heading to the end of the file, so anything
@@ -99,6 +106,10 @@ Absent is not zero. `bin/browse.py` sorts unrated Recipes last under every sort
 order, because a blank must not read as a bad score. Nothing else consumes the
 field: weekly planning and the shopping list both ignore it, and it is the
 browse page's sort control alone that gives it a consumer.
+
+**A snack's quantities are for the whole batch and its `macros` per serving**
+— the one exception to *Serves 2*. `makes` is what lets the shopping list buy
+one batch and the day totals spread it.
 
 ## Retiring a Recipe
 

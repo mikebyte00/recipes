@@ -1,7 +1,7 @@
 # Snack Slot — Design
 
 Date: 2026-10-11
-Status: approved in conversation; awaiting spec review
+Status: implemented — see issues/26-the-snack-slot.md
 
 ## Goal
 

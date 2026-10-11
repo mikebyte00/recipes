@@ -11,7 +11,8 @@ across many [Plans](#plan).
 ## Slot
 
 A position in a day that a [Recipe](#recipe) fills: breakfast, lunch, dinner,
-pudding. Macro targets are expressed per slot, not only per day, because the
+pudding, and the optional **snack** — a batch baked on the day it sits in and
+eaten across the week. Macro targets are expressed per slot, not only per day, because the
 existing corpus already clusters tightly by slot.
 
 ## Plan

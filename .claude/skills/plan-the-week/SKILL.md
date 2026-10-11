@@ -41,6 +41,7 @@ Read `VOCABULARY.md` — *The Plan grid* — and `GOALS.md` before editing a gri
      sunday:
        breakfast: <slug>
        ...
+       snack: <slug>   # optional; only on a day that bakes one
    ---
    ```
 
@@ -77,20 +78,15 @@ Read `VOCABULARY.md` — *The Plan grid* — and `GOALS.md` before editing a gri
    import sys; sys.path.insert(0, 'bin')
    sl = __import__('shopping-list')
    front, grid = sl.load_grid(sys.argv[1])
-   rec = sl.load_recipes('.', grid)
-   day = {d: [0, 0, 0] for d in sl.DAYS}
-   for d, _, v in grid:
-       if v == sl.EATEN_OUT:
-           day[d][2] += 1
-           continue
-       m = rec[v]['macros']
-       day[d][0] += m['protein_g']; day[d][1] += m['kcal']
+   totals = sl.day_macros(grid, sl.load_recipes('.', grid))
+   out = {d: sum(1 for day, s, v in grid if day == d and v == sl.EATEN_OUT) for d in sl.DAYS}
    for d in sl.DAYS:
-       p, k, out = day[d]
-       note = (f"  {out} Slot(s) eaten out -- not judged" if out else
+       p, k, snacks = totals[d]['protein_g'], totals[d]['kcal'], totals[d]['snacks']
+       note = (f"  {out[d]} Slot(s) eaten out -- not judged" if out[d] else
                ("  UNDER the ~120g floor" if p < 120 else "")
                + ("  OVER the ~1800 kcal ceiling" if k > 1800 else ""))
-       print(f"{d:<10} ~{p:g}g protein  ~{k:g} kcal{note}")
+       bakes = f"  (incl. snack share: {', '.join(sorted(set(snacks)))})" if snacks else ""
+       print(f"{d:<10} ~{p:g}g protein  ~{k:g} kcal{note}{bakes}")
    PY
    ```
 
@@ -130,6 +126,10 @@ trolley is offered, never required — a week that declines it is finished.
 as an **incomplete** grid and `bin/shopping-list.py` treats it as fatal, so a
 meal that is not being cooked is spelled `eaten-out`, the one reserved value.
 It buys nothing.
+
+The one exception is `snack`: optional, absent on a day that bakes nothing, and
+never `eaten-out`. A bake buys one batch, and its macros count as an even share
+toward each of the seven days from it.
 
 There is no doubling control, and asking for one is a sign the grid is being
 fought. Two Slots holding one slug **is** the doubled batch: the shopping list

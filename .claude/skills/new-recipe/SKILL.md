@@ -36,7 +36,8 @@ Bands.
    draft far harder than an adjective does.
 
    Puddings carry no protein, so `grep -l '^slot: pudding' Recipes/*.md` is the
-   whole set. It is the smallest slot — read all of it.
+   whole set. It is the smallest slot — read all of it. Snacks carry no protein
+   either: `grep -l '^slot: snack' Recipes/*.md`.
 
 3. **Resolve every ingredient against `PINS.md`** before drafting a line. Each
    ingredient is a `lower-kebab-case` key, and the Pin decides the unit:
@@ -61,7 +62,7 @@ Bands.
 
 4. **Write `Recipes/<slug>.md`.** The slug is the title in `lower-kebab-case`,
    and the **filename is the Recipe's identity** — a Plan cites it.
-   Fields in this order, `protein` omitted on a pudding:
+   Fields in this order, `protein` omitted on a pudding or snack:
 
    ```markdown
    ---
@@ -81,7 +82,10 @@ Bands.
    1. One numbered step per stretch of cooking.
    ```
 
-   `qty` is for **2 people** — the project constant, never a field. `prep` is
+   A **snack** adds `makes: 8` after `slot:` — servings per batch — and its
+   `qty` values are for the **whole batch**, its `macros` per serving.
+
+   Otherwise `qty` is for **2 people** — the project constant, never a field. `prep` is
    knife-work, `note` is the product or a clarification. `effort` is judged on
    pans and parallelism by `VOCABULARY.md`'s rules and then **stored**, never
    recomputed. `tags` are capability, not intent.
@@ -94,7 +98,7 @@ Bands.
    sl = __import__('shopping-list')
    path = sys.argv[1]; slug = os.path.basename(path)[:-3]
    front = sl.load_frontmatter(path)
-   V = {'slot': ['breakfast','lunch','dinner','pudding'],
+   V = {'slot': ['breakfast','lunch','dinner','pudding','snack'],
         'protein': ['sausage','egg','tofu','quorn','chicken','white-fish','oily-fish','beef','dairy','protein-powder'],
         'effort': ['low','medium','high'],
         'appliances': ['skillet','air-fryer','ninja-sizzle','rice-cooker','pot','toaster','poacher'],
@@ -102,14 +106,18 @@ Bands.
    bad = [f"{f}: {front.get(f)!r} is not in VOCABULARY.md" for f in ('slot','effort') if front.get(f) not in V[f]]
    bad += [f"{f}: {v!r} is not in VOCABULARY.md" for f in ('appliances','tags') for v in front.get(f) or [] if v not in V[f]]
    p = front.get('protein')
-   if front.get('slot') == 'pudding':
-       bad += ["a pudding carries no protein"] if p else []
+   if front.get('slot') in ('pudding', 'snack'):
+       bad += [f"a {front.get('slot')} carries no protein"] if p else []
    elif p not in V['protein']:
        bad += [f"protein: {p!r} is not in VOCABULARY.md"]
    if not re.fullmatch(r'[a-z0-9-]+', slug):
        bad += [f"slug is not lower-kebab-case: {slug}"]
    try:
        sl.check_rule({slug: front}, sl.load_pins('.'))
+   except sl.Failure as e:
+       bad += str(e).splitlines()[1:]
+   try:
+       sl.check_makes({slug: front})
    except sl.Failure as e:
        bad += str(e).splitlines()[1:]
    steps = len([l for l in open(path).read().split('---', 2)[2].splitlines() if re.match(r'^\d+\.', l.strip())])
@@ -142,6 +150,7 @@ inside the neighbours' numbers where those are tighter.
 | Lunch | 4–7, median 6 | 1–2 | 3–5 |
 | Dinner | 7–12, median 9 | 1–3 | 3–6 |
 | Pudding | 4–5 | 0 | 4 |
+| Snack | measured once a few exist | — | — |
 
 These ranges were measured when the pool was smaller. If a slot's neighbours
 now sit outside its row, **the corpus is right and the row is stale** — say so
