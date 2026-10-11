@@ -252,6 +252,16 @@ class Snacks(unittest.TestCase):
                 browse.load_all(root)
 
 
+class SnackPage(unittest.TestCase):
+    """The page's snack markup, rendered from a fixture payload."""
+
+    def test_the_recipe_list_groups_snacks_after_puddings(self):
+        self.assertIn("D.slots.concat('snack').map(slot =>", browse.TEMPLATE)
+
+    def test_a_day_names_the_bakes_in_its_totals(self):
+        self.assertIn("incl. snack share from", browse.TEMPLATE)
+
+
 class ShoppingBlocks(unittest.TestCase):
     """The Plan page's two shop tables, read from the Plan's shopping section."""
 

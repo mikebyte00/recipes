@@ -493,7 +493,7 @@ function recipeList(){
     const days = only ? pickedDays(plan, r.slug, planKey(PLAN_SEQ[cursor]), WEEK) : [];
     return days.length ? `<span class="pill picked">picked ${days.join(', ')}</span>` : '';
   };
-  const groups = D.slots.map(slot => [slot, sorted(hits.filter(r => r.slot === slot))])
+  const groups = D.slots.concat('snack').map(slot => [slot, sorted(hits.filter(r => r.slot === slot))])
                         .filter(([,rs]) => rs.length);
   const body = groups.length ? groups.map(([slot, rs]) => `
     <div class="group"><h2>${slot}</h2><em>${rs.length}</em></div>
@@ -501,7 +501,7 @@ function recipeList(){
       href="#recipe/${r.slug}${qs()}">
       <span class="t">${esc(r.title)}</span>
       <span class="macro">${scoreDot('protein',r)}${g(r.protein_g)} · ${kc(r.kcal)} kcal</span>
-      <span class="meta">${r.protein ? `<span class="pill protein">${nice(r.protein)}</span>` : ''}${picked(r)}${eaten(r)}${[star(r.rating), r.effort ? r.effort+' effort' : '',
+      <span class="meta">${r.protein ? `<span class="pill protein">${nice(r.protein)}</span>` : ''}${picked(r)}${eaten(r)}${[r.makes ? 'makes ' + r.makes : '', star(r.rating), r.effort ? r.effort+' effort' : '',
         (r.appliances||[]).map(nice).join(', ') || 'no appliance',
         (r.tags||[]).map(nice).join(', ')].filter(Boolean).join(' · ')}</span>
     </a>`).join('')}</div>`).join('')
@@ -564,7 +564,10 @@ function recipeDetail(slug){
       <table><thead><tr><th>Macro</th><th class="num">This</th><th class="num">Target</th>
         <th class="num">Corpus range</th><th>Band</th></tr></thead>
         <tbody>${bandRow('protein', r.protein_g, '')}${bandRow('kcal', r.kcal, '')}</tbody></table>
-      <p class="note">Serves 2. Bands guide, they do not gate — the goals are checked
+      <p class="note">${r.makes
+        ? `Makes ${r.makes} · macros per serving · quantities for the whole batch.
+           Baked on one day, its share counts toward each of the next seven.`
+        : 'Serves 2.'} Bands guide, they do not gate — the goals are checked
         by summing a day, not by policing a Recipe.</p></section>
 
     <section><h3>Ingredients — ${r.ingredients.length}</h3>
@@ -600,8 +603,9 @@ function planList(){
    which is why this is a function and not two copies of the markup. */
 function dayBlock(p, day, cls, label){
   const t = p.totals[day];
-  const cells = D.slots.map(s => {
+  const cells = D.slots.concat('snack').map(s => {
     const value = p.days[day][s];
+    if (s === 'snack' && !value) return '';
     const r = byslug[value];
     return `<dt>${s}</dt><dd>${r
       ? `<a href="#recipe/${r.slug}">${esc(r.title)}</a>
@@ -622,9 +626,14 @@ function dayBlock(p, day, cls, label){
       <div class="stat"><b>${kc(t.kcal)}</b><span>kcal</span></div>
       ${t.flags.length ? `<div class="stat flag"><b>↓</b><span>${t.flags.join(' &amp; ')}</span></div>` : ''}
     </div>` : '';
+  /* A bake's share lands on the next seven days, so a day can carry a snack it
+     did not bake. Name them, or the total reads higher than its meals. */
+  const bakes = [...new Set(t.snacks || [])].map(s => esc((byslug[s] || {}).title || s));
+  const snackNote = t.cooked && bakes.length
+    ? `<p class="note">incl. snack share from ${bakes.join(', ')}</p>` : '';
   return `<div class="day${cls ? ' ' + cls : ''}"><h4><span>${esc(label || cap(day))}</span>
     ${headMacro ? `<span class="macro">${headMacro}</span>` : ''}</h4>
-    ${stats}<dl>${cells}</dl></div>`;
+    ${stats}<dl>${cells}</dl>${snackNote}</div>`;
 }
 
 /* The Monday of the week containing `d`, as YYYY-MM-DD in local time -- a Plan
