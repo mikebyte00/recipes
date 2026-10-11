@@ -1058,6 +1058,7 @@ white-miso-paste:
   display: White miso paste
   store: waitrose
   unit: g
+  pack: { qty: 200, unit: g }
   search_term: Miso Tasty White Miso Paste
   line_number: "698669"
   staple: false
