@@ -30,7 +30,9 @@ the counts in this file are the only record of what a harvest found. The 05
 October harvest, read from a pasted order page on 11 October 2026, minted three
 — `coconut-milk`, `kidney-beans`, `strawberries` — taking the catalogue to 106,
 and switched `oat-milk` to Oatly Barista and `vegetarian-sausage` to Richmond's
-frozen Tasty Sausages, the previous products kept as alternates.
+frozen Tasty Sausages, the previous products kept as alternates. The 28
+September harvest, read from a pasted order page on 11 October 2026, minted two
+— `black-olives` and `cocoa-powder` (staple) — taking the catalogue to 108.
 
 ## Reading a Pin
 
@@ -132,6 +134,16 @@ black-beans:
   pack: { qty: 400, unit: g }
   search_term: Duchy Organic Black Beans in Water
   line_number: "841495"
+  staple: false
+  confirmed: true
+
+black-olives:
+  display: Black olives
+  store: waitrose
+  unit: g
+  pack: { qty: 120, unit: g }
+  search_term: Fragata Marinated Stoneless Olives with Sea Salt
+  line_number: "577281"
   staple: false
   confirmed: true
 
@@ -300,6 +312,16 @@ cinnamon:
   pack: { qty: 32, unit: g }
   search_term: Cooks' Ingredients Cinnamon
   line_number: "528453"
+  staple: true
+  confirmed: true
+
+cocoa-powder:
+  display: Cocoa powder
+  store: waitrose
+  unit: g
+  pack: { qty: 200, unit: g }
+  search_term: Menier 100% Cocoa Powder
+  line_number: "803154"
   staple: true
   confirmed: true
 
@@ -1103,7 +1125,8 @@ confirmed, so they sit here until a harvest and a human say otherwise.
 **Fresh, and deliberately not stapled (2)**
 
 - `ginger` · `black-olives` — cupboard-adjacent but genuinely perishable, so
-  they belong on a shopping list. No product harvested yet.
+  they belong on a shopping list. `black-olives` was Pinned by the 28
+  September harvest; `ginger` has no product harvested yet.
 
 `garlic` sat here until 27 September 2026, when the 17 September harvest
 Pinned it — **still not a Staple**, on the user's decision, so it stays on the
@@ -1135,6 +1158,10 @@ alcohol-free beers · kiwi · ice · two squashes.
 
 The 05 October order added twelve more: nine household lines and one
 personal-care line (counted, not named, as above), and two squashes.
+
+The 28 September order added nine more: three household lines and three
+personal-care lines (counted, not named, as above), and kiwi · baby cucumber ·
+Charlie Bigham's lasagne. One squash too.
 
 Groceries outside the recipe corpus (15): grapes · kiwi · carrots · peppers ·
 cucumber · radish · watercress · pumpkin seeds · plum tomatoes · blackeye
