@@ -202,8 +202,14 @@ th:first-child,td:first-child{padding-left:0}
 th:last-child,td:last-child{padding-right:0}
 td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .scroller{overflow-x:auto;-webkit-overflow-scrolling:touch}
-ol.method{margin:0;padding-left:1.4rem}
-ol.method li{margin-bottom:.85rem;line-height:1.6}
+ol.method{margin:0;padding-left:1.6rem}
+/* Read from the counter at arm's length: big type, and the whole step is the tap target. */
+ol.method li{font-size:clamp(1.15rem,.95rem + 1vw,1.5rem);line-height:1.6;
+  padding:.5rem .25rem;margin-bottom:.6rem;border-radius:var(--radius);cursor:pointer;
+  transition:color .2s ease-out}
+ol.method li::marker{color:var(--accent);font-weight:600}
+ol.method li.done{color:var(--soft);text-decoration:line-through;
+  text-decoration-color:var(--rule)}
 .note{font-size:.85rem;color:var(--soft);line-height:1.5}
 .warn{border-left:3px solid var(--accent);background:var(--accent-soft);
   border-radius:0 var(--radius) var(--radius) 0;
@@ -557,18 +563,9 @@ function recipeDetail(slug){
     ${r.retired ? `<div class="warn"><strong>Retired.</strong> Out of the pool and
       Plan mode; kept so the weeks that ate it still name it.</div>` : ''}
     <p class="tagline">${[star(r.rating), cap(r.slot), nice(r.protein), r.effort ? r.effort+' effort':'' ,
-        (r.appliances||[]).map(nice).join(' · ')].filter(Boolean).join(' · ')}
+        (r.appliances||[]).map(nice).join(' · '),
+        `${g(r.protein_g)} protein · ${kc(r.kcal)} kcal`].filter(Boolean).join(' · ')}
       ${(r.tags||[]).map(t=>`<span class="pill">${nice(t)}</span>`).join('')}</p>
-
-    <section><h3>Macros against the ${esc(r.slot)} Band</h3>
-      <table><thead><tr><th>Macro</th><th class="num">This</th><th class="num">Target</th>
-        <th class="num">Corpus range</th><th>Band</th></tr></thead>
-        <tbody>${bandRow('protein', r.protein_g, '')}${bandRow('kcal', r.kcal, '')}</tbody></table>
-      <p class="note">${r.makes
-        ? `Makes ${r.makes} · macros per serving · quantities for the whole batch.
-           Baked on one day, its share counts toward each of the next seven.`
-        : 'Serves 2.'} Bands guide, they do not gate — the goals are checked
-        by summing a day, not by policing a Recipe.</p></section>
 
     <section><h3>Ingredients — ${r.ingredients.length}</h3>
       ${r.unpinned.length ? `<div class="warn"><strong>${r.unpinned.length} Unpinned:</strong>
@@ -580,7 +577,20 @@ function recipeDetail(slug){
     </section>
 
     <section><h3>Method</h3>
-      <ol class="method">${r.method.map(s=>`<li>${esc(s)}</li>`).join('')}</ol></section>
+      <ol class="method">${r.method.map(s=>`<li tabindex="0">${
+        esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}</li>`).join('')}</ol>
+      <p class="note">Tap a step once it's done.</p></section>
+
+    <section><h3>Macros against the ${esc(r.slot)} Band</h3>
+      <table><thead><tr><th>Macro</th><th class="num">This</th><th class="num">Target</th>
+        <th class="num">Corpus range</th><th>Band</th></tr></thead>
+        <tbody>${bandRow('protein', r.protein_g, '')}${bandRow('kcal', r.kcal, '')}</tbody></table>
+      <p class="note">${r.makes
+        ? `Makes ${r.makes} · macros per serving · quantities for the whole batch.
+           Baked on one day, its share counts toward each of the next seven.`
+        : 'Serves 2.'} Bands guide, they do not gate — the goals are checked
+        by summing a day, not by policing a Recipe.</p></section>
+
   </article>`;
 }
 
@@ -975,8 +985,33 @@ function render(){
   if (checkedOut) wireCheckout();
   else if (v === 'recipes' || v === undefined) { wireFilters(); wirePlanClicks(); }
   wireCopies(); wireShopTables();
+  if (v === 'recipe') wireMethod();
+  keepAwake(v === 'recipe');
   window.scrollTo(0, 0);
 }
+
+function wireMethod(){
+  document.querySelectorAll('ol.method li').forEach(li => {
+    li.onclick = () => li.classList.toggle('done');
+    li.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); li.click(); } };
+  });
+}
+
+/* A Recipe is cooked from, so the screen must not sleep mid-step. The browser
+   drops the lock when the tab hides, hence the re-request on return. */
+let wakeLock = null, wantAwake = false;
+async function keepAwake(on){
+  wantAwake = on;
+  if (!on) { if (wakeLock) { wakeLock.release(); wakeLock = null; } return; }
+  if (wakeLock || !navigator.wakeLock) return;
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+    wakeLock.onrelease = () => { wakeLock = null; };
+  } catch (e) {}
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && wantAwake) keepAwake(true);
+});
 
 function wireFilters(){
   const sheet = document.getElementById('sheet');
