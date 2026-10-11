@@ -26,6 +26,10 @@ SLOTS = ["breakfast", "lunch", "dinner", "pudding"]
 # check still means something, and contributes nothing to the list.
 EATEN_OUT = "eaten-out"
 
+# The one optional Slot: a batch baked on the day it sits in and eaten across
+# the week. A day without one omits the key. Spec 2026-10-11-snack-slot-design.
+SNACK = "snack"
+
 # Units that measure an amount rather than count a container. A Pin whose own
 # unit is one of these cannot be divided by a pack sold in the other, so a
 # gram total against a millilitre pack is flagged, never converted.
@@ -68,7 +72,8 @@ def load_pins(root):
 
 
 def load_grid(path):
-    """Return the 28 Slots as (day, slot, value), hard-failing on an incomplete grid."""
+    """Return the 28 meal Slots, plus any day's snack, as (day, slot, value).
+    Hard-fails on an incomplete grid; a snack is optional but never eaten-out."""
     front = load_frontmatter(path)
     days = front.get("days")
     if not isinstance(days, dict):
@@ -87,6 +92,11 @@ def load_grid(path):
                 missing.append(f"{day}/{slot}")
             else:
                 grid.append((day, slot, value))
+        snack = entry.get(SNACK)
+        if snack == EATEN_OUT:
+            raise Failure(f"{path}: {day}/snack is eaten-out -- omit the key instead")
+        if snack:
+            grid.append((day, SNACK, snack))
 
     if missing:
         raise Failure(
@@ -142,6 +152,49 @@ def check_rule(recipes, pins):
             "Recipe/Pin rule violated -- the sum would be meaningless:\n  "
             + "\n  ".join(violations)
         )
+
+
+def check_makes(recipes):
+    """A snack says how many servings its batch makes; nothing else does."""
+    bad = []
+    for slug, recipe in sorted(recipes.items()):
+        makes = recipe.get("makes")
+        if recipe.get("slot") == SNACK:
+            if type(makes) is not int or makes < 1:
+                bad.append(f"{slug}: a snack needs makes: <servings per batch>, got {makes!r}")
+        elif "makes" in recipe:
+            bad.append(f"{slug}: makes: belongs on a snack only")
+    if bad:
+        raise Failure("makes: rule violated:\n  " + "\n  ".join(bad))
+
+
+def day_macros(grid, recipes):
+    """Per person, per day: the meals, plus each snack batch's share.
+
+    A batch baked on day D is assumed eaten evenly over D..D+6 by 2 people, so
+    each of those days gets makes / 2 x per-serving macros / 7. Days past this
+    Plan's Sunday are not carried into the next one. A Slot decides how a
+    Recipe counts, not the Recipe's own slot: field.
+    """
+    out = {day: {"protein_g": 0.0, "kcal": 0.0, "snacks": []} for day in DAYS}
+    for day, slot, value in grid:
+        recipe = recipes.get(value)
+        if recipe is None:
+            continue  # eaten-out, or a slug the caller could not resolve
+        macros = recipe.get("macros") or {}
+        if slot == SNACK:
+            share, days = recipe["makes"] / 2 / 7, DAYS[DAYS.index(day):]
+        else:
+            share, days = 1, [day]
+        for d in days:
+            out[d]["protein_g"] += share * float(macros.get("protein_g") or 0)
+            out[d]["kcal"] += share * float(macros.get("kcal") or 0)
+            if slot == SNACK:
+                out[d]["snacks"].append(value)
+    for totals in out.values():
+        totals["protein_g"] = round(totals["protein_g"], 1)
+        totals["kcal"] = round(totals["kcal"], 1)
+    return out
 
 
 def aggregate(grid, recipes):
@@ -332,6 +385,7 @@ def main(argv):
     _, grid = load_grid(argv[1])
     recipes = load_recipes(root, grid)
     check_rule(recipes, pins)
+    check_makes(recipes)
     totals, quantified, _ = aggregate(grid, recipes)
     shoppable, staples, unpinned = build(totals, quantified, pins)
     print(render(argv[1], grid, shoppable, staples, unpinned))
