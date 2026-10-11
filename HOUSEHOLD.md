@@ -14,3 +14,9 @@ Edit freely, then regenerate the page (`.venv/bin/python bin/browse.py`).
 - Shampoo
 - Conditioner
 - Antibac spray
+- Barbecue sauce
+- Multi-surface spray
+- Mouthwash
+- Kitchen towel
+- Laundry liquid
+- Bin bags
