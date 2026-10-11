@@ -52,7 +52,7 @@ until it has:
 2. `.venv/bin/python tests/test_browse.py` — 95 tests. Forty-one shell out to `node` — to run the page's theme boot script,
    its eaten-days count, its picked-days badge, Checkout's week, `days:` block and meal swap,
    and the filter reset Plan mode makes on every move — and skip cleanly when it is absent.
-   Then `.venv/bin/python tests/test_shopping_list.py` — 18 tests of the grid,
+   Then `.venv/bin/python tests/test_shopping_list.py` — 19 tests of the grid,
    `makes:` and day-total rules.
 3. `git commit` the source change **and** `index.html` in the same commit.
 4. `git push` — Pages serves the pushed commit, so an unpushed commit is a
