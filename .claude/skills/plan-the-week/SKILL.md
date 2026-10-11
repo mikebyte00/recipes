@@ -23,8 +23,8 @@ Read `VOCABULARY.md` — *The Plan grid* — and `GOALS.md` before editing a gri
    **Unpinned**, which is the designed path, and the next harvest Pins them.
 
 2. **Build the grid.** The browse page's **Plan mode** is where a week is
-   chosen: it walks all 28 Slots against the pool and its checkout hands back a
-   finished `days:` block. Ask the user to paste that block.
+   chosen: it walks all 28 Slots against the pool, and its checkout's **Copy
+   week** button copies a finished `days:` block. Ask the user to paste that block.
 
    Variety is measured against weeks actually eaten, and Plan mode shows it:
    while a Slot is being picked, a Recipe eaten in the last two weeks carries an

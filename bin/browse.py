@@ -1198,9 +1198,9 @@ function wireCopies(){
 }
 
 /* Plan mode. The pool stays on screen and the wizard walks: the drawer names
-   one Slot, a click on a Recipe fills it and advances. Selections live here for
-   the session only -- the page is generated, not an app, and a refresh starting
-   clean is honest where a stale grid would not be. */
+   one Slot, a click on a Recipe fills it and advances. Selections live for the
+   tab only (sessionStorage): a refresh or a phone discarding the tab keeps the
+   picks, while a new tab next week starts clean rather than on a stale grid. */
 /* Each day walks its four meals, then its snack -- the one optional Slot, and
    Skip is its expected answer. Progress and Checkout count the meals alone. */
 const PLAN_SEQ = WEEK.flatMap(day => D.slots.concat('snack').map(slot => [day, slot]));
@@ -1214,6 +1214,16 @@ let checkedOut = false;
 let editDay = null;
 /* The Slot key a Checkout swap started from, or null. */
 let swapFrom = null;
+try {
+  const saved = JSON.parse(sessionStorage.getItem('plan') || 'null');
+  if (saved) ({plan, planOn, cursor, checkedOut} = saved);
+} catch (e) {}
+function savePlan(){
+  try { sessionStorage.setItem('plan', JSON.stringify({plan, planOn, cursor, checkedOut})); } catch (e) {}
+}
+/* Throwing away picks asks first; with none made there is nothing to lose. */
+const okToDrop = what => !Object.keys(plan).length ||
+  confirm(`${what}? The ${planDone()} meals picked so far will be lost.`);
 
 const planKey = ([day, slot]) => day + '.' + slot;
 const planSlot = () => (PLAN_SEQ[cursor] || [])[1];
@@ -1284,17 +1294,14 @@ function checkoutView(){
         return `<dt>${s}</dt><dd><button class="swap${state}" data-key="${key}"
           aria-pressed="${key === swapFrom}">${esc(t)}</button></dd>`;
       }).join('')}</dl></div>`).join('');
-  return `<p class="lede">28 Slots, Monday first. A skipped Slot reads
-      <code>eaten-out</code> — the grid's one reserved value, and the only thing
-      besides a Recipe slug the shopping list accepts. It buys nothing. A day
-      that bakes a snack gets a <code>snack:</code> line; the rest have none. Paste this
-      into <code>plan-the-week</code> at step 2, where a Plan's grid starts.
-      Tap a meal, then the same meal on another day, to swap them.</p>
-    <div class="tools"><button id="copy" class="btn btn-primary btn-sm">Copy to clipboard</button>
+  return `<p class="lede">Your week. Tap a meal, then the same meal on another
+      day, to swap them. Then copy the week and paste it to Claude.</p>
+    <div class="tools"><button id="copy" class="btn btn-primary btn-sm">Copy week</button>
       <button id="edit">← Back to the week</button>
       <button id="startover">Start over</button></div>
     <section>${days}</section>
-    <textarea id="out" rows="32" readonly>${esc(planYaml(plan, WEEK, D.slots))}</textarea>`;
+    <details><summary class="note">Show what gets copied</summary>
+      <textarea id="out" rows="32" readonly>${esc(planYaml(plan, WEEK, D.slots))}</textarea></details>`;
 }
 
 function renderDrawer(){
@@ -1347,11 +1354,10 @@ function wirePlanClicks(){
 
 function wireCheckout(){
   const out = document.getElementById('out');
-  // Selected for copying, but not scrolled to: the week reads first.
-  out.focus({preventScroll: true}); out.select();
   document.getElementById('copy').onclick = event => copyText(event.currentTarget, out.value);
   document.getElementById('edit').onclick = () => { swapFrom = null; checkedOut = false; render(); };
   document.getElementById('startover').onclick = () => {
+    if (!okToDrop('Start over')) return;
     plan = {}; planMove(0); checkedOut = false; render(); };
   /* Swapping: a first tap picks a meal up, a tap on the same meal of another
      day swaps the two, and any other tap puts it back down. */
@@ -1376,6 +1382,7 @@ function wireCheckout(){
 }
 
 function render(){
+  savePlan();
   renderNav();
   const app = document.getElementById('app');
   /* Today has nothing to say before the first Plan exists; the pool does. */
