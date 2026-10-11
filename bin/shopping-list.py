@@ -183,7 +183,9 @@ def day_macros(grid, recipes):
             continue  # eaten-out, or a slug the caller could not resolve
         macros = recipe.get("macros") or {}
         if slot == SNACK:
-            share, days = recipe["makes"] / 2 / 7, DAYS[DAYS.index(day):]
+            # A meal put in a snack Slot has no makes:, so read it as one
+            # serving each rather than refuse a grid that otherwise loads.
+            share, days = (recipe.get("makes") or 2) / 2 / 7, DAYS[DAYS.index(day):]
         else:
             share, days = 1, [day]
         for d in days:

@@ -151,6 +151,13 @@ class DayMacros(unittest.TestCase):
         self.assertEqual(out["monday"]["protein_g"], 10.0)
         self.assertEqual(out["tuesday"]["protein_g"], 0.0)
 
+    def test_a_meal_in_a_snack_slot_spreads_as_two_servings(self):
+        """No makes: on a meal, so a snack Slot holding one reads it as one
+        serving each -- spread like any bake, never a crash."""
+        out = sl.day_macros([("saturday", "snack", "oats")], RECIPES)
+        self.assertEqual(out["saturday"]["protein_g"], 4.3)
+        self.assertEqual(out["sunday"]["snacks"], ["oats"])
+
     def test_an_unknown_slug_adds_nothing(self):
         out = sl.day_macros([("monday", "dinner", "gone")], RECIPES)
         self.assertEqual(out["monday"]["kcal"], 0.0)
