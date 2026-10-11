@@ -1175,7 +1175,10 @@ function wireCopies(){
    one Slot, a click on a Recipe fills it and advances. Selections live here for
    the session only -- the page is generated, not an app, and a refresh starting
    clean is honest where a stale grid would not be. */
-const PLAN_SEQ = WEEK.flatMap(day => D.slots.map(slot => [day, slot]));
+/* Each day walks its four meals, then its snack -- the one optional Slot, and
+   Skip is its expected answer. Progress and Checkout count the meals alone. */
+const PLAN_SEQ = WEEK.flatMap(day => D.slots.concat('snack').map(slot => [day, slot]));
+const MEAL_COUNT = PLAN_SEQ.filter(([, slot]) => slot !== 'snack').length;
 let plan = {};
 let planOn = false;
 let cursor = 0;
@@ -1188,20 +1191,22 @@ let swapFrom = null;
 
 const planKey = ([day, slot]) => day + '.' + slot;
 const planSlot = () => (PLAN_SEQ[cursor] || [])[1];
-const planDone = () => PLAN_SEQ.filter(pair => plan[planKey(pair)]).length;
+const planDone = () => PLAN_SEQ.filter(pair => pair[1] !== 'snack' && plan[planKey(pair)]).length;
 
-/* The Plan grid's own frontmatter shape -- two-space YAML, every Slot valued,
-   a skipped Slot spelled `eaten-out`. VOCABULARY.md, The Plan grid. */
-function planYaml(){
-  const days = [...new Set(PLAN_SEQ.map(([day]) => day))];
-  return 'days:\n' + days.map(day => '  ' + day + ':\n' +
-    D.slots.map(s => '    ' + s + ': ' + plan[day + '.' + s]).join('\n')
+/* The Plan grid's own frontmatter shape -- two-space YAML, every meal Slot
+   valued, a skipped one spelled `eaten-out`, and a snack line only on a day
+   that bakes one. VOCABULARY.md, The Plan grid. */
+function planYaml(plan, week, slots){
+  return 'days:\n' + week.map(day => '  ' + day + ':\n' +
+    slots.concat(plan[day + '.snack'] ? ['snack'] : [])
+      .map(s => '    ' + s + ': ' + plan[day + '.' + s]).join('\n')
   ).join('\n') + '\n';
 }
 
 function planSet(value){
   if (cursor >= PLAN_SEQ.length) return;
-  plan[planKey(PLAN_SEQ[cursor])] = value;
+  if (value) plan[planKey(PLAN_SEQ[cursor])] = value;
+  else delete plan[planKey(PLAN_SEQ[cursor])];
   planNext();
 }
 
@@ -1229,10 +1234,11 @@ function planExit(){
    [slot, what it reads as]. A slug the pool no longer knows reads as itself,
    so the list never shows a blank where the grid holds something. */
 function weekRows(plan, week, slots, titles){
-  return week.map(day => ({day, slots: slots.map(slot => {
-    const v = plan[day + '.' + slot];
-    return [slot, !v ? '\u2014' : v === 'eaten-out' ? 'skipped' : titles[v] || v];
-  })}));
+  return week.map(day => ({day, slots: slots.concat(plan[day + '.snack'] ? ['snack'] : [])
+    .map(slot => {
+      const v = plan[day + '.' + slot];
+      return [slot, !v ? '\u2014' : v === 'eaten-out' ? 'skipped' : titles[v] || v];
+    })}));
 }
 
 /* Two Slots trade what they hold. A new grid, so a swap is one assignment. */
@@ -1254,14 +1260,15 @@ function checkoutView(){
       }).join('')}</dl></div>`).join('');
   return `<p class="lede">28 Slots, Monday first. A skipped Slot reads
       <code>eaten-out</code> — the grid's one reserved value, and the only thing
-      besides a Recipe slug the shopping list accepts. It buys nothing. Paste this
+      besides a Recipe slug the shopping list accepts. It buys nothing. A day
+      that bakes a snack gets a <code>snack:</code> line; the rest have none. Paste this
       into <code>plan-the-week</code> at step 2, where a Plan's grid starts.
       Tap a meal, then the same meal on another day, to swap them.</p>
     <div class="tools"><button id="copy" class="btn btn-primary btn-sm">Copy to clipboard</button>
       <button id="edit">← Back to the week</button>
       <button id="startover">Start over</button></div>
     <section>${days}</section>
-    <textarea id="out" rows="32" readonly>${esc(planYaml())}</textarea>`;
+    <textarea id="out" rows="32" readonly>${esc(planYaml(plan, WEEK, D.slots))}</textarea>`;
 }
 
 function renderDrawer(){
@@ -1274,6 +1281,7 @@ function renderDrawer(){
   const at = PLAN_SEQ[cursor];
   const here = at
     ? `${editDay ? 'Editing' : 'Pick'} <b>${cap(at[0])} ${at[1]}</b>${
+        at[1] === 'snack' ? ' <span class="note">— optional, Skip if nothing is baked</span>' : ''}${
         plan[planKey(at)] ? ` <span class="note">— holds ${
           plan[planKey(at)] === 'eaten-out' ? 'skipped'
           : esc((byslug[plan[planKey(at)]] || {}).title || '')}</span>` : ''}`
@@ -1281,19 +1289,20 @@ function renderDrawer(){
 
   drawer.innerHTML = `<div class="wrap">
     <span class="where">${here}</span>
-    <span class="macro">${done} / ${PLAN_SEQ.length}</span>
+    <span class="macro">${done} / ${MEAL_COUNT}</span>
     <span class="rest">
       <button id="planback" class="btn btn-outline-secondary btn-sm"${
         cursor && (!editDay || PLAN_SEQ[cursor - 1][0] === editDay) ? '' : ' disabled'}>← Back</button>
       ${editDay ? `<button id="plankeep" class="btn btn-outline-secondary btn-sm">Keep</button>` : ''}
       ${at ? `<button id="planskip" class="btn btn-outline-secondary btn-sm">Skip</button>` : ''}
-      <button id="planout" class="btn btn-outline-primary btn-sm"${done < PLAN_SEQ.length ? ' disabled' : ''}>Checkout</button>
+      <button id="planout" class="btn btn-outline-primary btn-sm"${done < MEAL_COUNT ? ' disabled' : ''}>Checkout</button>
       <button id="planexit" class="btn btn-outline-secondary btn-sm">Exit</button>
     </span></div>`;
 
   document.getElementById('planback').onclick = () => { planMove(cursor - 1); render(); };
   if (editDay) document.getElementById('plankeep').onclick = planNext;
-  if (at) document.getElementById('planskip').onclick = () => planSet('eaten-out');
+  if (at) document.getElementById('planskip').onclick = () =>
+    planSet(at[1] === 'snack' ? null : 'eaten-out');
   document.getElementById('planout').onclick = () => { editDay = null; checkedOut = true; render(); };
   document.getElementById('planexit').onclick = planExit;
 }

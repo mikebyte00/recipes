@@ -717,7 +717,7 @@ ROW_SLOTS = ["breakfast", "lunch", "dinner", "pudding"]
 ROW_TITLES = {"oats": "Overnight Oats", "chilli": "Beef Chilli"}
 ROW_PLAN = {"tuesday.breakfast": "oats", "monday.breakfast": "oats",
             "monday.lunch": "eaten-out", "monday.dinner": "chilli",
-            "monday.pudding": "gone-from-the-pool"}
+            "monday.pudding": "gone-from-the-pool", "monday.snack": "oats"}
 
 
 @unittest.skipUnless(shutil.which("node"), "node is not installed")
@@ -748,7 +748,7 @@ console.log(JSON.stringify(weekRows(%s, %s, %s, %s)));
 
     def test_every_day_lists_every_slot_in_order(self):
         for row in self.rows:
-            self.assertEqual([s for s, _ in row["slots"]], ROW_SLOTS)
+            self.assertEqual([s for s, _ in row["slots"]][:4], ROW_SLOTS)
 
     def test_a_recipe_reads_as_its_title(self):
         self.assertEqual(self.rows[0]["slots"][2], ["dinner", "Beef Chilli"])
@@ -762,6 +762,50 @@ console.log(JSON.stringify(weekRows(%s, %s, %s, %s)));
 
     def test_an_empty_slot_reads_as_a_dash(self):
         self.assertEqual(self.rows[1]["slots"][1], ["lunch", "\u2014"])
+
+    def test_a_day_with_a_snack_lists_it_after_its_meals(self):
+        self.assertEqual(self.rows[0]["slots"][4], ["snack", "Overnight Oats"])
+
+    def test_a_day_without_a_snack_lists_only_its_meals(self):
+        self.assertEqual(len(self.rows[1]["slots"]), 4)
+
+
+PLAN_YAML = re.compile(r"function planYaml\(plan, week, slots\)\{.*?\n\}", re.S)
+
+
+@unittest.skipUnless(shutil.which("node"), "node is not installed")
+class PlanYaml(unittest.TestCase):
+    """Checkout's days: block. A snack line only on a day that baked one."""
+
+    @classmethod
+    def setUpClass(cls):
+        fn = PLAN_YAML.search(browse.TEMPLATE)
+        assert fn, "planYaml is no longer in TEMPLATE"
+        plan = {f"{d}.{s}": "x" for d in ("monday", "tuesday") for s in ROW_SLOTS}
+        plan["tuesday.snack"] = "bar"
+        script = fn.group(0) + "\nconsole.log(JSON.stringify(planYaml(%s, %s, %s)));\n" % (
+            json.dumps(plan), json.dumps(["monday", "tuesday"]), json.dumps(ROW_SLOTS))
+        with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as handle:
+            handle.write(script)
+            path = handle.name
+        try:
+            out = subprocess.run([shutil.which("node"), path], check=True,
+                                 capture_output=True, text=True).stdout
+        finally:
+            os.unlink(path)
+        cls.yaml = json.loads(out)
+
+    def test_a_snack_line_follows_pudding_on_its_day(self):
+        self.assertIn("    pudding: x\n    snack: bar\n", self.yaml)
+
+    def test_a_day_without_a_snack_writes_no_snack_line(self):
+        self.assertEqual(self.yaml.count("snack:"), 1)
+
+    def test_the_block_loads_as_the_grid_shopping_list_reads(self):
+        import yaml
+        days = yaml.safe_load(self.yaml)["days"]
+        self.assertEqual(days["tuesday"]["snack"], "bar")
+        self.assertNotIn("snack", days["monday"])
 
 
 PLAN_SWAP = re.compile(r"function planSwap\(plan, a, b\)\{.*?\n\}", re.S)
