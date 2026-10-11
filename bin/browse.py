@@ -518,6 +518,22 @@ button,select{font:inherit;font-size:.95rem;color:inherit;background:var(--card)
   border:1px solid var(--rule);border-radius:9px;padding:.65rem 1rem;cursor:pointer;
   transition:border-color .15s,color .15s}
 button:hover,select:hover{border-color:var(--accent);color:var(--accent)}
+/* Bootstrap bakes its own blue into these rather than reading --bs-primary,
+   so the page's accent is handed to each one directly. */
+.btn-primary,.btn-outline-primary{
+  --bs-btn-bg:var(--accent); --bs-btn-border-color:var(--accent); --bs-btn-color:var(--on-accent);
+  --bs-btn-hover-bg:var(--ink); --bs-btn-hover-border-color:var(--ink); --bs-btn-hover-color:var(--paper);
+  --bs-btn-active-bg:var(--ink); --bs-btn-active-border-color:var(--ink); --bs-btn-active-color:var(--paper);
+  --bs-btn-disabled-bg:transparent; --bs-btn-disabled-border-color:var(--rule);
+  --bs-btn-disabled-color:var(--soft); --bs-btn-focus-shadow-rgb:var(--bs-primary-rgb)}
+.btn-outline-primary{--bs-btn-bg:transparent; --bs-btn-color:var(--accent)}
+.form-check-input:checked{background-color:var(--accent);border-color:var(--accent)}
+.form-check-input:focus,.form-range:focus::-webkit-slider-thumb{
+  border-color:var(--accent);box-shadow:0 0 0 .2rem var(--accent-soft)}
+.form-range{accent-color:var(--accent)}
+.form-range::-webkit-slider-thumb{background:var(--accent)}
+.form-range::-moz-range-thumb{background:var(--accent)}
+.form-range::-webkit-slider-thumb:active{background:var(--ink)}
 /* The old rules removed the outline and left a border-colour change as the only
    focus signal, which a keyboard user cannot see on a control that has no
    border to begin with. :focus-visible keeps the mouse clean and gives the
