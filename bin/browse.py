@@ -14,6 +14,7 @@ Usage: bin/browse.py [--check]
 
 import datetime
 import glob
+import importlib.util
 import json
 import os
 import re
@@ -23,6 +24,15 @@ import yaml
 
 class Failure(Exception):
     """A violation that makes the page wrong or unsafe. Stop; do not write it."""
+
+
+# The shopping list owns the grid's rules -- the snack spread and the makes:
+# check -- so the page reads them from there rather than keeping a second copy.
+_spec = importlib.util.spec_from_file_location(
+    "shopping_list", os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                  "shopping-list.py"))
+sl = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(sl)
 
 
 def json_dump(value):
@@ -120,18 +130,6 @@ def plan_staples(days, recipes, pins):
                     name = pin.get("display") or humanise(line["ingredient"])
                     meals[name] = meals.get(name, 0) + 1
     return sorted([name, n] for name, n in meals.items())
-
-
-def day_totals(slots, recipes):
-    """Sum a day from its Recipes -- never from a grid's hand-written table."""
-    protein = kcal = 0.0
-    for slug in slots.values():
-        if slug == EATEN_OUT or slug not in recipes:
-            continue
-        macros = recipes[slug].get("macros") or {}
-        protein += float(macros.get("protein_g") or 0)
-        kcal += float(macros.get("kcal") or 0)
-    return {"protein_g": round(protein, 1), "kcal": round(kcal, 1)}
 
 
 def last_eaten(plans):
@@ -277,8 +275,10 @@ def load_household(root):
 
 def load_all(root):
     goals_text = read(os.path.join(root, "GOALS.md"))
+    recipes = load_recipes(root)
+    sl.check_makes(recipes)
     return {
-        "recipes": load_recipes(root),
+        "recipes": recipes,
         "plans": load_plans(root),
         "pins": load_pins(root),
         "bands": parse_bands(goals_text),
@@ -329,6 +329,8 @@ def build_payload(data):
             "tags": recipe.get("tags") or [],
             "protein_g": macros.get("protein_g"),
             "kcal": macros.get("kcal"),
+            # Servings per batch, on a snack only. VOCABULARY.md.
+            "makes": recipe.get("makes"),
             "band": band,
             "score": {
                 "protein": band_score(macros.get("protein_g") or 0, band, "protein") if band else None,
@@ -343,12 +345,15 @@ def build_payload(data):
     plan_rows = []
     for plan in data["plans"]:
         totals, cooked = {}, 0
+        grid = [(day, slot, value) for day, slots in plan["days"].items()
+                for slot, value in slots.items() if value]
+        summed_week = sl.day_macros(grid, recipes)
         for day in DAYS:
             slots = plan["days"].get(day, {})
             at_home = sum(1 for slot in SLOTS
                           if slots.get(slot) not in (None, EATEN_OUT))
             cooked += at_home
-            summed = day_totals(slots, recipes)
+            summed = summed_week[day]
             # A day nobody cooked misses both goals trivially. Flagging it would
             # report a night out as a nutritional failure.
             summed["flags"] = goal_flags(summed, data["goals"]) if at_home else []
@@ -1488,6 +1493,6 @@ def main(argv):
 if __name__ == "__main__":
     try:
         sys.exit(main(sys.argv[1:]))
-    except Failure as exc:
+    except (Failure, sl.Failure) as exc:
         print(f"browse: {exc}", file=sys.stderr)
         sys.exit(1)

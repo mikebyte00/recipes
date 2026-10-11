@@ -116,6 +116,7 @@ RECIPES = {
     "burger": {"slot": "dinner", "protein": "chicken",
                "macros": {"protein_g": 55, "kcal": 780}, "tags": ["fakeaway"]},
     "mousse": {"slot": "pudding", "macros": {"protein_g": 13, "kcal": 165}, "tags": []},
+    "bar": {"slot": "snack", "makes": 8, "macros": {"protein_g": 10, "kcal": 150}, "tags": []},
 }
 
 WEEK_DAYS = {
@@ -138,8 +139,10 @@ WEEK_DAYS = {
 
 class DayTotals(unittest.TestCase):
     def test_sums_a_days_four_slots_from_the_recipes(self):
-        totals = browse.day_totals(WEEK_DAYS["thursday"], RECIPES)
-        self.assertEqual(totals, {"protein_g": 140.0, "kcal": 1705.0})
+        thursday = plan_payload([{"slug": "2026-09-14", "title": "t",
+                                  "days": {"thursday": WEEK_DAYS["thursday"]}}])[0]
+        self.assertEqual(thursday["totals"]["thursday"]["protein_g"], 140.0)
+        self.assertEqual(thursday["totals"]["thursday"]["kcal"], 1705.0)
 
     def test_a_day_clearing_the_floor_and_the_ceiling_is_flagged_neither_way(self):
         self.assertEqual(browse.goal_flags({"protein_g": 140.0, "kcal": 1685.0}), [])
@@ -195,6 +198,58 @@ class Plans(unittest.TestCase):
 
     def test_a_plan_is_never_checked_against_a_layout(self):
         self.assertNotIn("violations", plan_payload([self.plan])[0])
+
+
+class Snacks(unittest.TestCase):
+    def setUp(self):
+        days = {day: dict(slots) for day, slots in WEEK_DAYS.items()}
+        days["wednesday"]["snack"] = "bar"
+        self.plan = {"slug": "2026-09-14", "title": "Week of 2026-09-14", "days": days}
+
+    def test_payload_totals_are_day_macros(self):
+        grid = [(d, s, v) for d, slots in self.plan["days"].items() for s, v in slots.items()]
+        want = browse.sl.day_macros(grid, RECIPES)
+        got = plan_payload([self.plan])[0]["totals"]
+        for day in browse.DAYS:
+            self.assertEqual({k: got[day][k] for k in ("protein_g", "kcal", "snacks")},
+                             want[day])
+
+    def test_a_bake_adds_its_share_from_its_day_on(self):
+        totals = plan_payload([self.plan])[0]["totals"]
+        self.assertEqual(totals["tuesday"]["snacks"], [])
+        self.assertEqual(totals["thursday"]["snacks"], ["bar"])
+        self.assertEqual(totals["thursday"]["protein_g"], 145.7)
+
+    def test_a_snack_is_not_a_cooked_meal(self):
+        self.assertEqual(plan_payload([self.plan])[0]["cooked"], 28)
+        self.assertEqual(plan_payload([self.plan])[0]["totals"]["wednesday"]["cooked"], 4)
+
+    def test_a_week_with_no_snack_sums_as_before(self):
+        del self.plan["days"]["wednesday"]["snack"]
+        totals = plan_payload([self.plan])[0]["totals"]
+        self.assertEqual(totals["thursday"]["protein_g"], 140.0)
+        self.assertEqual(totals["thursday"]["kcal"], 1705.0)
+
+    def test_a_snack_row_carries_makes(self):
+        rows = {r["slug"]: r for r in browse.build_payload({
+            "recipes": RECIPES, "plans": [], "pins": {}, "bands": {},
+            "goals": browse.DEFAULT_GOALS})["recipes"]}
+        self.assertEqual(rows["bar"]["makes"], 8)
+        self.assertIsNone(rows["mousse"]["makes"])
+
+    def test_the_page_refuses_a_snack_without_makes(self):
+        with tempfile.TemporaryDirectory() as root:
+            for name in ("Recipes", "Plans"):
+                os.mkdir(os.path.join(root, name))
+            for name, text in {
+                "Recipes/bar.md": "---\ntitle: Bar\nslot: snack\nmacros: {protein_g: 1, kcal: 1}\n---\n",
+                "PINS.md": "```yaml\n{}\n```\n",
+                "GOALS.md": GOALS,
+            }.items():
+                with open(os.path.join(root, name), "w") as handle:
+                    handle.write(text)
+            with self.assertRaisesRegex(browse.sl.Failure, "bar"):
+                browse.load_all(root)
 
 
 class ShoppingBlocks(unittest.TestCase):
@@ -352,7 +407,8 @@ class AgainstTheRealRepo(unittest.TestCase):
         # cooked is spelled eaten-out rather than emptied.
         self.assertTrue(self.data["plans"], "Plans/ is empty")
         for plan in self.data["plans"]:
-            filled = [s for slots in plan["days"].values() for s in slots.values() if s]
+            filled = [s for slots in plan["days"].values()
+                      for slot, s in slots.items() if s and slot != "snack"]
             self.assertEqual(len(filled), 28, plan["slug"])
 
     def test_every_plan_slot_is_a_recipe_or_eaten_out(self):
