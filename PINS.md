@@ -26,7 +26,11 @@ page on 27 September 2026, minted nine more — `blueberries`, `cinnamon`
 (staple), `flaked-almonds`, `garlic`, `halloumi`, `peas`, `pineapple`,
 `red-onion`, `waffle-fries` — taking the catalogue to 103. That harvest was the
 first under the discard rule: the order itself was not kept, so from here on
-the counts in this file are the only record of what a harvest found.
+the counts in this file are the only record of what a harvest found. The 05
+October harvest, read from a pasted order page on 11 October 2026, minted three
+— `coconut-milk`, `kidney-beans`, `strawberries` — taking the catalogue to 106,
+and switched `oat-milk` to Oatly Barista and `vegetarian-sausage` to Richmond's
+frozen Tasty Sausages, the previous products kept as alternates.
 
 ## Reading a Pin
 
@@ -299,6 +303,16 @@ cinnamon:
   staple: true
   confirmed: true
 
+coconut-milk:
+  display: Coconut milk
+  store: waitrose
+  unit: ml
+  pack: { qty: 400, unit: ml }
+  search_term: Duchy Organic Coconut Milk
+  line_number: "495822"
+  staple: false
+  confirmed: true
+
 cottage-cheese:
   display: Cottage cheese
   store: waitrose
@@ -492,6 +506,16 @@ hot-sauce:
   staple: true
   confirmed: true
 
+kidney-beans:
+  display: Kidney beans
+  store: waitrose
+  unit: g
+  pack: { qty: 400, unit: g }
+  search_term: Duchy Organic Red Kidney Beans in Water
+  line_number: "482361"
+  staple: false
+  confirmed: true
+
 lemon:
   display: Lemons
   store: waitrose
@@ -570,8 +594,9 @@ oat-milk:
   store: waitrose
   unit: ml
   pack: { qty: 1000, unit: ml }
-  search_term: MOMA Organic Oat Barista
-  line_number: "662470"
+  search_term: Oatly! Oat Drink Barista Organic Long Life
+  line_number: "441406"
+  alternates: ["MOMA Organic Oat Barista (662470)"]
   staple: false
   confirmed: true
 
@@ -867,6 +892,16 @@ spring-onions:
   staple: false
   confirmed: true
 
+strawberries:
+  display: Strawberries
+  store: waitrose
+  unit: g
+  pack: { qty: 230, unit: g }
+  search_term: Waitrose Strawberries
+  line_number: "088067"
+  staple: false
+  confirmed: true
+
 sugar-snap-peas:
   display: Sugar snap peas
   store: waitrose
@@ -961,8 +996,9 @@ vegetarian-sausage:
   store: waitrose
   unit: each
   pack: { qty: 8, unit: each }
-  search_term: Richmond 8 Vegan Meat Free Sausages
-  line_number: "551047"
+  search_term: Richmond Meat Free Tasty Sausages
+  line_number: "812680"
+  alternates: ["Richmond 8 Vegan Meat Free Sausages (551047)"]
   staple: false
   confirmed: true
 
@@ -1033,7 +1069,7 @@ worcestershire-sauce:
 
 ## Absences
 
-The 24 ingredients with no Pin, and why. Recorded here so the catalogue's
+The 21 ingredients with no Pin, and why. Recorded here so the catalogue's
 coverage is checkable rather than assumed. **This list is the Unpinned flag**:
 an ingredient here is added to the order by hand, and buying it once means the
 next harvest turns it into a Pin.
@@ -1048,15 +1084,17 @@ The 08 September harvest resolved six of these: `banana`, `blue-cheese`,
 product and are now Pins; `quorn-pieces` arrived with three new Recipes and
 matched Quorn Vegetarian Pieces (441467) in the same order.
 
-**Never harvested (13)** — real shopping items absent from the orders harvested
+**Never harvested (10)** — real shopping items absent from the orders harvested
 so far. Each will Pin itself on the next harvest after you buy it. The 17
 September harvest resolved seven more of the original twenty: `flaked-almonds`,
 `halloumi`, `pineapple`, `red-onion`, `waffle-fries`, `cinnamon` and `peas`.
 
-- `burger-buns` · `lettuce` · `parsley` · `strawberries` ·
-  `wholewheat-linguine` · `chilli-oil` · `coconut-milk` ·
-  `jerk-seasoning` · `kidney-beans` · `marmalade` · `rice-vinegar` ·
+- `burger-buns` · `lettuce` · `parsley` · `wholewheat-linguine` ·
+  `chilli-oil` · `jerk-seasoning` · `marmalade` · `rice-vinegar` ·
   `spring-onion` · `sweetheart-cabbage`
+
+The 05 October harvest resolved three more: `coconut-milk`, `kidney-beans` and
+`strawberries`.
 
 Three of those — `chilli-oil`, `jerk-seasoning`, `rice-vinegar` —
 read like store cupboard, and would likely mint as staples. Likely is not
@@ -1094,6 +1132,9 @@ would publish the one thing the harvest deliberately throws away.
 The 17 September order added twelve more: five household lines and one
 personal-care line (counted, not named, as above), and ciabatta rolls · two
 alcohol-free beers · kiwi · ice · two squashes.
+
+The 05 October order added twelve more: nine household lines and one
+personal-care line (counted, not named, as above), and two squashes.
 
 Groceries outside the recipe corpus (15): grapes · kiwi · carrots · peppers ·
 cucumber · radish · watercress · pumpkin seeds · plum tomatoes · blackeye

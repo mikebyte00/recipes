@@ -6,10 +6,12 @@ kept — a harvest reads one, writes its Pins, and discards it — so this is th
 trace an order leaves. Waitrose's own *My Orders* page has the details.
 
 Last checked against *My Orders* on 16 September 2026; the 17 September order was
-added on 27 September. Orders after 17 September have not been checked.
+added on 27 September, and the 5 October order on 11 October from a pasted
+order page. *My Orders* has not been checked between 17 September and 5 October.
 
 | Order date | Status | Harvested |
 |---|---|---|
+| Monday 5 October 2026 | Completed | 11 October 2026 |
 | Thursday 17 September 2026 | Completed | 27 September 2026 |
 | Tuesday 8 September 2026 | Completed | 16 September 2026 |
 | Monday 31 August 2026 | Completed | 07 September 2026 |
