@@ -320,6 +320,9 @@ def build_payload(data):
             # Human-only, and absent on most Recipes. VOCABULARY.md: nothing
             # infers a rating, so an unrated Recipe carries None and sorts last.
             "rating": recipe.get("rating"),
+            # Out of the pool, kept on disk so the past weeks that ate it still
+            # name it. VOCABULARY.md, Retiring a Recipe.
+            "retired": bool(recipe.get("retired")),
             # Plan mode judges "recent" against the reader's clock, not here.
             "last_eaten": eaten.get(slug),
             "appliances": recipe.get("appliances") or [],
@@ -363,7 +366,7 @@ def build_payload(data):
             "multi_search": plan.get("multi_search", ""),
         })
 
-    facets = {field: sorted({v for r in recipe_rows for v in
+    facets = {field: sorted({v for r in recipe_rows if not r["retired"] for v in
                              (r[field] if isinstance(r[field], list) else [r[field]])
                              if v})
               for field in ("slot", "protein", "effort", "appliances", "tags")}
@@ -594,7 +597,9 @@ ol.method li{margin-bottom:.85rem;line-height:1.6}
 .pill{display:inline-block;border:1px solid var(--rule);border-radius:999px;
   padding:.15rem .7rem;font-size:.8rem;color:var(--soft);margin:0 .3rem .3rem 0}
 .pill.un{border-color:var(--accent);color:var(--accent)}
-.pill.eaten,.pill.picked{margin:0 .4rem 0 0;padding:0 .55rem;font-size:.75rem}
+/* The protein leads a row, so two versions of one dish read apart at a glance. */
+.pill.protein{font-weight:600}
+.pill.eaten,.pill.picked,.pill.protein{margin:0 .4rem 0 0;padding:0 .55rem;font-size:.75rem}
 .pill.picked{border-color:var(--accent);color:var(--accent)}
 .day{border-bottom:1px solid var(--rule);padding:1.1rem 0}
 .day h4{margin:0 0 .55rem;font-size:.9rem;font-weight:600;color:var(--soft);
@@ -704,6 +709,9 @@ const SORTS = {
   title:   {label:'Title',   key: r => r.title.toLowerCase()},
   rating:  {label:'Rating',  key: r => r.rating,    desc:true},
   protein: {label:'Protein', key: r => r.protein_g, desc:true},
+  /* Longest ago first, never-eaten before all of them: the top of each Slot
+     is the freshest pick. A date still to come sorts as recent. */
+  eaten:   {label:'Eaten longest ago', key: r => r.last_eaten || ''},
 };
 
 /* Absent last, then by key, then title as the tie-break so the order is
@@ -854,12 +862,14 @@ function recipeList(){
   /* While a Slot is being picked the pool narrows to Recipes of that Slot --
      the facets and the search box still apply on top. */
   const only = planOn && !checkedOut ? planSlot() : null;
-  const hits = D.recipes.filter(r => (!only || r.slot === only) && matches(r));
+  const pool = D.recipes.filter(r => !r.retired);
+  const hits = pool.filter(r => (!only || r.slot === only) && matches(r));
   const now = new Date();
   /* A hint, never a gate: a Recipe eaten lately stays pickable, and the list
-     keeps its order. Only while picking, since only then is variety the question. */
+     keeps its order. Only while picking, or sorting by it, since only then is
+     variety the question. */
   const eaten = r => {
-    const n = only ? eatenAgo(r.last_eaten, now) : null;
+    const n = only || route.sort === 'eaten' ? eatenAgo(r.last_eaten, now) : null;
     return n == null ? '' : `<span class="pill eaten">eaten ${
       n === 0 ? 'today' : n === 1 ? 'yesterday' : n + ' days ago'}</span>`;
   };
@@ -876,14 +886,14 @@ function recipeList(){
       href="#recipe/${r.slug}${qs()}">
       <span class="t">${esc(r.title)}</span>
       <span class="macro">${scoreDot('protein',r)}${g(r.protein_g)} · ${kc(r.kcal)} kcal</span>
-      <span class="meta">${picked(r)}${eaten(r)}${[star(r.rating), nice(r.protein), r.effort ? r.effort+' effort' : '',
+      <span class="meta">${r.protein ? `<span class="pill protein">${nice(r.protein)}</span>` : ''}${picked(r)}${eaten(r)}${[star(r.rating), r.effort ? r.effort+' effort' : '',
         (r.appliances||[]).map(nice).join(', ') || 'no appliance',
         (r.tags||[]).map(nice).join(', ')].filter(Boolean).join(' · ')}</span>
     </a>`).join('')}</div>`).join('')
     : `<p class="empty">No Recipe matches those filters.</p>`;
 
   const n = activeCount();
-  return `<p class="lede">${D.recipes.length} Recipes. Showing ${hits.length}.</p>
+  return `<p class="lede">${pool.length} Recipes. Showing ${hits.length}.</p>
     <div class="tools">
       <input type="search" id="q" class="form-control" placeholder="Search recipes"
              title="Searches titles, ingredients, Pinned products and method"
@@ -929,6 +939,8 @@ function recipeDetail(slug){
   return `<a class="back" href="${listHash()}">← Recipes</a>
   <article>
     <h2>${esc(r.title)}</h2>
+    ${r.retired ? `<div class="warn"><strong>Retired.</strong> Out of the pool and
+      Plan mode; kept so the weeks that ate it still name it.</div>` : ''}
     <p class="tagline">${[star(r.rating), cap(r.slot), nice(r.protein), r.effort ? r.effort+' effort':'' ,
         (r.appliances||[]).map(nice).join(' · ')].filter(Boolean).join(' · ')}
       ${(r.tags||[]).map(t=>`<span class="pill">${nice(t)}</span>`).join('')}</p>

@@ -4,6 +4,7 @@ slot: lunch
 protein: chicken
 effort: medium
 tags: []
+retired: true
 appliances: [air-fryer, skillet]
 macros: { protein_g: 45, kcal: 395 }
 ingredients:

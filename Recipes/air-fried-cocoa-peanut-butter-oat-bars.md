@@ -4,6 +4,7 @@ slot: breakfast
 protein: protein-powder
 effort: medium
 tags: [eat-cold]
+retired: true
 appliances: [air-fryer]
 macros: { protein_g: 30, kcal: 420 }
 ingredients:

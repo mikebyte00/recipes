@@ -13,6 +13,7 @@ which holds the reasoning. This file is the operative list.
 | `protein` | one, or absent on a pudding | `sausage` `egg` `tofu` `quorn` `chicken` `white-fish` `oily-fish` `beef` `dairy` `protein-powder` |
 | `effort` | one | `low` `medium` `high` |
 | `rating` | one, or absent | `1` `2` `3` `4` `5` |
+| `retired` | `true`, or absent | `true` |
 | `appliances` | list | `skillet` `air-fryer` `ninja-sizzle` `rice-cooker` `pot` `toaster` `poacher` |
 | `tags` | list | `fakeaway` `bulk-cook` `eat-cold` |
 
@@ -98,3 +99,12 @@ Absent is not zero. `bin/browse.py` sorts unrated Recipes last under every sort
 order, because a blank must not read as a bad score. Nothing else consumes the
 field: weekly planning and the shopping list both ignore it, and it is the
 browse page's sort control alone that gives it a consumer.
+
+## Retiring a Recipe
+
+**A Recipe the household no longer wants is retired, not deleted, once any Plan
+has eaten it.** `retired: true` takes it out of the browse page's list and Plan
+mode; the file stays so the past weeks that ate it still show its title and
+macros, since nothing edited later may change what a past week says it ate. A
+Recipe no Plan has cited is simply deleted. Retiring is the household's call,
+never an agent's.
