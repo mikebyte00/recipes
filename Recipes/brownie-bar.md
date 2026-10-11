@@ -1,7 +1,7 @@
 ---
 title: Brownie Bar
-slot: breakfast
-protein: protein-powder
+slot: snack
+makes: 4
 effort: high
 tags: [bulk-cook, eat-cold]
 appliances: [air-fryer]
@@ -18,9 +18,8 @@ ingredients:
   - { ingredient: greek-yogurt, qty: 50, unit: g, note: to serve }
 ---
 
-Betty's fudgy brownie baked oats. Makes 4 slices, a whole batch: one slice each
-is a serving, so a batch covers two breakfast Slots. Macros are per slice.
-Keeps 4–5 days in the fridge.
+Betty's fudgy brownie baked oats. Makes 4 slices: quantities are for the whole
+batch, macros per slice. Keeps 4–5 days in the fridge.
 
 1. Mash the bananas in a bowl, then stir in the almond milk and a teaspoon of honey.
 2. Mix in the oats, protein powder, cocoa and baking powder until no dry pockets remain, then fold through half the chocolate chips.
