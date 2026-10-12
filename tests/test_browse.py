@@ -435,18 +435,18 @@ class GeneratedPage(unittest.TestCase):
         cls.html = browse.render(cls.data)
 
     def test_the_page_only_fetches_its_pinned_ui_library(self):
-        """Ticket 24's amendment allows exactly one runtime fetch: the pinned
-        Bootstrap build, by exact URL. Anything else external creeping in --
-        an accidental second CDN dependency, a typo'd version -- is what
-        this test exists to catch, same as the old absolute-zero version did
-        before there was a reason to allow one."""
-        bootstrap_css = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-        bootstrap_js = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        """Ticket 24 allows one dependency: the pinned Bootstrap build,
+        vendored beside the page. Anything else creeping in -- a CDN, a
+        second library, a typo'd version -- is what this test exists to catch."""
+        bootstrap_css = "vendor/bootstrap-5.3.8/bootstrap.min.css"
+        bootstrap_js = "vendor/bootstrap-5.3.8/bootstrap.bundle.min.js"
         scripts = re.findall(r'<script src="([^"]+)"', self.html)
         links = re.findall(r'<link[^>]*rel="stylesheet"[^>]*>', self.html)
         self.assertEqual(scripts, [bootstrap_js])
         self.assertEqual(len(links), 1)
         self.assertIn(bootstrap_css, links[0])
+        for path in (bootstrap_css, bootstrap_js):
+            self.assertTrue(os.path.isfile(os.path.join(ROOT, path)), path)
 
     def test_the_page_carries_no_orders_view(self):
         # Orders are harvested into Pins and discarded; the page never shows one.

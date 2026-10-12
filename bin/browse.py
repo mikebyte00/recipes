@@ -400,11 +400,11 @@ TEMPLATE = r"""<!doctype html>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="Meals">
 <meta name="theme-color" content="#95462a">
-<!-- Pinned to an exact patch release with Subresource Integrity: a compromised
-     CDN response is rejected by the browser rather than executed. Ticket 24's
-     amendment accepts this as the page's one runtime fetch -- everything else
-     it needs is still the inlined JSON payload below. -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+<!-- Bootstrap is vendored next to the page and served by Pages from the same
+     origin, so the page renders without any third-party CDN (ticket 24's second
+     amendment). The integrity hashes are the upstream release's: an edited copy
+     is refused rather than run. -->
+<link href="vendor/bootstrap-5.3.8/bootstrap.min.css"
       rel="stylesheet"
       integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
       crossorigin="anonymous">
@@ -1557,7 +1557,7 @@ addEventListener('hashchange', () => { route = readHash(); render(); });
 route = readHash();
 render();
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+<script src="vendor/bootstrap-5.3.8/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
 </body>

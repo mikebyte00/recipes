@@ -61,6 +61,13 @@ says so is unchanged.
   inlined JSON, never fetched, so `bin/browse.py`'s output remains a single
   generated artifact with no build tool and no server-side pipeline.
 
+  **Amended again on 12 October 2026**: Bootstrap is now vendored in
+  `vendor/bootstrap-5.3.8/` and loaded from the same origin, with the upstream
+  integrity hashes kept. A design critique found the nav, filter sheet and Plan
+  drawer collapse when the CDN is unreachable, which matters for a phone on
+  flaky kitchen wifi. The page again makes no third-party fetch; the vendored
+  files are two static files beside `index.html`, not a third `bin/` entry.
+
   **Carried out the same day**: the filter sheet, nav, recipe list, and
   Plan-mode wizard bar all now render as Bootstrap 5.3.8 components
   (Offcanvas, navbar, list-group, and utility classes respectively),
