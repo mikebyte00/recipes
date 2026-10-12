@@ -5,9 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Meal Planning</title>
 <!-- Static files at the repo root, not generated: the SVG is the tab icon, the
-     PNG is what "Add to Home Screen" uses, since iOS will not take an SVG. -->
+     PNG is what "Add to Home Screen" uses, since iOS will not take an SVG.
+     The manifest makes the page installable: it opens standalone, without the
+     browser's address bar, like an app. -->
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Meals">
 <meta name="theme-color" content="#95462a">
 <!-- Bootstrap is vendored next to the page and served by Pages from the same

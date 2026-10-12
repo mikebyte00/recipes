@@ -448,6 +448,14 @@ class GeneratedPage(unittest.TestCase):
         for path in (bootstrap_css, bootstrap_js):
             self.assertTrue(os.path.isfile(os.path.join(ROOT, path)), path)
 
+    def test_the_page_is_installable(self):
+        self.assertIn('<link rel="manifest" href="manifest.webmanifest">', self.html)
+        with open(os.path.join(ROOT, "manifest.webmanifest")) as f:
+            manifest = json.load(f)
+        self.assertEqual(manifest["display"], "standalone")
+        for icon in manifest["icons"]:
+            self.assertTrue(os.path.isfile(os.path.join(ROOT, icon["src"])), icon["src"])
+
     def test_the_page_carries_no_orders_view(self):
         # Orders are harvested into Pins and discarded; the page never shows one.
         self.assertNotIn("ordersView", self.html)
