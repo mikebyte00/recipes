@@ -503,7 +503,7 @@ h1,h2,h3{font-weight:600;margin:0}
 /* main.wrap, not main: .wrap's own padding shorthand outranks a bare element
    selector and zeroed these. Top and bottom only -- the gutters are .wrap's. */
 main.wrap{padding-top:clamp(1.4rem,2vw,2.2rem);padding-bottom:5rem}
-.lede{color:var(--soft);font-size:.95rem;line-height:1.6;margin:.1rem 0 1.5rem}
+.lede{color:var(--soft);font-size:.95rem;line-height:1.6;margin:.1rem 0 1.5rem;font-weight:400;max-width:70ch}
 .tools{display:flex;gap:.6rem;margin-bottom:1.5rem;flex-wrap:wrap}
 /* Quick Slot filtering below the search bar so it survives the sheet
    collapsing behind Filters on narrow screens. The sheet keeps its own Slot
@@ -616,7 +616,7 @@ ol.method li{font-size:clamp(1.15rem,.95rem + 1vw,1.5rem);line-height:1.6;
 ol.method li::marker{color:var(--accent);font-weight:600}
 ol.method li.done{color:var(--soft);text-decoration:line-through;
   text-decoration-color:var(--rule)}
-.note{font-size:.85rem;color:var(--soft);line-height:1.5}
+.note{font-size:.85rem;color:var(--soft);line-height:1.5;max-width:70ch}
 .warn{border-left:3px solid var(--accent);background:var(--accent-soft);
   border-radius:0 var(--radius) var(--radius) 0;
   padding:.8rem 1rem;font-size:.9rem;line-height:1.55;margin:.8rem 0}
@@ -1105,11 +1105,11 @@ function todayView(){
   const rest = (stale ? WEEK : WEEK.filter(d => d !== day))
                  .map(d => dayBlock(p, d)).join('');
 
-  return `<p class="lede">${esc(date)} · <a href="#plan/${p.slug}">${esc(p.title)}</a></p>
+  return `<h2 class="lede">${esc(date)} · <a href="#plan/${p.slug}">${esc(p.title)}</a></h2>
     ${stale
       ? `<div class="warn">No Plan covers this week. Showing the latest,
           <strong>${esc(p.title)}</strong> — <code>plan-the-week</code> writes the next one.</div>`
-      : dayBlock(p, day, 'now', 'Today — ' + cap(day))}
+      : `<section><h3 class="visually-hidden">Today</h3>${dayBlock(p, day, 'now', 'Today — ' + cap(day))}</section>`}
     <section><h3>${stale ? 'The week' : 'The rest of the week'}</h3>${rest}</section>`;
 }
 
