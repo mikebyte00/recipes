@@ -64,6 +64,10 @@ Read `VOCABULARY.md` — *The Plan grid* — and `GOALS.md` before editing a gri
    | Fancies something else | That Slot takes another slug from `Recipes/` |
    | Cooks one batch across two meals | The **same slug in both Slots** |
 
+   A **`bulk-cook` meal** is sized as one cook for two Slots — its quantities
+   are half the batch. Held in only one Slot it buys half a batch, so step 4
+   flags it: offer the user a second Slot for it. A flag, never a gate.
+
    Every Slot keeps a value, so the grid stays at 28 — see [The grid stays
    whole](#the-grid-stays-whole). Notes about the week go **above** the
    `## Shopping` heading; everything below it is replaced at step 5.
@@ -78,7 +82,8 @@ Read `VOCABULARY.md` — *The Plan grid* — and `GOALS.md` before editing a gri
    import sys; sys.path.insert(0, 'bin')
    sl = __import__('shopping-list')
    front, grid = sl.load_grid(sys.argv[1])
-   totals = sl.day_macros(grid, sl.load_recipes('.', grid))
+   recipes = sl.load_recipes('.', grid)
+   totals = sl.day_macros(grid, recipes)
    out = {d: sum(1 for day, s, v in grid if day == d and v == sl.EATEN_OUT) for d in sl.DAYS}
    for d in sl.DAYS:
        p, k, snacks = totals[d]['protein_g'], totals[d]['kcal'], totals[d]['snacks']
@@ -87,6 +92,10 @@ Read `VOCABULARY.md` — *The Plan grid* — and `GOALS.md` before editing a gri
                + ("  OVER the ~1800 kcal ceiling" if k > 1800 else ""))
        bakes = f"  (incl. snack share: {', '.join(sorted(set(snacks)))})" if snacks else ""
        print(f"{d:<10} ~{p:g}g protein  ~{k:g} kcal{note}{bakes}")
+   for slug, r in sorted(recipes.items()):
+       if r.get('slot') != 'snack' and 'bulk-cook' in (r.get('tags') or []) \
+               and sum(1 for _, _, v in grid if v == slug) == 1:
+           print(f"PICK TWICE: {slug} is bulk-cook but holds only one Slot")
    PY
    ```
 

@@ -921,6 +921,9 @@ function recipeList(){
     const days = only ? pickedDays(plan, r.slug, planKey(PLAN_SEQ[cursor]), WEEK) : [];
     return days.length ? `<span class="pill picked">picked ${days.join(', ')}</span>` : '';
   };
+  /* A bulk-cook meal is one cook for two Slots -- say so before it is chosen. */
+  const twice = r => only && r.slot !== 'snack' && (r.tags || []).includes('bulk-cook')
+    ? '<span class="pill picked">pick twice</span>' : '';
   const groups = D.slots.concat('snack').map(slot => [slot, sorted(hits.filter(r => r.slot === slot))])
                         .filter(([,rs]) => rs.length);
   const body = groups.length ? groups.map(([slot, rs]) => `
@@ -929,7 +932,7 @@ function recipeList(){
       href="#recipe/${r.slug}${qs()}">
       <span class="t">${esc(r.title)}</span>
       <span class="macro">${scoreDot('protein',r)}${g(r.protein_g)} · ${kc(r.kcal)} kcal</span>
-      <span class="meta">${r.protein ? `<span class="pill protein">${nice(r.protein)}</span>` : ''}${picked(r)}${eaten(r)}${[r.makes ? 'makes ' + r.makes : '', star(r.rating), r.effort ? r.effort+' effort' : '',
+      <span class="meta">${r.protein ? `<span class="pill protein">${nice(r.protein)}</span>` : ''}${twice(r)}${picked(r)}${eaten(r)}${[r.makes ? 'makes ' + r.makes : '', star(r.rating), r.effort ? r.effort+' effort' : '',
         (r.appliances||[]).map(nice).join(', ') || 'no appliance',
         (r.tags||[]).map(nice).join(', ')].filter(Boolean).join(' · ')}</span>
     </a>`).join('')}</div>`).join('')
@@ -1098,6 +1101,15 @@ function pickedDays(plan, slug, current, week){
   const days = new Set(Object.keys(plan)
     .filter(k => k !== current && plan[k] === slug).map(k => k.split('.')[0]));
   return week.filter(d => days.has(d)).map(d => d[0].toUpperCase() + d.slice(1, 3));
+}
+
+/* A bulk-cook meal is sized as one cook for two Slots, so held once it buys
+   half its batch. Snacks are a batch already and are never doubled. */
+function pickedOnce(plan, recipes){
+  const held = {};
+  Object.values(plan).forEach(v => { held[v] = (held[v] || 0) + 1; });
+  return recipes.filter(r => r.slot !== 'snack'
+    && (r.tags || []).includes('bulk-cook') && held[r.slug] === 1);
 }
 
 /* What am I cooking tonight, and where is that Recipe. The page's most-asked
@@ -1323,6 +1335,7 @@ function planSwap(plan, a, b){
 
 function checkoutView(){
   const titles = Object.fromEntries(D.recipes.map(r => [r.slug, r.title]));
+  const once = pickedOnce(plan, D.recipes);
   const days = weekRows(plan, WEEK, D.slots, titles).map(({day, slots}) => `
     <div class="day"><h4><span>${cap(day)}</span>
       <button class="edit btn btn-outline-secondary btn-sm" data-day="${day}">Edit</button></h4>
@@ -1335,6 +1348,10 @@ function checkoutView(){
       }).join('')}</dl></div>`).join('');
   return `<p class="lede">Your week. Tap a meal, then the same meal on another
       day, to swap them. Then copy the week and paste it to Claude.</p>
+    ${once.length ? `<div class="warn"><strong>Pick twice:</strong> ${once.map(r => esc(r.title)).join(', ')}
+      ${once.length > 1 ? 'are' : 'is'} bulk-cook, sized as one cook for two meals, but
+      ${once.length > 1 ? 'each is' : 'is'} picked only once. Edit a day to give
+      ${once.length > 1 ? 'each' : 'it'} a second Slot.</div>` : ''}
     <div class="tools"><button id="copy" class="btn btn-primary btn-sm">Copy week</button>
       <button id="edit">← Back to the week</button>
       <button id="startover">Start over</button></div>

@@ -33,12 +33,17 @@ which holds the reasoning. This file is the operative list.
 
 - **`fakeaway`** — restaurant-style dish cooked at home. Independent of
   `protein`: chicken in one, lemon sole in the other.
-- **`bulk-cook`** — can be cooked 4+ portions in one go.
+- **`bulk-cook`** — on a meal, one cook for **two Slots**: its quantities are
+  half the batch, so a Plan picks it twice. On a snack, the batch is already
+  whole and the tag is a label only.
 - **`eat-cold`** — fit to eat cold the next day, where no reheat is available.
 
-**`bulk-cook` and `eat-cold` have no consumer.** They are labels a human reads.
-Recipe generation, weekly planning and the shopping list all ignore them.
-Acting on either is a Plan-time decision, and a Plan spells it by
+**`eat-cold` has no consumer**, and nor has `bulk-cook` on a snack: they are
+labels a human reads. **`bulk-cook` on a meal has one — weekly planning flags it
+when a week holds it in only one Slot**: Plan mode pills it *pick twice* while
+a Slot is picked and warns at Checkout, and `plan-the-week` checks the grid. A
+flag, never a gate. The shopping list ignores every tag. Acting on a tag is a
+Plan-time decision, and a Plan spells it by
 holding the **same Recipe in both Slots** — which sums to exactly one doubled
 batch, because the shopping list adds quantities before it rounds up to packs.
 See [How A Plan Records Bulk-Cook And

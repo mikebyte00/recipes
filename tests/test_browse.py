@@ -719,6 +719,66 @@ console.log(JSON.stringify(out));
         self.assertEqual(self.picked["same_day_twice"], ["Mon"])
 
 
+PICKED_ONCE = re.compile(r"function pickedOnce\(plan, recipes\)\{.*?\n\}", re.S)
+
+ONCE_RECIPES = [
+    {"slug": "pie", "slot": "dinner", "tags": ["bulk-cook"]},
+    {"slug": "curry", "slot": "dinner", "tags": []},
+    {"slug": "cookies", "slot": "snack", "tags": ["bulk-cook"]},
+]
+
+# A plan -> the slugs pickedOnce flags.
+ONCE_CASES = {
+    "once": {"monday.dinner": "pie"},
+    "twice": {"monday.dinner": "pie", "tuesday.dinner": "pie"},
+    "absent": {"monday.dinner": "curry"},
+    "plain_once": {"monday.dinner": "curry", "tuesday.dinner": "pie", "wednesday.dinner": "pie"},
+    "snack_once": {"monday.snack": "cookies"},
+}
+
+
+@unittest.skipUnless(shutil.which("node"), "node is not installed")
+class PickedOnce(unittest.TestCase):
+    """Checkout's pick-twice warning: a bulk-cook meal held in exactly one
+    Slot buys half its batch. Lifted out of TEMPLATE, so the test runs what
+    ships."""
+
+    @classmethod
+    def setUpClass(cls):
+        fn = PICKED_ONCE.search(browse.TEMPLATE)
+        assert fn, "pickedOnce is no longer in TEMPLATE"
+        script = fn.group(0) + """
+const recipes = %s, out = {};
+for (const [k, plan] of Object.entries(%s))
+  out[k] = pickedOnce(plan, recipes).map(r => r.slug);
+console.log(JSON.stringify(out));
+""" % (json.dumps(ONCE_RECIPES), json.dumps(ONCE_CASES))
+        with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as handle:
+            handle.write(script)
+            path = handle.name
+        try:
+            out = subprocess.run([shutil.which("node"), path], check=True,
+                                 capture_output=True, text=True).stdout
+        finally:
+            os.unlink(path)
+        cls.once = json.loads(out)
+
+    def test_a_bulk_cook_meal_held_once_is_flagged(self):
+        self.assertEqual(self.once["once"], ["pie"])
+
+    def test_held_twice_is_the_whole_batch(self):
+        self.assertEqual(self.once["twice"], [])
+
+    def test_a_bulk_cook_meal_not_picked_is_not_flagged(self):
+        self.assertEqual(self.once["absent"], [])
+
+    def test_a_meal_without_the_tag_is_never_flagged(self):
+        self.assertEqual(self.once["plain_once"], [])
+
+    def test_a_snack_bake_is_never_flagged(self):
+        self.assertEqual(self.once["snack_once"], [])
+
+
 WEEK_ROWS = re.compile(r"function weekRows\(plan, week, slots, titles\)\{.*?\n\}", re.S)
 
 ROW_SLOTS = ["breakfast", "lunch", "dinner", "pudding"]

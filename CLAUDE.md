@@ -49,8 +49,8 @@ Pin or `HOUSEHOLD.md` therefore finishes the same way, and the change is not don
 until it has:
 
 1. `.venv/bin/python bin/browse.py` — regenerate the page.
-2. `.venv/bin/python tests/test_browse.py` — 95 tests. Forty-one shell out to `node` — to run the page's theme boot script,
-   its eaten-days count, its picked-days badge, Checkout's week, `days:` block and meal swap,
+2. `.venv/bin/python tests/test_browse.py` — 101 tests. Forty-six shell out to `node` — to run the page's theme boot script,
+   its eaten-days count, its picked-days badge, its pick-twice warning, Checkout's week, `days:` block and meal swap,
    and the filter reset Plan mode makes on every move — and skip cleanly when it is absent.
    Then `.venv/bin/python tests/test_shopping_list.py` — 19 tests of the grid,
    `makes:` and day-total rules.

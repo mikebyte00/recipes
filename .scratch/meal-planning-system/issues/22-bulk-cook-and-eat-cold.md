@@ -112,3 +112,17 @@ else.
 - [Author The Plan-The-Week Skill](20-author-plan-the-week.md): the skill offers
   a Recipe swap, which already covers the bulk-cook case. It must **not** offer
   a doubling control.
+
+## Amended 2026-11-08: `bulk-cook` on a meal gains a consumer
+
+Overruled by the user for `bulk-cook` alone. The first meal Recipe to carry it,
+`cheesy-harissa-sausage-pie`, is sized so **two dinners use one serves-6 card**,
+and it is never meant to be picked once. So weekly planning now **flags** a
+`bulk-cook` meal held in exactly one Slot: Plan mode pills it *pick twice* while
+a Slot is picked and warns at Checkout (`pickedOnce` in `bin/browse.py`), and
+`plan-the-week` checks the pasted grid. It is a flag, never a gate.
+
+What stands: the Plan Slot still holds a slug and nothing else, there is still
+no multiplier or doubling control, and two Slots holding one slug is still the
+doubled batch. `eat-cold` keeps no consumer, and nor does `bulk-cook` on a
+snack, whose `makes:` batch is already whole.
