@@ -5,19 +5,19 @@ protein: sausage
 effort: high
 tags: [bulk-cook]
 appliances: [pot, skillet, air-fryer]
-macros: { protein_g: 45, kcal: 790 }
+macros: { protein_g: 45, kcal: 760 }
 ingredients:
   - { ingredient: vegetarian-sausage, qty: 4, unit: each, prep: chopped }
-  - { ingredient: red-onion, qty: 1, unit: each, prep: finely chopped }
+  - { ingredient: red-onion, qty: 0.5, unit: each, prep: finely chopped }
   - { ingredient: harissa-paste, qty: 30, unit: g }
-  - { ingredient: passata, qty: 200, unit: g }
+  - { ingredient: passata, qty: 150, unit: g }
   - { ingredient: kalamata-olives, qty: 30, unit: g, prep: roughly chopped }
   - { ingredient: lentils, qty: 250, unit: g, note: pre-cooked }
   - { ingredient: potatoes, qty: 400, unit: g, prep: "peeled, chunked" }
   - { ingredient: greek-yogurt, qty: 120, unit: g }
   - { ingredient: parmesan, qty: 30, unit: g, prep: finely grated }
-  - { ingredient: peas, qty: 200, unit: g }
-  - { ingredient: olive-oil, qty: 10, unit: g }
+  - { ingredient: peas, qty: 225, unit: g }
+  - { ingredient: olive-oil, qty: 5, unit: g }
 ---
 
 1. Boil the potatoes in the pot for 15 minutes until tender, dropping in the peas for the final 3 minutes. Lift out the peas, drain the potatoes, and mash them with the Greek yogurt and half the parmesan.
