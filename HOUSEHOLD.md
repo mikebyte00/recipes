@@ -11,6 +11,7 @@ Edit freely, then regenerate the page (`.venv/bin/python bin/browse.py`).
 - Squash
 - Dishwasher tablets
 - Dishwasher salt
+- Dishwasher rinse aid
 - Shampoo
 - Conditioner
 - Antibac spray

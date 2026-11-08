@@ -245,6 +245,13 @@ celery:
   staple: false
   confirmed: true
 
+cheddar:
+  display: Cheddar cheese
+  store: waitrose
+  unit: g
+  staple: true
+  confirmed: true
+
 cherry-tomatoes:
   display: Cherry tomatoes
   store: waitrose
@@ -1141,7 +1148,7 @@ September harvest.
 
 **Not yet audited.** Recipes added since 16 September use ingredients this
 section does not list yet — among them `basmati-rice`, `cauliflower-rice`,
-`cheddar`, `cornflour`, `egg-whites`, `red-pepper`, `self-raising-flour`,
+`cornflour`, `egg-whites`, `red-pepper`, `self-raising-flour`,
 `sesame-seeds` and `tenderstem-broccoli`. They are Unpinned all the same; the
 count above is of the ones this section has reasoned about.
 
