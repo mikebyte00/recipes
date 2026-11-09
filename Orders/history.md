@@ -7,13 +7,17 @@ trace an order leaves. Waitrose's own *My Orders* page has the details.
 
 Last checked against *My Orders* on 16 September 2026; the 17 September order was
 added on 27 September, and the 5 October and 28 September orders on 11 October from pasted
-order pages. *My Orders* has not been checked between 17 September and 5 October,
-so other orders in that gap may still need harvesting.
+order pages. *My Orders* was checked in full on 9 November 2026, when the 9
+November order was harvested from its live page; the 12 October order is still
+to harvest.
 
 | Order date | Status | Harvested |
 |---|---|---|
+| Monday 9 November 2026 | Completed (refund pending) | 09 November 2026 |
+| Monday 12 October 2026 | Completed | |
 | Monday 5 October 2026 | Completed | 11 October 2026 |
 | Monday 28 September 2026 | Completed | 11 October 2026 |
+| Monday 28 September 2026 | Cancelled | — cancelled, no items |
 | Thursday 17 September 2026 | Completed | 27 September 2026 |
 | Tuesday 8 September 2026 | Completed | 16 September 2026 |
 | Monday 31 August 2026 | Completed | 07 September 2026 |

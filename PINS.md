@@ -33,6 +33,16 @@ and switched `oat-milk` to Oatly Barista and `vegetarian-sausage` to Richmond's
 frozen Tasty Sausages, the previous products kept as alternates. The 28
 September harvest, read from a pasted order page on 11 October 2026, minted two
 — `black-olives` and `cocoa-powder` (staple) — taking the catalogue to 108.
+The 09 November harvest, read from the live order page on 09 November 2026,
+minted eight — `baby-corn`, `cucumber`, `dark-chocolate`,
+`dark-chocolate-chips`, `edamame`, `hoisin-sauce` (staple), `sriracha`
+(staple), `tenderstem-broccoli` — and added a line number to the `capers`
+staple, taking the catalogue (with `cheddar`, pinned by hand) to 117. It also
+switched seven Pins to the cheaper product bought, under the household's move
+away from organic where it makes little difference: `avocado`, `banana`,
+`coconut-milk`, `lemon`, `lime`, `red-onion` and `red-pesto`, each keeping the
+previous product as an alternate. The loose lemons and limes may be waxed;
+three Recipes zest them.
 
 ## Reading a Pin
 
@@ -94,9 +104,19 @@ avocado:
   store: waitrose
   unit: each
   pack: { qty: 2, unit: each }
-  search_term: Duchy Organic Ripe Avocados
-  line_number: "742393"
-  alternates: ["Duchy Organic Avocado (046734)"]
+  search_term: Waitrose Perfectly Ripe & Home Ripen Avocados
+  line_number: "839147"
+  alternates: ["Duchy Organic Ripe Avocados (742393)", "Duchy Organic Avocado (046734)"]
+  staple: false
+  confirmed: true
+
+baby-corn:
+  display: Baby corn
+  store: waitrose
+  unit: g
+  pack: { qty: 125, unit: g }
+  search_term: Duchy Organic Baby Corn
+  line_number: "085326"
   staple: false
   confirmed: true
 
@@ -121,9 +141,10 @@ banana:
   display: Bananas
   store: waitrose
   unit: each
-  pack: { qty: 6, unit: each }
-  search_term: Duchy Organic Fairtrade Bananas
-  line_number: "088937"
+  pack: { qty: 7, unit: each }
+  search_term: Waitrose Small Fairtrade Bananas
+  line_number: "033668"
+  alternates: ["Duchy Organic Fairtrade Bananas (088937)"]
   staple: false
   confirmed: true
 
@@ -232,6 +253,9 @@ capers:
   display: Capers
   store: waitrose
   unit: g
+  pack: { qty: 180, unit: g }
+  search_term: Opies Organic Capers in Salt Water
+  line_number: "034475"
   staple: true
   confirmed: true
 
@@ -337,8 +361,9 @@ coconut-milk:
   store: waitrose
   unit: ml
   pack: { qty: 400, unit: ml }
-  search_term: Duchy Organic Coconut Milk
-  line_number: "495822"
+  search_term: Essential Coconut Milk
+  line_number: "446420"
+  alternates: ["Duchy Organic Coconut Milk (495822)"]
   staple: false
   confirmed: true
 
@@ -363,6 +388,16 @@ courgette:
   staple: false
   confirmed: true
 
+cucumber:
+  display: Cucumber
+  store: waitrose
+  unit: each
+  pack: { qty: 1, unit: each }
+  search_term: Duchy Organic Salad Cucumber
+  line_number: "564598"
+  staple: false
+  confirmed: true
+
 curry-powder:
   display: Curry powder
   store: waitrose
@@ -371,6 +406,26 @@ curry-powder:
   search_term: Cooks' Ingredients Medium Curry Powder
   line_number: "515328"
   staple: true
+  confirmed: true
+
+dark-chocolate:
+  display: Dark chocolate
+  store: waitrose
+  unit: g
+  pack: { qty: 90, unit: g }
+  search_term: Green & Black's Organic 85% Dark Chocolate Bar
+  line_number: "065367"
+  staple: false
+  confirmed: true
+
+dark-chocolate-chips:
+  display: Dark chocolate chips
+  store: waitrose
+  unit: g
+  pack: { qty: 100, unit: g }
+  search_term: Cooks' Ingredients Dark Chocolate Chips
+  line_number: "792748"
+  staple: false
   confirmed: true
 
 dijon-mustard:
@@ -404,6 +459,16 @@ dried-parsley:
   store: waitrose
   unit: pinch
   staple: true
+  confirmed: true
+
+edamame:
+  display: Edamame
+  store: waitrose
+  unit: g
+  pack: { qty: 500, unit: g }
+  search_term: Waitrose Frozen Edamame Beans
+  line_number: "699899"
+  staple: false
   confirmed: true
 
 eggs:
@@ -520,6 +585,16 @@ harissa-paste:
   staple: true
   confirmed: true
 
+hoisin-sauce:
+  display: Hoisin sauce
+  store: waitrose
+  unit: g
+  pack: { qty: 250, unit: ml }
+  search_term: Blue Dragon Hoisin Sauce
+  line_number: "380919"
+  staple: true
+  confirmed: true
+
 honey:
   display: Honey
   store: soutars
@@ -549,10 +624,10 @@ lemon:
   display: Lemons
   store: waitrose
   unit: each
-  pack: { qty: 3, unit: each }
-  search_term: Duchy Organic Unwaxed Lemons
-  line_number: "088911"
-  alternates: ["Cooks' Ingredients Unwaxed Lemons (088460)"]
+  pack: { qty: 1, unit: each }
+  search_term: Waitrose Loose Lemons
+  line_number: "088411"
+  alternates: ["Duchy Organic Unwaxed Lemons (088911)", "Cooks' Ingredients Unwaxed Lemons (088460)"]
   staple: false
   confirmed: true
 
@@ -602,9 +677,10 @@ lime:
   display: Limes
   store: waitrose
   unit: each
-  pack: { qty: 4, unit: each }
-  search_term: Cooks' Ingredients Unwaxed Limes
-  line_number: "011269"
+  pack: { qty: 1, unit: each }
+  search_term: Waitrose Loose Limes
+  line_number: "088461"
+  alternates: ["Cooks' Ingredients Unwaxed Limes (011269)"]
   staple: false
   confirmed: true
 
@@ -799,9 +875,10 @@ red-onion:
   display: Red onions
   store: waitrose
   unit: each
-  pack: { qty: 500, unit: g }
-  search_term: Duchy Organic Red Onions
-  line_number: "085112"
+  pack: { qty: 3, unit: each }
+  search_term: Waitrose Red Onions
+  line_number: "496597"
+  alternates: ["Duchy Organic Red Onions (085112)"]
   staple: false
   confirmed: true
 
@@ -810,8 +887,9 @@ red-pesto:
   store: waitrose
   unit: g
   pack: { qty: 190, unit: g }
-  search_term: No.1 Calabrian Chilli, Red Pepper & Almond Pesto
-  line_number: "542712"
+  search_term: Waitrose Red Tomato Pesto
+  line_number: "017391"
+  alternates: ["No.1 Calabrian Chilli, Red Pepper & Almond Pesto (542712)"]
   staple: false
   confirmed: true
 
@@ -921,6 +999,16 @@ spring-onions:
   staple: false
   confirmed: true
 
+sriracha:
+  display: Sriracha
+  store: waitrose
+  unit: g
+  pack: { qty: 430, unit: ml }
+  search_term: Uni-Eagle Sriracha Hot Chilli Sauce
+  line_number: "621464"
+  staple: true
+  confirmed: true
+
 strawberries:
   display: Strawberries
   store: waitrose
@@ -969,6 +1057,16 @@ tartare-sauce:
   search_term: Essential Tartare Sauce
   line_number: "034638"
   alternates: ["Waitrose Tartare Sauce (933476)"]
+  staple: false
+  confirmed: true
+
+tenderstem-broccoli:
+  display: Tenderstem broccoli
+  store: waitrose
+  unit: g
+  pack: { qty: 200, unit: g }
+  search_term: Duchy Organic Tenderstem Broccoli
+  line_number: "521800"
   staple: false
   confirmed: true
 
@@ -1148,8 +1246,8 @@ September harvest.
 
 **Not yet audited.** Recipes added since 16 September use ingredients this
 section does not list yet — among them `basmati-rice`, `cauliflower-rice`,
-`cornflour`, `egg-whites`, `red-pepper`, `self-raising-flour`,
-`sesame-seeds` and `tenderstem-broccoli`. They are Unpinned all the same; the
+`cornflour`, `egg-whites`, `red-pepper`, `self-raising-flour` and
+`sesame-seeds`. They are Unpinned all the same; the
 count above is of the ones this section has reasoned about.
 
 ## Bought, matched nothing
@@ -1173,12 +1271,20 @@ The 28 September order added nine more: three household lines and three
 personal-care lines (counted, not named, as above), and kiwi · baby cucumber ·
 Charlie Bigham's lasagne. One squash too.
 
+The 09 November order added four more: two household lines (counted, not
+named, as above), and large vine tomatoes · frozen sweetcorn. The sweetcorn is
+not the `sweetcorn` Pin, which every Recipe measures as a drained can. The
+Sriracha it carried was **not** taken for `hot-sauce`: that Recipe names
+Frank's RedHot, and Sriracha has its own slug.
+
 Groceries outside the recipe corpus (15): grapes · kiwi · carrots · peppers ·
 cucumber · radish · watercress · pumpkin seeds · plum tomatoes · blackeye
 beans · beef bone broth · chimichurri marinade · tomato salsa dip · Cooks'
 Ingredients Basil · **Tenderstem broccoli**.
 
-Chocolate (1): Cooks' Ingredients Belgian Dark Chocolate. The only chocolates
+Chocolate (1): Cooks' Ingredients Belgian Dark Chocolate. (`dark-chocolate`
+was Pinned on 09 November to the Green & Black's 85% bar the cookies were
+bought with — a different product, so this line stays unmatched.) The only chocolates
 in the order history are dark, milk (now Pinned) and white — this one may well
 be what the strawberry pots actually use, but swapping a stated ingredient for
 a different one on a hunch is exactly what `confirmed` exists to prevent.
@@ -1188,5 +1294,4 @@ was minted by the 17 September harvest.
 
 **Tenderstem broccoli** was worth a second look — 200g, bought twice, and no
 Recipe used it. The sweet & sour chicken now does (27 September 2026), so it
-is a Pin candidate the next time an order carries it; its line number went
-with the orders that were not kept.
+was Pinned by the 09 November harvest (521800).
