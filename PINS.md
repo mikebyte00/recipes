@@ -42,7 +42,13 @@ switched seven Pins to the cheaper product bought, under the household's move
 away from organic where it makes little difference: `avocado`, `banana`,
 `coconut-milk`, `lemon`, `lime`, `red-onion` and `red-pesto`, each keeping the
 previous product as an alternate. The loose lemons and limes may be waxed;
-three Recipes zest them.
+three Recipes zest them. The 12 October harvest, read the same day from its
+live order page, minted three — `hemp-seeds`, `lettuce`, `mozzarella` — taking
+the catalogue to 120, added a line number to the `cheddar` staple, and switched
+`gochujang` from Hot Honey Gochujang to plain Gochujang Paste. Read after the
+09 November order, it changed no Pin that order had set: its Duchy Organic
+avocados stay an alternate. `lettuce` is measured in grams but sold as two
+Little Gems, so the list flags its pack and buys one.
 
 ## Reading a Pin
 
@@ -273,6 +279,9 @@ cheddar:
   display: Cheddar cheese
   store: waitrose
   unit: g
+  pack: { qty: 200, unit: g }
+  search_term: No. 1 Cornish Quartz Vintage Reserve Mature Cheddar Cheese Strength 7
+  line_number: "657141"
   staple: true
   confirmed: true
 
@@ -529,12 +538,13 @@ garlic-powder:
   confirmed: true
 
 gochujang:
-  display: Gochujang (hot honey)
+  display: Gochujang
   store: waitrose
   unit: g
   pack: { qty: 105, unit: g }
-  search_term: Cooks' Ingredients Hot Honey Gochujang
-  line_number: "930008"
+  search_term: Cooks' Ingredients Gochujang Paste
+  line_number: "888413"
+  alternates: ["Cooks' Ingredients Hot Honey Gochujang (930008)"]
   staple: true
   confirmed: true
 
@@ -583,6 +593,16 @@ harissa-paste:
   store: waitrose
   unit: g
   staple: true
+  confirmed: true
+
+hemp-seeds:
+  display: Hemp seeds
+  store: waitrose
+  unit: g
+  pack: { qty: 200, unit: g }
+  search_term: Linwoods Shelled Hemp
+  line_number: "574823"
+  staple: false
   confirmed: true
 
 hoisin-sauce:
@@ -662,6 +682,16 @@ lentils:
   staple: false
   confirmed: true
 
+lettuce:
+  display: Lettuce
+  store: waitrose
+  unit: g
+  pack: { qty: 2, unit: each }
+  search_term: Essential Little Gem Lettuce
+  line_number: "086430"
+  staple: false
+  confirmed: true
+
 light-cream-cheese:
   display: Light cream cheese
   store: waitrose
@@ -691,6 +721,16 @@ milk-chocolate:
   pack: { qty: 90, unit: g }
   search_term: Green & Black's Organic 37% Milk Chocolate Bar
   line_number: "045527"
+  staple: false
+  confirmed: true
+
+mozzarella:
+  display: Mozzarella
+  store: waitrose
+  unit: g
+  pack: { qty: 220, unit: g }
+  search_term: Galbani Italian Mozzarella Cheese
+  line_number: "041220"
   staple: false
   confirmed: true
 
@@ -1270,6 +1310,11 @@ personal-care line (counted, not named, as above), and two squashes.
 The 28 September order added nine more: three household lines and three
 personal-care lines (counted, not named, as above), and kiwi · baby cucumber ·
 Charlie Bigham's lasagne. One squash too.
+
+The 12 October order added sixteen more: ten household, pet and
+personal-care lines (counted, not named, as above), and ciabatta rolls · BBQ
+sauce · four squashes. The ciabatta rolls are not `burger-buns`, which the
+Recipe wants brioche or wholemeal.
 
 The 09 November order added four more: two household lines (counted, not
 named, as above), and large vine tomatoes · frozen sweetcorn. The sweetcorn is
