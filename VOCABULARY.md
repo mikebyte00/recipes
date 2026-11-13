@@ -15,7 +15,7 @@ which holds the reasoning. This file is the operative list.
 | `rating` | one, or absent | `1` `2` `3` `4` `5` |
 | `retired` | `true`, or absent | `true` |
 | `makes` | a positive integer, required on a `snack`, absent otherwise | servings per batch |
-| `appliances` | list | `skillet` `air-fryer` `ninja-sizzle` `rice-cooker` `pot` `toaster` `poacher` |
+| `appliances` | list | `skillet` `air-fryer` `ninja-sizzle` `rice-cooker` `pot` `toaster` `poacher` `oven` |
 | `tags` | list | `fakeaway` `bulk-cook` `eat-cold` |
 
 ## Rules

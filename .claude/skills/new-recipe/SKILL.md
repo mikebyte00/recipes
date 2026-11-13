@@ -101,7 +101,7 @@ Bands.
    V = {'slot': ['breakfast','lunch','dinner','pudding','snack'],
         'protein': ['sausage','egg','tofu','quorn','chicken','white-fish','oily-fish','beef','dairy','protein-powder'],
         'effort': ['low','medium','high'],
-        'appliances': ['skillet','air-fryer','ninja-sizzle','rice-cooker','pot','toaster','poacher'],
+        'appliances': ['skillet','air-fryer','ninja-sizzle','rice-cooker','pot','toaster','poacher','oven'],
         'tags': ['fakeaway','bulk-cook','eat-cold']}
    bad = [f"{f}: {front.get(f)!r} is not in VOCABULARY.md" for f in ('slot','effort') if front.get(f) not in V[f]]
    bad += [f"{f}: {v!r} is not in VOCABULARY.md" for f in ('appliances','tags') for v in front.get(f) or [] if v not in V[f]]
