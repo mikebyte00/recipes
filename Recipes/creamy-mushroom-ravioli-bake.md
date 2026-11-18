@@ -9,7 +9,7 @@ macros: { protein_g: 21, kcal: 515 }
 ingredients:
   - { ingredient: mushroom-ravioli, qty: 250, unit: g, note: "one pack, mushroom & ricotta" }
   - { ingredient: three-mushroom-sauce, qty: 180, unit: g, note: one tub }
-  - { ingredient: whole-milk, qty: 2, unit: tbsp }
+  - { ingredient: oat-milk, qty: 30, unit: ml, note: 2 tbsp; in place of the card's whole milk }
   - { ingredient: chestnut-mushrooms, qty: 125, unit: g, prep: roughly chopped }
   - { ingredient: thyme, qty: 3, unit: sprigs }
   - { ingredient: mozzarella, qty: 125, unit: g, prep: "drained and torn", note: one standard ball }
