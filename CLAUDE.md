@@ -123,7 +123,7 @@ raising rather than a spec to follow.
 - **Targets live in [GOALS.md](GOALS.md)**: the daily nutrient goals and the
   per-Slot Macro Bands. Anything generating a Recipe or a Plan reads it.
 - **Shopping lists split by Store.** Waitrose is the bulk; eggs, chicken, steak,
-  pork sausages and honey come from Soutars; fish from Dorset Meats, which comes **skin on** — a fish Recipe cooks it skin-on or says to skin it. Only Waitrose is online.
+  pork sausages and honey come from Soutars; fish from Dorset Meats, which comes **skin on** — a fish Recipe cooks it skin-on and never asks for it to be skinned; flaked fish comes ready-flaked, such as hot-smoked salmon. Only Waitrose is online.
 
 ## Waitrose
 
