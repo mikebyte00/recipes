@@ -122,8 +122,8 @@ raising rather than a spec to follow.
   estimates and the tilde is the honest signal.
 - **Targets live in [GOALS.md](GOALS.md)**: the daily nutrient goals and the
   per-Slot Macro Bands. Anything generating a Recipe or a Plan reads it.
-- **Shopping lists split by Store.** Waitrose is the bulk; eggs, chicken, steak
-  and honey come from Soutars; fish from Dorset Meats. Only Waitrose is online.
+- **Shopping lists split by Store.** Waitrose is the bulk; eggs, chicken, steak,
+  pork sausages and honey come from Soutars; fish from Dorset Meats. Only Waitrose is online.
 
 ## Waitrose
 

@@ -5,9 +5,9 @@ protein: sausage
 effort: high
 tags: []
 appliances: [skillet, pot, oven]
-macros: { protein_g: 26, kcal: 600 }
+macros: { protein_g: 34, kcal: 730 }
 ingredients:
-  - { ingredient: vegetarian-sausage, qty: 2.66, unit: each, note: "Richmond meat-free in place of the card's pork; one dinner's share of the batch's 8" }
+  - { ingredient: pork-sausages, qty: 2.666667, unit: each, note: "free range, from Soutars; one dinner's share of the batch's 8" }
   - { ingredient: onion, qty: 0.33, unit: each, prep: finely chopped }
   - { ingredient: olive-oil, qty: 2, unit: g, note: "½ tsp, light" }
   - { ingredient: fennel-seeds, qty: 1, unit: tsp, prep: crushed }

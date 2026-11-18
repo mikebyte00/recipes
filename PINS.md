@@ -860,6 +860,13 @@ pineapple:
   staple: false
   confirmed: true
 
+pork-sausages:
+  display: Pork sausages
+  store: soutars
+  unit: each
+  staple: false
+  confirmed: true
+
 potatoes:
   display: Potatoes
   store: waitrose
@@ -1248,6 +1255,9 @@ next harvest turns it into a Pin.
 it would never have surfaced through a harvest. Recorded here rather than in
 the counts below, since it broke the assumption the rest of this section rests
 on.
+
+`pork-sausages` was pinned directly on 18 November 2026 for the same reason:
+Soutars sells them loose, so the household buys the exact number a Plan needs.
 
 The 08 September harvest resolved six of these: `banana`, `blue-cheese`,
 `chestnut-mushrooms`, `green-beans`, `milk-chocolate` all matched a harvested
