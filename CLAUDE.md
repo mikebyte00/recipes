@@ -103,6 +103,8 @@ cooking rice from dry where the recipe calls for pre-cooked rice. **Any other
 change** — swapping an ingredient, changing the cooking method or appliance,
 cutting a quantity, trimming a long list — is listed for the user first and made
 only once they approve it. The same holds for any later edit to such a Recipe.
+**The kitchen has no microwave**, so a microwave step becomes the nearest thing
+the kitchen does have — a small pan, the pot, the air fryer — and is said aloud.
 Ruled by the user on 18 November 2026, after three card dinners were rewritten
 beyond recognition.
 

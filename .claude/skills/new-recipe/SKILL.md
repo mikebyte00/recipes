@@ -28,7 +28,9 @@ pool's shape is what this rule exists to stop. Transcribe it as written.
   numbered format.
 - **Without asking**, and saying so in the report: scale it to serve 2 (or keep
   the card's batch and tag it `bulk-cook`), and cook rice from dry where it calls
-  for pre-cooked rice — the same rice, cooked by us.
+  for pre-cooked rice — the same rice, cooked by us. **There is no microwave**:
+  a microwave step moves to the nearest appliance the kitchen has (a small pan,
+  the pot, the air fryer), doing the same job.
 - **Ask first** for anything else: an ingredient swapped, added or dropped, a
   quantity cut, a method or appliance changed, a long list trimmed. List each
   proposed change and why, and write only what the user approves.
