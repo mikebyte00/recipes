@@ -17,9 +17,10 @@ ingredients:
   - { ingredient: white-wine-vinegar, qty: 0.5, unit: tbsp }
   - { ingredient: olive-oil, qty: 20, unit: g, note: "1½ tbsp: 1 with the potatoes, ½ for the paprika oil" }
   - { ingredient: salt, note: ¼ tsp }
+  - { ingredient: dried-oregano, note: "optional, or dried thyme: the card's Level up, which uses fresh sprigs" }
 ---
 
 1. This cooks the card's whole batch — 4 portions, two dinners for two — in a large roasting tin, about 38 × 28cm, so the potatoes sit in one layer. The list above is one dinner's share; the batch uses 8 sausages, 800g potatoes, 1 onion, ½ tsp salt, 3 tbsp olive oil, 4 tsp smoked paprika, 1 tsp honey, 1 tbsp white wine vinegar, 2 garlic cloves and the 200g pack of greens.
 2. Heat the oven to 220°C (200°C fan). Line the tin with baking parchment. Add the potatoes, onion, salt and 2 tbsp of the oil, toss together and roast for 15 minutes. Meanwhile, in a small bowl mix the remaining 1 tbsp oil, the paprika, honey, vinegar and garlic.
-3. After 15 minutes, stir the potatoes and nestle in the sausages. Roast for another 15 minutes. Meanwhile, roughly slice the greens.
+3. After 15 minutes, stir the potatoes and nestle in the sausages. If you like, scatter about 1 tsp dried oregano or thyme over the sausages. Roast for another 15 minutes. Meanwhile, roughly slice the greens.
 4. Push the sausages to one side, stir the greens through the potatoes, then turn the sausages and put them back on top. Pour the paprika oil over everything, season and roast for another 15–18 minutes, until the sausages are golden with no pink meat remaining and the potatoes are tender.
