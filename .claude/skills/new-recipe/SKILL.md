@@ -16,6 +16,29 @@ writing a file.
 Read `VOCABULARY.md` for the closed value lists and `GOALS.md` for the Macro
 Bands.
 
+## A recipe the user brings
+
+A Waitrose recipe card, a magazine page, a photo or a pasted recipe is **not a
+brief to adapt** — the household added it for variety, and adapting it to the
+pool's shape is what this rule exists to stop. Transcribe it as written.
+
+- **Keep** its ingredients as named (breaded chicken stays breaded chicken),
+  its appliances (an oven traybake stays in the oven — add the appliance to
+  `VOCABULARY.md` if it is new) and its method, steps reworded only to fit the
+  numbered format.
+- **Without asking**, and saying so in the report: scale it to serve 2 (or keep
+  the card's batch and tag it `bulk-cook`), and cook rice from dry where it calls
+  for pre-cooked rice — the same rice, cooked by us.
+- **Ask first** for anything else: an ingredient swapped, added or dropped, a
+  quantity cut, a method or appliance changed, a long list trimmed. List each
+  proposed change and why, and write only what the user approves.
+- [The bar](#the-bar) and step 2's neighbour counts **do not apply**. Step 3's
+  Pin resolution and step 5's check still do — they decide units, not food.
+
+The same holds for **editing** a Recipe that came from the user: no change
+lands without their approval. A Recipe's commit history says where it came
+from.
+
 ## Steps
 
 1. **Fix the brief.** A Recipe is a `slot`, a `protein` and a band. Say all

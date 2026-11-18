@@ -93,6 +93,19 @@ impressive:
 Read a handful of the existing meals before generating one. Elaborate cheffy
 recipes fail this project even when they hit the macros.
 
+**The bar is for Recipes Claude generates, not ones the user brings.** A recipe
+the user supplies — a Waitrose recipe card, the magazine, a photo, a pasted page
+— was chosen for variety and to widen the household's cooking. Transcribe it
+**as written**: its ingredients (breaded chicken stays breaded chicken), its
+appliances (an oven traybake stays in the oven) and its method. Two adjustments
+need no approval, and are said aloud when made: scaling it to serve 2, and
+cooking rice from dry where the recipe calls for pre-cooked rice. **Any other
+change** — swapping an ingredient, changing the cooking method or appliance,
+cutting a quantity, trimming a long list — is listed for the user first and made
+only once they approve it. The same holds for any later edit to such a Recipe.
+Ruled by the user on 18 November 2026, after three card dinners were rewritten
+beyond recognition.
+
 ## Standing constraints
 
 These are settled. Treat a request that contradicts one as a question worth
