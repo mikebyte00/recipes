@@ -8,7 +8,7 @@ appliances: [oven]
 macros: { protein_g: 28, kcal: 655 }
 ingredients:
   - { ingredient: pork-sausages, qty: 4, unit: each, note: "free range, from Soutars; one dinner's share of the batch's 8" }
-  - { ingredient: maris-piper-potatoes, qty: 400, unit: g, prep: cut into roughly 4cm chunks }
+  - { ingredient: potatoes, qty: 400, unit: g, prep: cut into roughly 4cm chunks, note: "the card asks for Maris Piper; our usual potatoes are fine" }
   - { ingredient: onion, qty: 0.5, unit: each, prep: sliced }
   - { ingredient: baby-leaf-greens, qty: 100, unit: g, prep: thick stems discarded, note: "one dinner's share of the batch's 200g pack" }
   - { ingredient: garlic, qty: 1, unit: clove, prep: crushed }
