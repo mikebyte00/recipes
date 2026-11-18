@@ -4,23 +4,23 @@ slot: dinner
 protein: dairy
 effort: high
 tags: []
-appliances: [skillet, air-fryer]
-macros: { protein_g: 44, kcal: 790 }
+appliances: [pot, skillet, oven]
+macros: { protein_g: 21, kcal: 515 }
 ingredients:
-  - { ingredient: mushroom-ravioli, qty: 250, unit: g, note: "fresh, mushroom & ricotta" }
-  - { ingredient: chestnut-mushrooms, qty: 250, unit: g, prep: roughly chopped }
-  - { ingredient: cottage-cheese, qty: 200, unit: g }
-  - { ingredient: light-cream-cheese, qty: 60, unit: g }
-  - { ingredient: mozzarella, qty: 125, unit: g, prep: "drained and torn" }
-  - { ingredient: spinach, qty: 100, unit: g }
-  - { ingredient: parmesan, qty: 20, unit: g, prep: finely grated }
+  - { ingredient: mushroom-ravioli, qty: 250, unit: g, note: "one pack, mushroom & ricotta" }
+  - { ingredient: three-mushroom-sauce, qty: 180, unit: g, note: one tub }
+  - { ingredient: whole-milk, qty: 2, unit: tbsp }
+  - { ingredient: chestnut-mushrooms, qty: 125, unit: g, prep: roughly chopped }
+  - { ingredient: thyme, qty: 3, unit: sprigs }
+  - { ingredient: mozzarella, qty: 125, unit: g, prep: "drained and torn", note: one standard ball }
   - { ingredient: panko, qty: 15, unit: g }
-  - { ingredient: thyme, qty: 4, unit: sprigs }
-  - { ingredient: olive-oil, qty: 10, unit: g }
-  - { ingredient: black-pepper, qty: 1, unit: pinch }
+  - { ingredient: olive-oil, qty: 20, unit: g, note: "1½ tbsp: 1 to fry, ½ for the crumbs" }
+  - { ingredient: salt, note: for the water and the crumbs }
+  - { ingredient: black-pepper, note: lots, cracked }
+  - { ingredient: rocket, qty: 60, unit: g, note: "a punchy green salad to serve, optional" }
 ---
 
-1. Heat the olive oil in the skillet and fry the mushrooms with the thyme over a high heat for 5–7 minutes until golden. Remove the thyme sprigs.
-2. Turn the heat down, stir in the cottage cheese, cream cheese, black pepper and about 100ml water to make a sauce. Add the ravioli and spinach and simmer for 3–4 minutes until the pasta is tender, loosening with a splash more water if needed.
-3. Tip everything into a dish that fits the air fryer. Dot with the torn mozzarella and scatter over the panko and parmesan.
-4. Air-fry at 200°C for 5–6 minutes until golden and bubbling.
+1. Bring a pot of salted water to the boil. Meanwhile, heat 1 tbsp of the oil in the skillet. Add the mushrooms with 1 thyme sprig and fry over a high heat for 5–7 minutes until golden; season. Reduce the heat to low, add the mushroom sauce and milk, stir to combine, then bring to a simmer. Season and remove the thyme sprig.
+2. Cook the ravioli in the boiling water as per the pack instructions. Drain, stir into the sauce, then pour into a roasting tin. Dot with the torn mozzarella.
+3. Heat the grill to its highest setting. Pick the leaves from the remaining 2 thyme sprigs and mix in a bowl with the panko, the remaining ½ tbsp oil, a pinch of salt and lots of cracked black pepper. Scatter over the pasta and grill for 4–5 minutes until golden and bubbling.
+4. Serve with the rocket salad, if you like.
